@@ -1,0 +1,13 @@
+for(each simulation in 1000 simulations) {
+    
+    for(each process in 20 processes) {
+        assign Arrival Time for process equal to twice the process index
+        assign Service Time to be a random integer [1, 10]
+    }
+    
+    compute Turnaround (Finish Time - Arrival Time) and Relative Turnaround (Turnaround / Service Time) for each of the following:
+    * FCFS
+    * RR
+    * SPN
+    * SRT 
+}
