@@ -53,8 +53,17 @@ void fcfs()
     int currentTime = 0;
 
     // Executing each process in order
-    for(unsigned int p = 0; p  < NUM_PROCESSES; ++p)
+    for(unsigned int p = 0; p < NUM_PROCESSES; ++p)
     {
+        // Ensures the process has arrived by inserting no-op cycles
+        // Arrival time is twice the process index, p
+        int noops = (2*p) - currentTime; 
+        for(int n = 0; n < noops; ++n)
+        {
+            cycles[currentTime] = -1;
+            ++currentTime;
+        }
+
         // Executes a single process to completion
         for(unsigned int i = processes[p]; i > 0; --i)
         {
@@ -63,6 +72,9 @@ void fcfs()
         }
     }
 }
+
+// For Round-Robin the currently executing process (which was interrupted) gets placed in the BACK of the queue
+// Consider using a queue to hold the processes as they arrive, then iterate through time to perform scheduling
 
 void showTimeline() 
 {
