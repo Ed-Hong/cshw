@@ -3,14 +3,19 @@
 #include <stdlib.h>
 
 
+// * Constants
+static const unsigned int NUM_SIMULATIONS = 10;
+static const unsigned int NUM_PROCESSES = 20;
+static const unsigned int NUM_CYCLES = 200;
+
 // * Variable Declarations
-int simulations[1]; // not sure if this is actually necessary but TODO: REMEMBER TO CHANGE THIS BACK TO 1000
-int processes[20];
+int simulations[NUM_SIMULATIONS]; // not sure if this is actually necessary but TODO: REMEMBER TO CHANGE THIS BACK TO 1000
+int processes[NUM_PROCESSES];
 
 // Represents time in clock cycles
 // Array index represents the cycle at which a process finished
 // Value in the array represents process id, [1-20], with -1 representing no-op
-int cycles[200];
+int cycles[NUM_CYCLES];
 
 // * Function Declarations
 void init();
@@ -21,18 +26,15 @@ int main()
 {
     init();
 
-    for (int& sim : simulations)
+    for (unsigned int i = 0; i < NUM_SIMULATIONS; ++i)
     {
-        auto index = &sim - &simulations[0];
-        std::cout << "> Simulation " << index << " running..." << std::endl;
+        std::cout << "> Simulation " << i << " running..." << std::endl;
 
-        for(int& proc : processes)
+        for(unsigned int p = 0; p < NUM_PROCESSES; ++p)
         {
-            auto index = &proc - &processes[0];
-
             // Assigning a random Service Time between 1 and 10
-            processes[index] = rand() % 10 + 1;
-            std::cout << "  Process " << index << " ST = " << processes[index] << std::endl;
+            processes[p] = rand() % 10 + 1;
+            std::cout << "  Process " << p << " ST = " << processes[p] << std::endl;
         }
 
         // FCFS Simulation
@@ -51,14 +53,12 @@ void fcfs()
     int currentTime = 0;
 
     // Executing each process in order
-    for(int& proc : processes)
+    for(unsigned int p = 0; p  < NUM_PROCESSES; ++p)
     {
-        auto procId = &proc - &processes[0];
-
         // Executes a single process to completion
-        for(unsigned int i = processes[procId]; i > 0; --i)
+        for(unsigned int i = processes[p]; i > 0; --i)
         {
-            cycles[currentTime] = procId;
+            cycles[currentTime] = p;
             ++currentTime;
         }
     }
@@ -66,10 +66,9 @@ void fcfs()
 
 void showTimeline() 
 {
-    for(int& cycle : cycles)
+    for(unsigned int c = 0; c < NUM_CYCLES; ++c)
     {
-        auto currentCycle = &cycle - &cycles[0];
-        std::cout << cycles[currentCycle] << " ";
+        std::cout << cycles[c] << " ";
     }
     std::cout << std::endl;
 }
