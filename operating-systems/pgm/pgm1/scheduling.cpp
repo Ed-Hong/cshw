@@ -1,6 +1,7 @@
 // TODO: Finish Commenting
 #include <iostream>
 #include <stdlib.h>
+#include "Process.h"
 
 
 // * Constants
@@ -94,4 +95,7 @@ void init()
     
     // Seed our RNG
     srand(time(NULL));
+
+    // Init currentTime for Processes
+    Process::currentTime = 0;
 }
