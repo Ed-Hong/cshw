@@ -1,27 +1,62 @@
 // TODO: Finish Commenting
 #include <iostream>
+#include <queue>
+#include <vector>
 #include <stdlib.h>
 #include "Process.h"
 
-
 // * Constants
-static const unsigned int NUM_SIMULATIONS = 10;
+static const unsigned int NUM_SIMULATIONS = 1;
 static const unsigned int NUM_PROCESSES = 20;
 static const unsigned int NUM_CYCLES = 200;
 
 // * Variable Declarations
-int simulations[NUM_SIMULATIONS]; // not sure if this is actually necessary but TODO: REMEMBER TO CHANGE THIS BACK TO 1000
+//int simulations[NUM_SIMULATIONS]; // not sure if this is actually necessary but TODO: REMEMBER TO CHANGE THIS BACK TO 1000
 int processes[NUM_PROCESSES];
+
+
+std::queue<Process> processQueue;
+
 
 // Represents time in clock cycles
 // Array index represents the cycle at which a process finished
 // Value in the array represents process id, [1-20], with -1 representing no-op
 int cycles[NUM_CYCLES];
 
+// SPN Comparator
+struct CompSPN{
+    bool operator()(const Process& a, const Process& b){
+        return a.serviceTime > b.serviceTime;
+    }
+};
+
+// SPN Comparator
+struct CompSRT{
+    bool operator()(const Process& a, const Process& b){
+        return a.remainingTime > b.remainingTime;
+    }
+};
+
 // * Function Declarations
 void init();
 void fcfs();
 void showTimeline();
+
+template<typename T> void printQueue(T& q) {
+    while(!q.empty()) {
+        std::cout << q.top().pid << " ";
+        q.pop();
+    }
+    std::cout << '\n';
+}
+
+void printProcessQueue() {
+    while(!processQueue.empty()) {
+        std::cout << processQueue.front().pid << " ";
+        processQueue.pop();
+    }
+    std::cout << '\n';
+}
 
 int main()
 {
@@ -31,16 +66,37 @@ int main()
     {
         std::cout << "> Simulation " << i << " running..." << std::endl;
 
-        for(unsigned int p = 0; p < NUM_PROCESSES; ++p)
+        std::priority_queue<Process, std::vector<Process>, CompSPN> SPNQueue;
+        std::priority_queue<Process, std::vector<Process>, CompSRT> SRTQueue;
+
+
+        for(unsigned int pid = 0; pid < NUM_PROCESSES; ++pid)
         {
             // Assigning a random Service Time between 1 and 10
-            processes[p] = rand() % 10 + 1;
-            std::cout << "  Process " << p << " ST = " << processes[p] << std::endl;
+            int serviceTime = rand() % 10 + 1;
+            Process p = Process(pid, serviceTime);
+            
+            processQueue.push(p);
+            SPNQueue.push(p);
+            SRTQueue.push(p);
+            
+            std::cout << "  Process " << pid << " ST = " << serviceTime << std::endl;
         }
 
         // FCFS Simulation
-        fcfs();
-        showTimeline();
+        //fcfs();
+        //showTimeline();
+
+        std::cout << "PROCESS QUEUE" << std::endl;
+        printProcessQueue();
+        
+        std::cout << "SPN QUEUE" << std::endl;
+        printQueue(SPNQueue);
+
+        std::cout << "SRT QUEUE" << std::endl;
+        printQueue(SRTQueue);
+
+
     }
 
 	return 0;
@@ -95,7 +151,4 @@ void init()
     
     // Seed our RNG
     srand(time(NULL));
-
-    // Init currentTime for Processes
-    Process::currentTime = 0;
 }
