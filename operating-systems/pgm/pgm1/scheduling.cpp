@@ -1,6 +1,7 @@
 // TODO: Finish Commenting
 #include <iostream>
 #include <queue>
+#include <deque>
 #include <vector>
 #include <stdlib.h>
 #include "Process.h"
@@ -23,9 +24,14 @@ struct comp_srt {
     }
 };
 
-// Queue Declarations for the four scheduling algorithms
+// Declaring a Queue for the FCFS Algorithm
 std::queue<Process> q_fcfs;
-std::queue<Process> q_rr;
+
+// Declaring a Deque for the RR Algorithm, so that a process can be placed back into the front of the queue
+// in the event that the next process hasn't arrived, and the current process can continue executing
+std::deque<Process> q_rr;
+
+// Priority Queues for the SPN and SRT algorithms using the above comparators
 std::priority_queue<Process, std::vector<Process>, comp_spn> pq_spn;
 std::priority_queue<Process, std::vector<Process>, comp_srt> pq_srt;
 
@@ -81,35 +87,41 @@ void rr() {
 
     // Executing each process in order of RR
     while(!q_rr.empty()) {
+        std::cout << "TIME:" << Process::currentTime << " " << std::endl;
+
         Process currentProcess = q_rr.front();
 
         // Check that the process has arrived
         if(currentProcess.arrivalTime <= Process::currentTime) {
             // Executing a single process for one cycle (q = 1)
-            ++Process::currentTime;
             currentProcess.process(1);
-            q_rr.pop();
+            q_rr.pop_front();
+
+            Process nextProcess = q_rr.front();
+
+            std::cout << "PID:" << currentProcess.pid << " " << std::endl;
+            std::cout << "remaining:" << currentProcess.remainingTime << " " << std::endl;
+            std::cout << std::endl;
 
             // Place process back into the queue if it hasn't finished executing
             if(currentProcess.remainingTime > 0) {
-                q_rr.push(currentProcess);
+                // If the next process after current process hasn't arrived yet, then continue executing current process
+                if(nextProcess.arrivalTime > Process::currentTime) {
+                    q_rr.push_front(currentProcess);
+                } else {
+                    q_rr.push_back(currentProcess);
+                }
+            } else {
+                std::cout << "FINISHED PID:" << currentProcess.pid << " " << std::endl;
+                std::cout << "FT:" << currentProcess.finishTime << " " << std::endl;
+                std::cout << "T:" << currentProcess.turnaround << " " << std::endl;
+                std::cout << "RT:" << currentProcess.relativeTurnaround << " " << std::endl;
+                std::cout << std::endl;
             }
-
-        } else {
-            ++Process::currentTime;
         }
-
-        std::cout << "PID:" << currentProcess.pid << " " << std::endl;
-        std::cout << "ST:" << currentProcess.serviceTime << " " << std::endl;
-        std::cout << "FT:" << currentProcess.finishTime << " " << std::endl;
-        std::cout << "T:" << currentProcess.turnaround << " " << std::endl;
-        std::cout << "RT:" << currentProcess.relativeTurnaround << " " << std::endl;
-        std::cout << std::endl;
+        ++Process::currentTime;
     }
 }
-
-// For Round-Robin the currently executing process (which was interrupted) gets placed in the BACK of the queue
-// Consider using a queue to hold the processes as they arrive, then iterate through time to perform scheduling
 
 int main() {
     
@@ -132,16 +144,16 @@ int main() {
 
 
             q_fcfs.push(p);
-            q_rr.push(p);
+            q_rr.push_back(p);
             pq_spn.push(p);
             pq_srt.push(p);
             
             std::cout << "  Process " << pid << " ST = " << serviceTime << std::endl;
         }
 
-        fcfs();     // Simulate FCFS scheduling algorithm
+        //fcfs();     // Simulate FCFS scheduling algorithm
         
-        rr();     // Simulate RR scheduling algorithm
+        //rr();     // Simulate RR scheduling algorithm
 
         std::cout << "SPN QUEUE" << std::endl;
         printQueue(pq_spn);
