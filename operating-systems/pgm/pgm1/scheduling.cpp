@@ -38,14 +38,6 @@ std::deque<Process> q_rr;
 std::priority_queue<Process, std::vector<Process>, comp_spn> pq_spn;
 std::priority_queue<Process, std::vector<Process>, comp_srt> pq_srt;
 
-template<typename T> void printQueue(T& q) {
-    while(!q.empty()) {
-        std::cout << q.top().pid << " ";
-        q.pop();
-    }
-    std::cout << '\n';
-}
-
 // Prints Program Name and Author to the console
 // and seeds the Random Number Generator
 void init() {
@@ -56,28 +48,30 @@ void init() {
     srand(time(NULL));
 }
 
-void fcfs() {
-    std::cout << "- FCFS:" << std::endl;
+void showProcessDetails(const Process& proc) {
+    std::cout << "> PROCESS FINISHED" << std::endl;
+    std::cout << "PID:" << proc.pid << " " << std::endl;
+    std::cout << "AT:" << proc.arrivalTime << " " << std::endl;
+    std::cout << "ST:" << proc.serviceTime << " " << std::endl;
+    std::cout << "FT:" << proc.finishTime << " " << std::endl;
+    std::cout << "TT:" << proc.turnaround << " " << std::endl;
+    std::cout << "RTT:" << proc.relativeTurnaround << " " << std::endl;
+    std::cout << std::endl;
+}
 
-    // Executing each process in order of FCFS
+void fcfs() {
     while(!q_fcfs.empty()) {
         Process currentProcess = q_fcfs.front();
 
         // Check that the process has arrived
         if(currentProcess.arrivalTime <= Process::currentTime) {
+
             // Executing a single process to completion
             for(unsigned int t = currentProcess.remainingTime; t > 0; --t) {
                 ++Process::currentTime;
                 currentProcess.process(1);
             }
-            
-            std::cout << "PID:" << currentProcess.pid << " " << std::endl;
-            std::cout << "ST:" << currentProcess.serviceTime << " " << std::endl;
-            std::cout << "FT:" << currentProcess.finishTime << " " << std::endl;
-            std::cout << "T:" << currentProcess.turnaround << " " << std::endl;
-            std::cout << "RT:" << currentProcess.relativeTurnaround << " " << std::endl;
-            std::cout << std::endl;
-
+            showProcessDetails(currentProcess);
             q_fcfs.pop();
         } else {
             ++Process::currentTime;
@@ -86,25 +80,17 @@ void fcfs() {
 }
 
 void rr() {
-    std::cout << "- RR:" << std::endl;
-
-    // Executing each process in order of RR
     while(!q_rr.empty()) {
-        std::cout << "TIME:" << Process::currentTime << " " << std::endl;
-
         Process currentProcess = q_rr.front();
 
         // Check that the process has arrived
         if(currentProcess.arrivalTime <= Process::currentTime) {
+
             // Executing a single process for one cycle (q = 1)
             currentProcess.process(1);
             q_rr.pop_front();
 
             Process nextProcess = q_rr.front();
-
-            std::cout << "PID:" << currentProcess.pid << " " << std::endl;
-            std::cout << "remaining:" << currentProcess.remainingTime << " " << std::endl;
-            std::cout << std::endl;
 
             // Place process back into the queue if it hasn't finished executing
             if(currentProcess.remainingTime > 0) {
@@ -115,11 +101,7 @@ void rr() {
                     q_rr.push_back(currentProcess);
                 }
             } else {
-                std::cout << "FINISHED PID:" << currentProcess.pid << " " << std::endl;
-                std::cout << "FT:" << currentProcess.finishTime << " " << std::endl;
-                std::cout << "T:" << currentProcess.turnaround << " " << std::endl;
-                std::cout << "RT:" << currentProcess.relativeTurnaround << " " << std::endl;
-                std::cout << std::endl;
+                showProcessDetails(currentProcess);
             }
         }
         ++Process::currentTime;
@@ -127,13 +109,11 @@ void rr() {
 }
 
 void spn_srt() {
-    while(!q_procs.empty()) {
-        std::cout << "TIME:" << Process::currentTime << " " << std::endl;
-
+    while(!q_procs.empty() || !pq_spn.empty() || !pq_srt.empty()) {
         Process currentProcess = q_procs.front();
 
         // Check that the process has arrived
-        if(currentProcess.arrivalTime <= Process::currentTime) {
+        if(!q_procs.empty() && currentProcess.arrivalTime <= Process::currentTime) {
             q_procs.pop();
             pq_spn.push(currentProcess);
             pq_srt.push(currentProcess);
@@ -147,17 +127,9 @@ void spn_srt() {
             // Executing process with highest priority (in this case the shortest process) for one cycle
             shortestProc.process(1);
             
-            // std::cout << "PID:" << shortestProc.pid << " " << std::endl;
-            // std::cout << "remaining:" << shortestProc.remainingTime << " " << std::endl;
-            // std::cout << std::endl;
-
             if(shortestProc.remainingTime == 0) {
-                // std::cout << "FINISHED PID:" << shortestProc.pid << " " << std::endl;
-                // std::cout << "ST:" << shortestProc.serviceTime << " " << std::endl;
-                // std::cout << "FT:" << shortestProc.finishTime << " " << std::endl;
-                // std::cout << "T:" << shortestProc.turnaround << " " << std::endl;
-                // std::cout << "RT:" << shortestProc.relativeTurnaround << " " << std::endl;
-                // std::cout << std::endl;
+                std::cout << "--- SPN ---" << std::endl;
+                showProcessDetails(shortestProc);
             } else {
                 pq_spn.push(shortestProc);
             }
@@ -170,18 +142,10 @@ void spn_srt() {
 
             // Executing process with highest priority (in this case the shortest process) for one cycle
             shortestRemainingProc.process(1);
-            
-            std::cout << "PID:" << shortestRemainingProc.pid << " " << std::endl;
-            std::cout << "remaining:" << shortestRemainingProc.remainingTime << " " << std::endl;
-            std::cout << std::endl;
 
             if(shortestRemainingProc.remainingTime == 0) {
-                std::cout << "FINISHED PID:" << shortestRemainingProc.pid << " " << std::endl;
-                std::cout << "ST:" << shortestRemainingProc.serviceTime << " " << std::endl;
-                std::cout << "FT:" << shortestRemainingProc.finishTime << " " << std::endl;
-                std::cout << "T:" << shortestRemainingProc.turnaround << " " << std::endl;
-                std::cout << "RT:" << shortestRemainingProc.relativeTurnaround << " " << std::endl;
-                std::cout << std::endl;
+                std::cout << "--- SRT ---" << std::endl;
+                showProcessDetails(shortestRemainingProc);
             } else {
                 pq_srt.push(shortestRemainingProc);
             }
@@ -206,32 +170,23 @@ int main() {
             // Assigning a random Service Time between 1 and 10
             int serviceTime = rand() % 10 + 1;
             Process p = Process(pid, serviceTime);
-            
-            //debug
-            //Process p = Process(pid, 1);
 
             q_procs.push(p);
             q_fcfs.push(p);
             q_rr.push_back(p);
-            //pq_spn.push(p);
-            //pq_srt.push(p);
             
             std::cout << "  Process " << pid << " ST = " << serviceTime << std::endl;
         }
 
-        //fcfs();     // Simulate FCFS scheduling algorithm
+        std::cout << "--- FCFS ---" << std::endl;
+        fcfs();                     // Simulate FCFS scheduling algorithm
+        Process::currentTime = 0;   // Reset Processes' current time
         
-        //rr();     // Simulate RR scheduling algorithm
+        std::cout << "--- RR ---" << std::endl;
+        rr();                       // Simulate RR scheduling algorithm
+        Process::currentTime = 0;   // Reset Processes' current time
 
-        spn_srt();
-
-        // std::cout << "SPN QUEUE" << std::endl;
-        // printQueue(pq_spn);
-
-        // std::cout << "SRT QUEUE" << std::endl;
-        // printQueue(pq_srt);
-
-
+        spn_srt();                  // Simulate SPN and SRT scheduling algorithms
     }
 
 	return 0;
