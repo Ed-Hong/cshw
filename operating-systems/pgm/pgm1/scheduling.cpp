@@ -24,10 +24,13 @@ struct comp_srt {
     }
 };
 
-// Declaring a Queue for the FCFS Algorithm
+// Queue for storing processes in order of arrival
+std::queue<Process> q_procs;
+
+// Queue for the FCFS Algorithm
 std::queue<Process> q_fcfs;
 
-// Declaring a Deque for the RR Algorithm, so that a process can be placed back into the front of the queue
+// Deque for the RR Algorithm, so that a process can be placed back into the front of the queue
 // in the event that the next process hasn't arrived, and the current process can continue executing
 std::deque<Process> q_rr;
 
@@ -123,6 +126,48 @@ void rr() {
     }
 }
 
+void spn() {
+    std::cout << "- SPN:" << std::endl;
+
+    // Executing each process in order of SPN
+    while(!q_procs.empty()) {
+        std::cout << "TIME:" << Process::currentTime << " " << std::endl;
+
+        Process currentProcess = q_procs.front();
+
+        // Check that the process has arrived
+        if(currentProcess.arrivalTime <= Process::currentTime) {
+            q_procs.pop();
+            pq_spn.push(currentProcess);
+        }
+
+        if(!pq_spn.empty()) {
+
+            Process shortestProc = pq_spn.top();
+            pq_spn.pop();
+
+            // Executing process with highest priority (in this case the shortest process) for one cycle
+            shortestProc.process(1);
+            
+            std::cout << "PID:" << shortestProc.pid << " " << std::endl;
+            std::cout << "remaining:" << shortestProc.remainingTime << " " << std::endl;
+            std::cout << std::endl;
+
+            if(shortestProc.remainingTime == 0) {
+                std::cout << "FINISHED PID:" << shortestProc.pid << " " << std::endl;
+                std::cout << "ST:" << shortestProc.serviceTime << " " << std::endl;
+                std::cout << "FT:" << shortestProc.finishTime << " " << std::endl;
+                std::cout << "T:" << shortestProc.turnaround << " " << std::endl;
+                std::cout << "RT:" << shortestProc.relativeTurnaround << " " << std::endl;
+                std::cout << std::endl;
+            } else {
+                pq_spn.push(shortestProc);
+            }
+        }
+        ++Process::currentTime;
+    }
+}
+
 int main() {
     
     init();
@@ -142,11 +187,11 @@ int main() {
             //debug
             //Process p = Process(pid, 1);
 
-
+            q_procs.push(p);
             q_fcfs.push(p);
             q_rr.push_back(p);
-            pq_spn.push(p);
-            pq_srt.push(p);
+            //pq_spn.push(p);
+            //pq_srt.push(p);
             
             std::cout << "  Process " << pid << " ST = " << serviceTime << std::endl;
         }
@@ -155,11 +200,13 @@ int main() {
         
         //rr();     // Simulate RR scheduling algorithm
 
-        std::cout << "SPN QUEUE" << std::endl;
-        printQueue(pq_spn);
+        spn();
 
-        std::cout << "SRT QUEUE" << std::endl;
-        printQueue(pq_srt);
+        // std::cout << "SPN QUEUE" << std::endl;
+        // printQueue(pq_spn);
+
+        // std::cout << "SRT QUEUE" << std::endl;
+        // printQueue(pq_srt);
 
 
     }
