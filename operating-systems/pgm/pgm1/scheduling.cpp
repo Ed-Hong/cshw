@@ -126,10 +126,7 @@ void rr() {
     }
 }
 
-void spn() {
-    std::cout << "- SPN:" << std::endl;
-
-    // Executing each process in order of SPN
+void spn_srt() {
     while(!q_procs.empty()) {
         std::cout << "TIME:" << Process::currentTime << " " << std::endl;
 
@@ -139,31 +136,57 @@ void spn() {
         if(currentProcess.arrivalTime <= Process::currentTime) {
             q_procs.pop();
             pq_spn.push(currentProcess);
+            pq_srt.push(currentProcess);
         }
 
+        // Processing Shortest Process Next 
         if(!pq_spn.empty()) {
-
             Process shortestProc = pq_spn.top();
             pq_spn.pop();
 
             // Executing process with highest priority (in this case the shortest process) for one cycle
             shortestProc.process(1);
             
-            std::cout << "PID:" << shortestProc.pid << " " << std::endl;
-            std::cout << "remaining:" << shortestProc.remainingTime << " " << std::endl;
-            std::cout << std::endl;
+            // std::cout << "PID:" << shortestProc.pid << " " << std::endl;
+            // std::cout << "remaining:" << shortestProc.remainingTime << " " << std::endl;
+            // std::cout << std::endl;
 
             if(shortestProc.remainingTime == 0) {
-                std::cout << "FINISHED PID:" << shortestProc.pid << " " << std::endl;
-                std::cout << "ST:" << shortestProc.serviceTime << " " << std::endl;
-                std::cout << "FT:" << shortestProc.finishTime << " " << std::endl;
-                std::cout << "T:" << shortestProc.turnaround << " " << std::endl;
-                std::cout << "RT:" << shortestProc.relativeTurnaround << " " << std::endl;
-                std::cout << std::endl;
+                // std::cout << "FINISHED PID:" << shortestProc.pid << " " << std::endl;
+                // std::cout << "ST:" << shortestProc.serviceTime << " " << std::endl;
+                // std::cout << "FT:" << shortestProc.finishTime << " " << std::endl;
+                // std::cout << "T:" << shortestProc.turnaround << " " << std::endl;
+                // std::cout << "RT:" << shortestProc.relativeTurnaround << " " << std::endl;
+                // std::cout << std::endl;
             } else {
                 pq_spn.push(shortestProc);
             }
         }
+
+        // Processing Shortest Remaining Time Next 
+        if(!pq_srt.empty()) {
+            Process shortestRemainingProc = pq_srt.top();
+            pq_srt.pop();
+
+            // Executing process with highest priority (in this case the shortest process) for one cycle
+            shortestRemainingProc.process(1);
+            
+            std::cout << "PID:" << shortestRemainingProc.pid << " " << std::endl;
+            std::cout << "remaining:" << shortestRemainingProc.remainingTime << " " << std::endl;
+            std::cout << std::endl;
+
+            if(shortestRemainingProc.remainingTime == 0) {
+                std::cout << "FINISHED PID:" << shortestRemainingProc.pid << " " << std::endl;
+                std::cout << "ST:" << shortestRemainingProc.serviceTime << " " << std::endl;
+                std::cout << "FT:" << shortestRemainingProc.finishTime << " " << std::endl;
+                std::cout << "T:" << shortestRemainingProc.turnaround << " " << std::endl;
+                std::cout << "RT:" << shortestRemainingProc.relativeTurnaround << " " << std::endl;
+                std::cout << std::endl;
+            } else {
+                pq_srt.push(shortestRemainingProc);
+            }
+        }
+
         ++Process::currentTime;
     }
 }
@@ -200,7 +223,7 @@ int main() {
         
         //rr();     // Simulate RR scheduling algorithm
 
-        spn();
+        spn_srt();
 
         // std::cout << "SPN QUEUE" << std::endl;
         // printQueue(pq_spn);
