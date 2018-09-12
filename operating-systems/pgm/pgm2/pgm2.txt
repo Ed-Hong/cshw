@@ -1,0 +1,31 @@
+Producer function should produce the sum of 1000 random numbers in the range [0, 1) divided by 500.
+Producer function should produce 1,000,000 of the above values.
+
+// Producer pseudo-code
+for(1 million iterations) {
+    for(1 thousand iterations) {
+        sum += random[0, 1)
+    }
+    avg = sum/500
+    post(avg)
+}
+
+Note that post is a thread-safe method which is accessing a shared store of the values 
+which may also be accessed by the Consumer threads
+
+Note on generating the random number: One way to do it is to do
+    rand() / (RAND_MAX+1.0)
+
+There are 10 consumer pthreads which consume one value at a time and is added to their individual totals.
+
+// Consumer
+wait for a post
+receive a post
+consume the post by adding the value to the running total  
+
+As mentioned above, note that receiving/consuming a post must be thread safe as the Consumer thread
+will read a value in from the same shared store of values. In other words, the Consumer pthreads release their lock
+when no values remain in the store, so that the Producer can post a new value. 
+
+Output the each pthreads' / consumers' total.
+
