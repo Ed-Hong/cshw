@@ -29,3 +29,6 @@ when no values remain in the store, so that the Producer can post a new value.
 
 Output the each pthreads' / consumers' total.
 
+
+
+Note: Refer to Figure 5.14 in the Text for an example utilizing Semaphores
