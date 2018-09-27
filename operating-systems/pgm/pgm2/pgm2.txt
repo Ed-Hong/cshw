@@ -32,3 +32,6 @@ Output the each pthreads' / consumers' total.
 
 
 Note: Refer to Figure 5.14 in the Text for an example utilizing Semaphores
+- Remember that the producer should produce precisely 1,000,000 values, and thus terminates. 
+- Similarily, the consumers should also terminate; they will know when production has finished.
+
