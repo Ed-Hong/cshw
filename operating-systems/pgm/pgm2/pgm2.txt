@@ -35,3 +35,13 @@ Note: Refer to Figure 5.14 in the Text for an example utilizing Semaphores
 - Remember that the producer should produce precisely 1,000,000 values, and thus terminates. 
 - Similarily, the consumers should also terminate; they will know when production has finished.
 
+Notes on semaphores - refer to the man page:
+sem_t *n;
+n = sem_open(name, oflag, mode, initVal)    // set the mode to be S_IRWXU for read, write, and execute permissions
+
+sem_unlink()    // removes a created semaphores
+sem_wait()      // decrements (locks) the semaphore
+sem_post()      // increments (unlocks) the semaphore
+
+Notes on parbegin - refer to the pthread_create man page's example:
+
