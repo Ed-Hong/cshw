@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <semaphore.h>
 
-static const unsigned int SIZE = 10000;
+static const unsigned int SIZE = 1000000;
 static const unsigned int NUM_THREADS = 11;
 float buffer[SIZE];
 float total[NUM_THREADS];
@@ -30,7 +30,7 @@ void append(float value) {
 }
 
 float fetch() {
-    if(head == tail) {
+    if(tail >= head) {
         return 0;
     }
     float value = buffer[tail];
@@ -56,6 +56,8 @@ void *producer(void *tid) {
     }
     done = true;
     printTotals();
+    sem_close(buf);
+    sem_close(notEmpty);
     pthread_exit(NULL);
 }
 
@@ -84,9 +86,6 @@ int main() {
 
     // Create the producer thread
     pthread_create(&threads[NUM_THREADS - 1], NULL, producer, (void *)(NUM_THREADS - 1));
-
-    sem_close(buf);
-    sem_close(notEmpty);
 
     pthread_exit(NULL);
 }
