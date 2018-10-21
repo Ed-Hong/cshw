@@ -67,7 +67,7 @@ void *consumer(void *tid) {
         sem_wait(buf);          // wait for buffer to be released
         float value = fetch();
         sem_post(buf);          // signal that the buffer is released
-        std::cout << ".";
+        //std::cout << ".";
         total[(long(tid))] += value;
     }
     pthread_exit(NULL);
