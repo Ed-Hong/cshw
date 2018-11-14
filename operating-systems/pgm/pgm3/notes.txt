@@ -1,0 +1,15 @@
+* Slide 47 in Ch8 pp
+* Memory Trace - represented by an array of 1,000 data values
+* each Trace is 1,000 addresses
+* Trace generation Pseudo code:
+for(int part from 0 to 9)
+    var base = 25 * uniform(0,99)
+    for(index = 0; index < 100; index++)
+        trace[100*part+index] = base + uniform(0,99)
+
+// Uniform random distribution within range [lo, hi]
+int uniform(int lo, int hi) {
+    int x;
+    while((x = random()/(high-low+1)) > (high-low));
+    return x + low;
+})
