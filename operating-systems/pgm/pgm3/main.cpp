@@ -48,7 +48,58 @@ int uniform(int lo, int hi) {
 * wss I/P int The working set size
 **************************************************************************************************************/
 int lru(int wss) {
-    return 5;
+        
+    // Count of page faults
+    int faults = 0;
+
+    // Current trace index
+    int ti = 0;
+
+    // Hashmap acting as our working set
+    // Key being the page stored in the working set
+    // Value being the last time the page was used
+    std::unordered_map<int, int> ws;
+
+    // Populate working set with initial addresses
+    for(int i = 0; i < wss; i++) {
+        ws[trace[ti]] = ti;
+        ti++;
+        std::cout << "Working set at " << i << " = " << trace[ti] << std::endl;
+    }
+
+    // Simulating the rest of the page address stream
+    for(; ti < TRACE_SIZE; ti++) {
+        std::cout << "Attempting to find page " << trace[ti] << std::endl;
+ 
+        if (ws.find(trace[ti]) == ws.end()) {
+            std::cout << "Page NOT found in working set; PAGE FAULT "<< std::endl;
+
+            // Find the Least Recently Used item
+            int leastVal = INT_MAX;
+            int leastKey = 0;
+            for (auto itr = ws.begin(); itr != ws.end(); itr++) 
+            {
+                if(itr->second < leastVal) {
+                    leastVal = itr->second;
+                    leastKey = itr->first;
+                }
+            }
+
+            // Remove the Least Recently Used item by key
+            ws.erase(leastKey);
+
+            // Replace the removed item with new item
+            ws[trace[ti]] = ti;
+        }      
+        else{
+            std::cout << "Page found in working set: " << trace[ti] << std::endl;
+            
+            // Update the last time the page was accessed
+            ws[trace[ti]] = ti;
+        }
+    }
+
+    return faults;
 }
 
 /**************************************************************************************************************
@@ -202,11 +253,11 @@ int main() {
         std::cout << "Memory trace generated." << std::endl;
 
         for(int wss = 2; wss <= MAX_WORKING_SET_SIZE; wss++) {
-            // std::cout << "Simulating LRU with working set size " << wss << "..." << std::endl;
-            // faults[wss][LRU] += lru(wss);
+            std::cout << "Simulating LRU with working set size " << wss << "..." << std::endl;
+            faults[wss][LRU] += lru(wss);
 
-            std::cout << "Simulating FIFO with working set size " << wss << "..." << std::endl;
-            faults[wss][FIFO] += fifo(wss);
+            // std::cout << "Simulating FIFO with working set size " << wss << "..." << std::endl;
+            // faults[wss][FIFO] += fifo(wss);
 
             // std::cout << "Simulating CLK with working set size " << wss << "..." << std::endl;
             // faults[wss][CLOCK] += clk(wss);
