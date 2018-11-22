@@ -6,6 +6,8 @@
 *********************************************************************************************************************************/
 #include <stdlib.h>
 #include <iostream>
+#include <unordered_map>
+#include <algorithm>
 
 // Constants
 static const unsigned int NUM_EXPERIMENTS = 3;
@@ -83,7 +85,44 @@ int clk(int wss) {
 * wss I/P int The working set size
 **************************************************************************************************************/
 int rando(int wss) {
-    return 5;
+
+    // Count of page faults
+    int faults = 0;
+
+    // Current trace index
+    int ti = 0;
+
+    // Array acting as our working set
+    int ws[wss];
+
+    // Populate working set with initial addresses
+    for(int i = 0; i < wss; i++) {
+        ws[i] = trace[ti];
+        ti++;
+        std::cout << "Working set at " << i << " = " << ws[i] << std::endl;
+    }
+
+    // Simulating the rest of the page address stream
+    for(; ti < TRACE_SIZE; ti++) {
+        std::cout << "Attempting to find page " << trace[ti] << std::endl;
+
+        // Attempt to find the next page within the working set
+        int * p;
+        p = std::find (ws, ws+wss, trace[ti]);
+        if (p != ws+wss) {
+            std::cout << "Page found in working set: " << *p << std::endl;
+        }
+        else {
+            std::cout << "Page NOT found in working set; PAGE FAULT "<< std::endl;
+            faults++;
+
+            // Random replacement
+            int replace = uniform(0, wss-1);
+            ws[replace] = trace[ti];
+        }
+    }
+
+    return faults;
 }
 
 /**************************************************************************************************************
@@ -122,9 +161,16 @@ int main() {
         std::cout << "Memory trace generated." << std::endl;
 
         for(int wss = 2; wss <= MAX_WORKING_SET_SIZE; wss++) {
-            faults[wss][LRU] += lru(wss);
-            faults[wss][FIFO] += fifo(wss);
-            faults[wss][CLOCK] += clk(wss);
+            // std::cout << "Simulating LRU with working set size " << wss << "..." << std::endl;
+            // faults[wss][LRU] += lru(wss);
+
+            // std::cout << "Simulating FIFO with working set size " << wss << "..." << std::endl;
+            // faults[wss][FIFO] += fifo(wss);
+
+            // std::cout << "Simulating CLK with working set size " << wss << "..." << std::endl;
+            // faults[wss][CLOCK] += clk(wss);
+
+            std::cout << "Simulating RANDOM with working set size " << wss << "..." << std::endl;
             faults[wss][RANDOM] += rando(wss);
         }
     }
