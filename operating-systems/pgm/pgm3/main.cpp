@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <unordered_map>
+#include <map>
 #include <algorithm>
 
 // Constants
@@ -165,7 +166,59 @@ int fifo(int wss) {
 * wss I/P int The working set size
 **************************************************************************************************************/
 int clk(int wss) {
-    return 5;
+        
+    // Count of page faults
+    int faults = 0;
+
+    // Current trace index
+    int ti = 0;
+
+    // Ordered map acting as our circular buffer for the working set
+    // Key being the page stored in the working set
+    // Value being a bool representing the use bit
+    std::map<int, bool> ws;
+
+    // Populate working set with initial addresses
+    for(int i = 0; i < wss; i++) {
+        ws[trace[ti]] = true;
+        ti++;
+        std::cout << "Working set at " << i << " = " << trace[ti] << std::endl;
+    }
+
+    // Simulating the rest of the page address stream
+    for(; ti < TRACE_SIZE; ti++) {
+        std::cout << "Attempting to find page " << trace[ti] << std::endl;
+ 
+        if (ws.find(trace[ti]) == ws.end()) {
+            std::cout << "Page NOT found in working set; PAGE FAULT "<< std::endl;
+
+            // Find the first item with use bit being false
+            int replace = ws.begin()->first;
+            for (auto itr = ws.begin(); itr != ws.end(); itr++) 
+            {
+                if(itr->second == false) {
+                    replace = itr->first;
+                    break;
+                } else {
+                    ws[trace[ti]] = false;
+                }
+            }
+
+            // Remove the Least Recently Used item by key
+            ws.erase(replace);
+
+            // Replace the removed item with new item
+            ws[trace[ti]] = true;
+        }      
+        else{
+            std::cout << "Page found in working set: " << trace[ti] << std::endl;
+            
+            // Update the use bit
+            ws[trace[ti]] = true;
+        }
+    }
+
+    return faults;
 }
 
 /**************************************************************************************************************
@@ -253,14 +306,14 @@ int main() {
         std::cout << "Memory trace generated." << std::endl;
 
         for(int wss = 2; wss <= MAX_WORKING_SET_SIZE; wss++) {
-            std::cout << "Simulating LRU with working set size " << wss << "..." << std::endl;
-            faults[wss][LRU] += lru(wss);
+            // std::cout << "Simulating LRU with working set size " << wss << "..." << std::endl;
+            // faults[wss][LRU] += lru(wss);
 
             // std::cout << "Simulating FIFO with working set size " << wss << "..." << std::endl;
             // faults[wss][FIFO] += fifo(wss);
 
-            // std::cout << "Simulating CLK with working set size " << wss << "..." << std::endl;
-            // faults[wss][CLOCK] += clk(wss);
+            std::cout << "Simulating CLK with working set size " << wss << "..." << std::endl;
+            faults[wss][CLOCK] += clk(wss);
 
             // std::cout << "Simulating RANDOM with working set size " << wss << "..." << std::endl;
             // faults[wss][RANDOM] += rando(wss);
