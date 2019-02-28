@@ -39,8 +39,13 @@ def partition(x):
       vk: indices of x == vk }, where [v1, ... vk] are all the unique values in the vector z.
     """
 
-    # INSERT YOUR CODE HERE
-    raise Exception('Function not yet implemented!')
+    d = {}
+    for i, v in enumerate(x):
+        if v in d:
+            d[v].append(i)
+        else:
+            d[v] = [i]
+    return d
 
 
 def entropy(y):
