@@ -85,8 +85,54 @@ def mutual_information(x, y):
     Returns the mutual information: I(x, y) = H(y) - H(y | x)
     """
 
-    # INSERT YOUR CODE HERE
-    raise Exception('Function not yet implemented!')
+    xPartitioned = partition(x)
+
+    # Dictionary which      { v1: P(x=v1),
+    # maps the                v2: P(x=v2),    
+    # Probabilities of x:     ...
+    #                         vk: P(x=vk) }
+    probs = {}
+
+    # Dictionary which      { v1: H(Y | x=v1),
+    # maps the entropies      v2: H(Y | x=v1),    
+    # of y given x = v:       ...
+    #                         vk: H(Y | x=v1) }
+    hConditionals = {}
+
+    for v in xPartitioned:
+        # Compute probabilities P(x = v_i) and save to our probs dictionary
+        p = len(xPartitioned[v]) / len(x)
+        probs[v] = p
+
+        # Get indices where x = v
+        indices = xPartitioned[v]
+
+        # Data vector of y values given x = v
+        yGivenX = []
+
+        # Add the values of y given x = v to our vector
+        for i in indices:
+            yGivenX.append(y[i])
+
+        # Compute H(Y | x = v )
+        H_yGivenXequalsV = entropy(yGivenX)
+
+        # Save the conditional entropy to our hConditionals dictionary
+        hConditionals[v] = H_yGivenXequalsV
+
+    # compute H(y|x)
+    # P(x=v_i) * H(y|x=v_i) for all i
+    H_yGivenX = 0.0
+    for v in xPartitioned:
+        H_yGivenX += probs[v] * hConditionals[v]
+
+    # get entropy of y, H(y)
+    H_y = entropy(y)
+
+    # compute I(x, y) = H(y) - H(y | x)
+    I_xy = H_y - H_yGivenX
+
+    return I_xy
 
 
 def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
