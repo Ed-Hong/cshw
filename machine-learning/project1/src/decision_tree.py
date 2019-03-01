@@ -39,10 +39,13 @@ def partition(x):
       vk: indices of x == vk }, where [v1, ... vk] are all the unique values in the vector z.
     """
 
+    # Build our dictionary
     d = {}
     for i, v in enumerate(x):
+        # If the dictionary contains a key entry for v, then append the index i to its list of indices
         if v in d:
             d[v].append(i)
+        # Otherwise, create a new key entry for v and initialize the index list with i
         else:
             d[v] = [i]
     return d
@@ -55,8 +58,22 @@ def entropy(y):
     Returns the entropy of z: H(z) = p(z=v1) log2(p(z=v1)) + ... + p(z=vk) log2(p(z=vk))
     """
 
-    # INSERT YOUR CODE HERE
-    raise Exception('Function not yet implemented!')
+    # Initialize the total entropy H to be 0
+    H = 0.0
+
+    # p(z=v1) = length of v1 subset within partitioned vector / total
+
+    yPartitioned = partition(y)
+
+    for v in yPartitioned:
+        # Compute P(z = v)
+        # The probability of z = v is the number of times v occurs in z divided by the length of z
+        p = len(yPartitioned[v]) / len(y)
+
+        # Add to the total entropy
+        H -= p * np.log2(p)
+
+    return H
 
 
 def mutual_information(x, y):
