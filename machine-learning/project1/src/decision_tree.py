@@ -176,9 +176,209 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
      (4, 1, True): 1}
     """
 
-    # INSERT YOUR CODE HERE. NOTE: THIS IS A RECURSIVE FUNCTION.
-    raise Exception('Function not yet implemented!')
+    # Base cases:
 
+    # 0. If the set of labels is empty within this branch, return null (ie: case where all examples are shifted left or right )
+    if len(y) == 0:
+        return None
+
+    # 1. If the entire set of labels is pure, then return that label (which is the majority label)
+    if all(v == 0 for v in y) or all (v == 1 for v in y):
+        return y[0]
+
+    # 2. If there is nothing to split on, then return the majority label
+    if attribute_value_pairs is not None and len(attribute_value_pairs) == 0:
+        return majority_label(y)
+
+    # 3. If the max depth is reached, then return the majority label
+    if depth == max_depth:
+        return majority_label(y)
+
+    # If attribute_value_pairs is null then initialize with all attribute value pairs
+    if attribute_value_pairs is None:
+        attribute_value_pairs = get_attribute_value_pairs(x)
+    
+    # Determine the next best attribute-value pair to split on by selecting the one which yields the most Information Gain
+    # First, determine the best feature to split on
+    attr_set = set()
+    for a, v in attribute_value_pairs:
+        attr_set.add(a)
+    
+    bestAttr, bestAttrIndex = find_best_attribute(x,y, attr_set)
+
+    # Then, determine the best value of the feature to split on
+    value_set = set()
+    for aIdx, v in attribute_value_pairs:
+        if aIdx == bestAttrIndex:
+            value_set.add(v)
+    
+    bestValue = find_best_value(bestAttr, y, value_set)
+
+    # Remove the attribute-value pair from the list of attribute-value pairs
+    attribute_value_pairs.remove((bestAttrIndex, bestValue))
+
+    # New data sets for the "Left" branch which denotes (x_bestAttrIndex == bestValue)? -> False
+    xNewFalse = []
+    yNewFalse = []
+
+    # New data sets for the "Right" branch which denotes (x_bestAttrIndex == bestValue)? -> True
+    xNewTrue = []
+    yNewTrue = []
+
+    # Remove the examples matching the attribute-value pair from x and y
+    for rowIdx, row in enumerate(x):
+        addLeft = True
+        for i, v in enumerate(row):
+            if i == bestAttrIndex and v == bestValue:
+                addLeft = False
+        if addLeft:
+            xNewFalse.append(row)
+            yNewFalse.append(y[rowIdx])
+        else:
+            xNewTrue.append(row)
+            yNewTrue.append(y[rowIdx])
+    
+    # New decision node becomes [ (x_bestAttrIndex == bestValue)? ]
+    node = { (bestAttrIndex, bestValue, False) : id3(xNewFalse, yNewFalse, attribute_value_pairs, depth+1),
+             (bestAttrIndex, bestValue, True): id3(xNewTrue, yNewTrue, attribute_value_pairs,depth+1) }
+
+    return node
+
+
+def find_best_attribute(x, y, attr_set):
+    """
+    Determines the best feature to split on by selecting the one with the most Mutual Information between x and y 
+
+    Returns the feature x which maximizes Information Gain as a column vector, and its index
+    """
+
+    # {attr_index, i : column vector x_i}
+    attrs = {}
+    for row in x:
+        for i, val in enumerate(row):
+            if i in attrs:
+                attrs[i].append(val)
+            else:
+                attrs[i] = [val]
+
+    # {attr_index, i : Info Gain with the attribute }
+    attrs_InfoGain = {}
+    for i in attrs:
+        infoGain = mutual_information(attrs[i], y)
+        attrs_InfoGain[i] = infoGain
+
+    # Determine which feature/attribute has the most Mutual Information with y
+    bestAttr = None
+    bestAttrIndex = None
+    while True:
+        maxInfoGain = None
+        for i in attrs_InfoGain:
+            infoGainedByAttr = attrs_InfoGain[i]
+            if maxInfoGain is None or infoGainedByAttr >= maxInfoGain:
+                maxInfoGain = infoGainedByAttr
+                bestAttr = attrs[i]
+                bestAttrIndex = i
+
+        if bestAttrIndex in attr_set:
+            break
+        else:
+            attrs_InfoGain.pop(bestAttrIndex, None)
+
+        if len(attrs_InfoGain.keys()) == 0:
+            return list(attr_set)[0]
+    
+    return bestAttr, bestAttrIndex
+
+
+def find_best_value(attr, y, value_set):
+    """
+    Determines the best value of the given attribute to split on by determining which value of the attribute yields the least entropy with y 
+
+    Returns the value v 
+    """
+
+    bestAttrPartitioned = partition(attr)
+
+    # {attr_value, V : H(Y | X = V)}
+    vals_entropies = {}
+    for v in bestAttrPartitioned:
+        # Build the data vector of Y given x = v
+        yGivenXequalsV = []
+        for i in bestAttrPartitioned[v]:
+            yGivenXequalsV.append(y[i])
+
+        # Compute the entropy of Y given x = v and add to our dictionary
+        H_yGivenXequalsV = entropy(yGivenXequalsV)
+        vals_entropies[v] = H_yGivenXequalsV
+
+    # Determine the value of the attribute which yields the lowest entropy in y
+    bestAttrValue = None
+    while True:
+        minEntropy = None
+        for v in vals_entropies:
+            if minEntropy is None or vals_entropies[v] <= minEntropy:
+                minEntropy = vals_entropies[v]
+                bestAttrValue = v
+        
+        if bestAttrValue in value_set:
+            break
+        else:
+            vals_entropies.pop(bestAttrValue, None)
+
+        if len(vals_entropies.keys()) == 0:
+            return list(value_set)[0]
+
+    return bestAttrValue
+
+
+def majority_label(y):
+    """
+    Determines the majority label for a binary classification of 0 or 1
+
+    Returns 0 if the most common value of y is 0, otherwise return 1
+    """
+
+    zero_count = 0
+    one_count = 0
+
+    for v in y:
+        if v == 0: 
+            zero_count += 1
+        else:
+            one_count += 1
+
+    if zero_count > one_count:
+        return 0
+
+    return 1
+
+
+def get_attribute_value_pairs(x):
+    """
+    Builds the initial attribute-value pair list for attributes x
+
+    Returns a list of attribute-value pairs in the form [(attr_index, value), ...]
+    """
+
+    attribute_value_pairs = []
+
+    # {x_i : set of possible values for x_i}
+    attr_values = {}
+
+    # Determine all possible values for all attributes and map them to attr_values
+    for row in x:
+        for i, val in enumerate(row):
+            if i in attr_values:
+                attr_values[i].add(val)
+            else:
+                attr_values[i] = set([val])
+    
+    # Build attribute_value_pairs list
+    for x in attr_values:
+        for val in attr_values[x]:
+            attribute_value_pairs.append((x, val))
+
+    return attribute_value_pairs
 
 def predict_example(x, tree):
     """
