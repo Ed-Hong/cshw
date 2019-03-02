@@ -388,8 +388,24 @@ def predict_example(x, tree):
     Returns the predicted label of x according to tree
     """
 
-    # INSERT YOUR CODE HERE. NOTE: THIS IS A RECURSIVE FUNCTION.
-    raise Exception('Function not yet implemented!')
+    # If we've reached a null-child then step back
+    if tree is None:
+        return
+
+    # If we've reached a label
+    if type(tree) is not dict:
+        return tree
+
+    # Get the left child
+    attrIdx, attrVal, decisionTrue = list(tree.keys())[0]
+
+    # Test the decision
+    if x[attrIdx] == attrVal and decisionTrue:
+        # Go Left
+        return predict_example(x, tree[(attrIdx, attrVal, decisionTrue)])
+    else:
+        # Go Right
+        return predict_example(x, tree[(attrIdx, attrVal, not decisionTrue)])
 
 
 def compute_error(y_true, y_pred):
@@ -399,8 +415,14 @@ def compute_error(y_true, y_pred):
     Returns the error = (1/n) * sum(y_true != y_pred)
     """
 
-    # INSERT YOUR CODE HERE
-    raise Exception('Function not yet implemented!')
+    total_errors = 0
+    n = len(y_true)
+
+    for i, ytrue in enumerate(y_true):
+        if ytrue != y_pred[i]:
+            total_errors += 1
+
+    return (1 / n) * total_errors
 
 
 def visualize(tree, depth=0):
