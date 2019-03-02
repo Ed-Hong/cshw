@@ -26,7 +26,7 @@
 # the package scikit-learn OR ANY OTHER machine learning package in THIS file.
 
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def partition(x):
     """
@@ -61,8 +61,6 @@ def entropy(y):
     # Initialize the total entropy H to be 0
     H = 0.0
 
-    # p(z=v1) = length of v1 subset within partitioned vector / total
-
     yPartitioned = partition(y)
 
     for v in yPartitioned:
@@ -84,7 +82,7 @@ def mutual_information(x, y):
 
     Returns the mutual information: I(x, y) = H(y) - H(y | x)
     """
-
+    
     xPartitioned = partition(x)
 
     # Dictionary which      { v1: P(x=v1),
@@ -451,22 +449,48 @@ def visualize(tree, depth=0):
 
 
 if __name__ == '__main__':
-    # Load the training data
-    M = np.genfromtxt('./monks-1.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
-    ytrn = M[:, 0]
-    Xtrn = M[:, 1:]
 
-    # Load the test data
-    M = np.genfromtxt('./monks-1.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
-    ytst = M[:, 0]
-    Xtst = M[:, 1:]
+    # Running through each MONKS data set, 1-3 
+    for x in ["1", "2", "3"]:
+        # Load the training data
+        M = np.genfromtxt('./monks-' + x + '.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
+        ytrn = M[:, 0]
+        Xtrn = M[:, 1:]
 
-    # Learn a decision tree of depth 3
-    decision_tree = id3(Xtrn, ytrn, max_depth=3)
-    visualize(decision_tree)
+        # Load the test data
+        M = np.genfromtxt('./monks-' + x + '.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
+        ytst = M[:, 0]
+        Xtst = M[:, 1:]
 
-    # Compute the test error
-    y_pred = [predict_example(x, decision_tree) for x in Xtst]
-    tst_err = compute_error(ytst, y_pred)
+        # For tree depths 1 through 10
+        depths = range(1,11)
+        tst_errs = []
+        trn_errs = []
+        for d in depths:
+            # Learn a decision tree of depth d
+            decision_tree = id3(Xtrn, ytrn, max_depth=d)
+            
+            print("MONKS " + x)
+            print("DEPTH: " + str(d))
+            visualize(decision_tree)
 
-    print('Test Error = {0:4.2f}%.'.format(tst_err * 100))
+            # Compute the test error
+            y_pred = [predict_example(x, decision_tree) for x in Xtst]
+            tst_err = compute_error(ytst, y_pred)
+            tst_errs.append(tst_err)
+
+            # Compute the training error
+            y_pred = [predict_example(x, decision_tree) for x in Xtrn]
+            trn_err = compute_error(ytrn, y_pred)
+            trn_errs.append(trn_err)
+
+        # Plot
+        plt.plot(depths, tst_errs, label='Test Error')
+        plt.plot(depths, trn_errs, label='Training Error')
+        plt.xlabel('Tree Depth')
+        plt.ylabel('Error')
+        plt.title('MONKS ' + x + ' Training and Test Error')
+        plt.legend()
+        plt.show()
+
+
