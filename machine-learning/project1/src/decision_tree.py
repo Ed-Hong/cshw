@@ -27,6 +27,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn import tree
 
 def partition(x):
     """
@@ -423,6 +424,42 @@ def compute_error(y_true, y_pred):
     return (1 / n) * total_errors
 
 
+def get_confusion_matrix(y_true, y_pred):
+    """
+    Generates the confusion matrix given the true labels and predicted labels
+
+    Returns the confusion matrix represented as a 2d array in the form:
+                                          |  Col 0: Prediction is Positive   |    Col 1: Prediction is Negative
+        Row 0: Actual Value is Positive   |  TP Rate (# TP / # P Examples)   |    FN Rate (# FN / # N Examples)
+        Row 1: Actual Value is Negative   |  FP Rate (# FP / # P Examples)   |    TN Rate (# TN / # N Examples)
+    """
+
+    matrix = []
+    true_positives = 0
+    false_positives = 0
+    true_negatives = 0
+    false_negatives = 0
+
+    for i, ytrue in enumerate(y_true):
+        ypred = y_pred[i]
+        if ytrue == 1: 
+            if ypred == 1:
+                true_positives += 1
+                false_negatives += 1
+
+        if ytrue == 0:
+            if ypred == 1:
+                false_positives += 1
+                true_negatives += 1
+
+    n_positives = true_positives + false_positives
+    n_negatives = true_negatives + false_negatives
+
+    matrix.append([true_positives / n_positives, false_negatives / n_negatives])
+    matrix.append([false_positives / n_positives, true_negatives / n_negatives])
+
+    return matrix
+
 def visualize(tree, depth=0):
     """
     Pretty prints (kinda ugly, but hey, it's better than nothing) the decision tree to the console. Use print(tree) to
@@ -450,7 +487,8 @@ def visualize(tree, depth=0):
 
 if __name__ == '__main__':
 
-    # Running through each MONKS data set, 1-3 
+    # Part A: Running through each MONKS data set, 1-3 
+    print('---------- PART A ----------')
     for x in ["1", "2", "3"]:
         # Load the training data
         M = np.genfromtxt('./monks-' + x + '.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
@@ -492,5 +530,38 @@ if __name__ == '__main__':
         plt.title('MONKS ' + x + ' Training and Test Error')
         plt.legend()
         plt.show()
+
+    # Part B: Confusion Matrix of MONKS-1 for Depth=1 and Depth=2
+    print('---------- PART B ----------')
+
+    # Load the training data
+    M = np.genfromtxt('./monks-1.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
+    ytrn = M[:, 0]
+    Xtrn = M[:, 1:]
+
+    # Load the test data
+    M = np.genfromtxt('./monks-1.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
+    ytst = M[:, 0]
+    Xtst = M[:, 1:]
+
+    # Learn a decision tree of depth 1
+    decision_tree_depth1 = id3(Xtrn, ytrn, max_depth=1)
+    y_pred = [predict_example(x, decision_tree_depth1) for x in Xtst]
+    matrix1 = get_confusion_matrix(ytst, y_pred)
+    print('Confusion Matrix for MONKS-1, Depth = 1')
+    print(matrix1)
+
+    # Learn a decision tree of depth 2
+    decision_tree_depth2 = id3(Xtrn, ytrn, max_depth=2)
+    y_pred = [predict_example(x, decision_tree_depth2) for x in Xtst]
+    matrix2 = get_confusion_matrix(ytst, y_pred)
+    print('Confusion Matrix for MONKS-1, Depth = 2')
+    print(matrix2)
+
+    # Part C: Scikit-learn
+    clf = tree.DecisionTreeClassifier()
+    clf = clf.fit(Xtrn, ytrn)
+    tree.export_graphviz(clf, out_file='tree.dot') 
+
 
 
