@@ -28,3 +28,11 @@ The program is then run with the following terminal command:
 ./timing
 
 ----------------------------------------------------------------------------------------------------
+
+Question 6 uses "recursive.cpp". The program is compiled using gcc with the following terminal command:
+g++ -o recursive recursive.cpp
+
+The program is then run with the following terminal command:
+./recursive
+
+----------------------------------------------------------------------------------------------------
