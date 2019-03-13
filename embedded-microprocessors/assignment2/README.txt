@@ -1,7 +1,7 @@
 Author: Edward Hong
 ----------------------------------------------------------------------------------------------------
 
-uestions 1 - 3 use "file.cpp". The program is compiled using gcc with the following terminal command:
+Questions 1 - 3 use "file.cpp". The program is compiled using gcc with the following terminal command:
 g++ -o file file.cpp
 
 The program accepts as a command line argument the name of the input file to be read. 
@@ -18,5 +18,13 @@ g++ -o endianness endianness.cpp
 
 The program is then run with the following terminal command:
 ./endianness
+
+----------------------------------------------------------------------------------------------------
+
+Question 5 uses "timing.cpp". The program is compiled using gcc with the following terminal command:
+g++ -o timing timing.cpp
+
+The program is then run with the following terminal command:
+./timing
 
 ----------------------------------------------------------------------------------------------------
