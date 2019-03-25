@@ -352,6 +352,7 @@ def get_attribute_value_pairs(x):
 
     return attribute_value_pairs
 
+
 def predict_example(x, tree):
     """
     Predicts the classification label for a single example x using tree by recursively descending the tree until
@@ -433,6 +434,7 @@ def get_confusion_matrix(y_true, y_pred):
 
     return matrix
 
+
 def visualize(tree, depth=0):
     """
     Pretty prints (kinda ugly, but hey, it's better than nothing) the decision tree to the console. Use print(tree) to
@@ -458,83 +460,51 @@ def visualize(tree, depth=0):
             print('+-- [LABEL = {0}]'.format(sub_trees))
 
 
+def bagging(x, y, max_depth, num_trees):
+    """
+    Performs a bagging algorithm on the ID3 learner by generating num_trees samples of size M with replacement
+
+    Returns a list of the hypotheses generated for each of the N samples
+    In this case N many ID3 Decision Trees (represented as nested dictionaries) are returned
+    """
+
+
+def boosting(x, y, max_depth, num_stumps):
+    """
+    Performs a AdaBoost algorithm on the ID3 learner, iterating up to num_stumps
+
+    Returns a list of the hypotheses generated for each of the N samples
+    In this case N many ID3 Decision Trees (represented as nested dictionaries) are returned
+    """
+
+
+def predict_example_bagging(x, bag):
+    """
+    Predicts the classification label for a single example x using a bag of trees by recursively descending each tree
+    and taking a majority vote of the predicted label
+
+    Returns the predicted label of x according to a majority vote of the bag of trees
+    """
+
+
+def predict_example_boosting(x, h_ens):
+    """
+    Predicts the classification label for a single example x using an ensemble of weighted hypotheses and taking
+    a weighted vote of the predicted label
+
+    Returns the predicted label of x according to a weighted vote of the ensemble of weighted hypotheses / stumps
+    """
+
+
 if __name__ == '__main__':
 
-    # Part A: Running through each MONKS data set, 1-3 
-    print('---------- PART A ----------')
-    for x in ["1", "2", "3"]:
-        # Load the training data
-        M = np.genfromtxt('./monks-' + x + '.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
-        ytrn = M[:, 0]
-        Xtrn = M[:, 1:]
-
-        # Load the test data
-        M = np.genfromtxt('./monks-' + x + '.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
-        ytst = M[:, 0]
-        Xtst = M[:, 1:]
-
-        # For tree depths 1 through 10
-        depths = range(1,11)
-        tst_errs = []
-        trn_errs = []
-        for d in depths:
-            # Learn a decision tree of depth d
-            decision_tree = id3(Xtrn, ytrn, max_depth=d)
-            
-            print("MONKS " + x)
-            print("DEPTH: " + str(d))
-            visualize(decision_tree)
-
-            # Compute the test error
-            y_pred = [predict_example(x, decision_tree) for x in Xtst]
-            tst_err = compute_error(ytst, y_pred)
-            tst_errs.append(tst_err)
-
-            # Compute the training error
-            y_pred = [predict_example(x, decision_tree) for x in Xtrn]
-            trn_err = compute_error(ytrn, y_pred)
-            trn_errs.append(trn_err)
-
-        # Plot
-        plt.plot(depths, tst_errs, label='Test Error')
-        plt.plot(depths, trn_errs, label='Training Error')
-        plt.xlabel('Tree Depth')
-        plt.ylabel('Error')
-        plt.title('MONKS ' + x + ' Training and Test Error')
-        plt.legend()
-        plt.show()
-
-    # Part B: Confusion Matrix of MONKS-1 for Depth=1 and Depth=2
-    print('---------- PART B ----------')
-
     # Load the training data
-    M = np.genfromtxt('./monks-1.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
+    M = np.genfromtxt('./mushroom.train', missing_values=0, skip_header=0, delimiter=',', dtype=int)
     ytrn = M[:, 0]
     Xtrn = M[:, 1:]
 
     # Load the test data
-    M = np.genfromtxt('./monks-1.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
+    M = np.genfromtxt('./mushroom.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
     ytst = M[:, 0]
     Xtst = M[:, 1:]
-
-    # Learn a decision tree of depth 1
-    decision_tree_depth1 = id3(Xtrn, ytrn, max_depth=1)
-    y_pred = [predict_example(x, decision_tree_depth1) for x in Xtst]
-    matrix1 = get_confusion_matrix(ytst, y_pred)
-    print('Confusion Matrix for MONKS-1, Depth = 1')
-    print(matrix1)
-
-    # Learn a decision tree of depth 2
-    decision_tree_depth2 = id3(Xtrn, ytrn, max_depth=2)
-    y_pred = [predict_example(x, decision_tree_depth2) for x in Xtst]
-    matrix2 = get_confusion_matrix(ytst, y_pred)
-    print('Confusion Matrix for MONKS-1, Depth = 2')
-    print(matrix2)
-
-    # Part C: Scikit-learn
-    clf = tree.DecisionTreeClassifier()
-    clf = clf.fit(Xtrn, ytrn)
-    tree.export_graphviz(clf, out_file='tree.dot') 
-
-
 
