@@ -538,6 +538,17 @@ def predict_example_bagging(x, bag):
     Returns the predicted label of x according to a majority vote of the bag of trees
     """
 
+    predictions = []
+
+    # Make a prediction using each hypothesis (tree) in the bag
+    for h in bag:
+        prediction = predict_example(x, h)
+        predictions.append(prediction)
+
+    # Make final prediction using majority vote
+    majority = max(set(predictions), key = predictions.count)
+
+    return majority
 
 def predict_example_boosting(x, h_ens):
     """
@@ -560,10 +571,4 @@ if __name__ == '__main__':
     ytst = M[:, 0]
     Xtst = M[:, 1:]
 
-    print('Testing bagging:')
-    trees = bagging(Xtrn, ytrn, 3, 5)
-
-    print(trees)
-    for tree in trees:
-        visualize(tree)
 
