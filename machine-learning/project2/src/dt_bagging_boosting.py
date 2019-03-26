@@ -468,11 +468,18 @@ def bagging(x, y, max_depth, num_trees):
     Returns a list of the hypotheses generated for each of the N samples
     In this case N many ID3 Decision Trees (represented as nested dictionaries) are returned
     """
+    
     bags_X, bags_y = get_samples(x,y,num_trees)
-    print('BagsX:')
-    print(bags_X)
-    print('BagsY:')
-    print(bags_y)
+    
+    trees = []
+
+    # Learn a decision tree for each bag
+    for i in range(num_trees):
+        dt = id3(bags_X[i], bags_y[i], max_depth=max_depth)
+        trees.append(dt)
+
+    return trees
+
 
 def get_samples(x, y, num_trees):
     """
@@ -553,9 +560,10 @@ if __name__ == '__main__':
     ytst = M[:, 0]
     Xtst = M[:, 1:]
 
-    print('Testing get_samples:')
-    x = [1,2,3,4,5,6,7,8,9,10]
-    y = [11,22,33,44,55,66,77,88,99,1010]
+    print('Testing bagging:')
+    trees = bagging(Xtrn, ytrn, 3, 5)
 
-    bagging(x, y, 0, 5)
+    print(trees)
+    for tree in trees:
+        visualize(tree)
 
