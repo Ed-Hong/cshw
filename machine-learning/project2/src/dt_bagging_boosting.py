@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import tree
@@ -467,6 +468,50 @@ def bagging(x, y, max_depth, num_trees):
     Returns a list of the hypotheses generated for each of the N samples
     In this case N many ID3 Decision Trees (represented as nested dictionaries) are returned
     """
+    bags_X, bags_y = get_samples(x,y,num_trees)
+    print('BagsX:')
+    print(bags_X)
+    print('BagsY:')
+    print(bags_y)
+
+def get_samples(x, y, num_trees):
+    """
+    Creates num_trees bootstrap samples by randomly drawing examples with replacement 
+
+    Returns two lists: a list for bags of x and a list for bags of y, each bag containing M many samples ie:
+    bags_X: [   [x_1,x_2, ... , x_m] (B_1)
+                [x_1,x_2, ... , x_m] (B_2)
+                          ...
+                [x_1,x_2, ... , x_m] (B_N) ]
+
+    bags_y: [   [y_1,y_2, ... , y_m] (B_1)
+                [y_1,y_2, ... , y_m] (B_2)
+                          ...
+                [y_1,y_2, ... , y_m] (B_N) ]
+    """
+
+    bags_X = []
+    bags_y = []
+
+    # Each bag contains m evenly sized samples. ie each tree receives the same number of examples
+    m = len(x) // num_trees
+
+    # For each bag from 0 to num_trees - 1
+    for i in range(num_trees):
+        samples_X = []
+        samples_y = []
+
+        # Randomly select m examples
+        while len(samples_X) < m:
+            random_row = random.randrange(len(x))
+            samples_X.append(x[random_row])
+            samples_y.append(y[random_row])
+
+        # Add to the list of bags
+        bags_X.append(samples_X)
+        bags_y.append(samples_y)
+
+    return bags_X, bags_y
 
 
 def boosting(x, y, max_depth, num_stumps):
@@ -507,4 +552,10 @@ if __name__ == '__main__':
     M = np.genfromtxt('./mushroom.test', missing_values=0, skip_header=0, delimiter=',', dtype=int)
     ytst = M[:, 0]
     Xtst = M[:, 1:]
+
+    print('Testing get_samples:')
+    x = [1,2,3,4,5,6,7,8,9,10]
+    y = [11,22,33,44,55,66,77,88,99,1010]
+
+    bagging(x, y, 0, 5)
 
