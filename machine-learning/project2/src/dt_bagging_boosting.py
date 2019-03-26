@@ -48,6 +48,38 @@ def entropy(y):
 
     return H
 
+def entropy_weighted(y, d):
+    """
+    Compute the entropy of a vector y by considering the WEIGHTED counts of the unique values (v1, ... vk), in z
+    
+    For examples which were misclassified, their weights would be increased -> weighted count increases -> p increases -> H decreases
+    
+    The lower entropy means the criterion becomes a better candidate for the next split, as the greedy ID3 algorithm will select the 
+    attribute-value pair that minimizes entropy.
+    
+    Returns the entropy of z with respect to the weighted examples: H(z) = p(z=v1) log2(p(z=v1)) + ... + p(z=vk) log2(p(z=vk))
+    """
+
+    # Initialize the total entropy H to be 0
+    H = 0.0
+
+    yPartitioned = partition(y)
+
+    for v in yPartitioned:
+        # Compute the WEIGHTED count 
+        weighted_count = 0.0
+        for example_index in yPartitioned[v]:
+            weighted_count += d[example_index]
+
+        # Compute P(z = v)
+        # The probability of z = v is the weighted count of v divided by the length of z
+        p = weighted_count / len(y)
+
+        # Add to the total entropy
+        H -= (p * np.log2(p))
+
+    return H    
+
 
 def mutual_information(x, y):
     """
@@ -218,6 +250,91 @@ def id3(x, y, attribute_value_pairs=None, depth=0, max_depth=5):
     return node
 
 
+def id3_boosting(x, y, d, attribute_value_pairs=None, depth=0, max_depth=5):
+    """
+    Implements the same ID3 algorithm as above, only modified to accept an input distribution of the weighted examples
+    This is the Learn function which is called in the boosting algorithm
+
+    Returns a decision tree represented as a nested dictionary as before, for example
+    {(4, 1, False):
+        {(0, 1, False):
+            {(1, 1, False): 1,
+             (1, 1, True): 0},
+         (0, 1, True):
+            {(1, 1, False): 0,
+             (1, 1, True): 1}},
+     (4, 1, True): 1}
+    """
+
+    # Base cases:
+
+    # 0. If the set of labels is empty within this branch, return null (ie: case where all examples are shifted left or right )
+    if len(y) == 0:
+        return None
+
+    # 1. If the entire set of labels is pure, then return that label (which is the majority label)
+    if all(v == 0 for v in y) or all (v == 1 for v in y):
+        return y[0]
+
+    # 2. If there is nothing to split on, then return the majority label
+    if attribute_value_pairs is not None and len(attribute_value_pairs) == 0:
+        return majority_label(y)
+
+    # 3. If the max depth is reached, then return the majority label
+    if depth == max_depth:
+        return majority_label(y)
+
+    # If attribute_value_pairs is null then initialize with all attribute value pairs
+    if attribute_value_pairs is None:
+        attribute_value_pairs = get_attribute_value_pairs(x)
+    
+    # Determine the next best attribute-value pair to split on by selecting the one which yields the most Information Gain
+    # First, determine the best feature to split on
+    attr_set = set()
+    for a, v in attribute_value_pairs:
+        attr_set.add(a)
+    
+    bestAttr, bestAttrIndex = find_best_attribute(x,y, attr_set)
+
+    # Then, determine the best value of the feature to split on taking into account the weights of the examples
+    value_set = set()
+    for aIdx, v in attribute_value_pairs:
+        if aIdx == bestAttrIndex:
+            value_set.add(v)
+    
+    bestValue = find_best_value_weighted(bestAttr, y, d, value_set)
+
+    # Remove the attribute-value pair from the list of attribute-value pairs
+    attribute_value_pairs.remove((bestAttrIndex, bestValue))
+
+    # New data sets for the "Left" branch which denotes (x_bestAttrIndex == bestValue)? -> False
+    xNewFalse = []
+    yNewFalse = []
+
+    # New data sets for the "Right" branch which denotes (x_bestAttrIndex == bestValue)? -> True
+    xNewTrue = []
+    yNewTrue = []
+
+    # Remove the examples matching the attribute-value pair from x and y
+    for rowIdx, row in enumerate(x):
+        addLeft = True
+        for i, v in enumerate(row):
+            if i == bestAttrIndex and v == bestValue:
+                addLeft = False
+        if addLeft:
+            xNewFalse.append(row)
+            yNewFalse.append(y[rowIdx])
+        else:
+            xNewTrue.append(row)
+            yNewTrue.append(y[rowIdx])
+    
+    # New decision node becomes [ (x_bestAttrIndex == bestValue)? ]
+    node = { (bestAttrIndex, bestValue, False) : id3(xNewFalse, yNewFalse, attribute_value_pairs, depth+1),
+             (bestAttrIndex, bestValue, True): id3(xNewTrue, yNewTrue, attribute_value_pairs,depth+1) }
+
+    return node
+
+
 def find_best_attribute(x, y, attr_set):
     """
     Determines the best feature to split on by selecting the one with the most Mutual Information between x and y 
@@ -282,6 +399,50 @@ def find_best_value(attr, y, value_set):
 
         # Compute the entropy of Y given x = v and add to our dictionary
         H_yGivenXequalsV = entropy(yGivenXequalsV)
+        vals_entropies[v] = H_yGivenXequalsV
+
+    # Determine the value of the attribute which yields the lowest entropy in y
+    bestAttrValue = None
+    while True:
+        minEntropy = None
+        for v in vals_entropies:
+            if minEntropy is None or vals_entropies[v] <= minEntropy:
+                minEntropy = vals_entropies[v]
+                bestAttrValue = v
+        
+        if bestAttrValue in value_set:
+            break
+        else:
+            vals_entropies.pop(bestAttrValue, None)
+
+        if len(vals_entropies.keys()) == 0:
+            return list(value_set)[0]
+
+    return bestAttrValue
+
+
+def find_best_value_weighted(attr, y, d, value_set):
+    """
+    Determines the best value of the given attribute to split on by determining which value of the attribute yields the least entropy with y 
+    AND factoring in the weights of the examples given the distribution D
+
+    Returns the value v 
+    """
+
+    bestAttrPartitioned = partition(attr)
+
+    # {attr_value, V : H(Y | X = V)}
+    vals_entropies = {}
+    for v in bestAttrPartitioned:
+        # Build the data vector of Y given x = v
+        yGivenXequalsV = []
+        for i in bestAttrPartitioned[v]:
+            yGivenXequalsV.append(y[i])
+
+        # Compute the entropy of Y given x = v, factoring in the weighted examples
+        H_yGivenXequalsV = entropy_weighted(yGivenXequalsV, d)
+
+        # add to our dictionary
         vals_entropies[v] = H_yGivenXequalsV
 
     # Determine the value of the attribute which yields the lowest entropy in y
