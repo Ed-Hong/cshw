@@ -728,7 +728,7 @@ def boosting(x, y, max_depth, num_stumps):
         alpha_l = 0.5 * np.log((1 - error) / error)
 
         # add the hypothesis and the alpha to our ensemble
-        h_ens.append((h_l, alpha_l))
+        h_ens.append((alpha_l, h_l))
 
         # update the weighted distribution
         for i in range(len(d)):
@@ -770,6 +770,29 @@ def predict_example_boosting(x, h_ens):
 
     Returns the predicted label of x according to a weighted vote of the ensemble of weighted hypotheses / stumps
     """
+
+    weighted_sum = 0.0
+
+    # Generate predictions for the example x using each of the hypotheses
+    for a, h in h_ens:
+        prediction = predict_example(x, h)
+
+        # Our original labels are 0 and +1, but we need to change to -1 and +1
+        if prediction == 0:
+            prediction = -1
+            
+        # Compute the weighted vote alpha*h(x) and add to the sum
+        weighted_vote = a * prediction
+        weighted_sum += weighted_vote
+
+    # Final ensemble prediction is the sign of all the votes totaled
+    if weighted_sum < 0:
+        return 0
+    if weighted_sum > 0:
+        return 1
+
+    # If the final vote cancels to 0, then return null label (ie: cannot make a prediction)
+    return None
 
 
 if __name__ == '__main__':
