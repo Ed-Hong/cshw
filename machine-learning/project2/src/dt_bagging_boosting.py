@@ -759,9 +759,15 @@ def predict_example_bagging(x, bag):
         predictions.append(prediction)
 
     # Make final prediction using majority vote
-    majority = max(set(predictions), key = predictions.count)
+    positive_votes = sum(predictions)
+    if positive_votes > (len(bag) / 2):
+        return 1
+    if positive_votes < (len(bag) / 2):
+        return 0
 
-    return majority
+    # If there is a tie, no prediction can be made; return Null label
+    return None
+
 
 def predict_example_boosting(x, h_ens):
     """
