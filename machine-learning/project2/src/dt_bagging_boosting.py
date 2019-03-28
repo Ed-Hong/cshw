@@ -3,6 +3,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import tree
+from sklearn.ensemble import RandomForestClassifier
 
 def partition(x):
     """
@@ -841,16 +842,43 @@ if __name__ == '__main__':
     #         print('Confusion Matrix for Bagged DT: D = ' + str(d) + 'K = ' + str(k))
     #         print(conf_matrix)
 
-    print('---------- PART B ----------')
-    for d in [1, 2]:
-        for k in [20, 40]:
-            # Learn a weighted ensemble of k Decision Trees each of depth d
-            h_ens = boosting(Xtrn, ytrn, d, k)
+    # print('---------- PART B ----------')
+    # for d in [1, 2]:
+    #     for k in [20, 40]:
+    #         # Learn a weighted ensemble of k Decision Trees each of depth d
+    #         h_ens = boosting(Xtrn, ytrn, d, k)
 
-            y_pred = [predict_example_boosting(x, h_ens) for x in Xtst]
+    #         y_pred = [predict_example_boosting(x, h_ens) for x in Xtst]
+
+    #         conf_matrix = get_confusion_matrix(ytst, y_pred)
+
+    #         print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
+    #         print(conf_matrix)
+
+    print('---------- PART C ----------')
+    # scikit-learn bagging
+    for d in [3, 5]:
+        for k in [10, 20]:
+            clf_bagging = RandomForestClassifier(n_estimators=k)
+            clf_bagging.fit(Xtrn, ytrn)
+
+            y_pred = clf_bagging.predict(Xtst)
 
             conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-            print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
+            print('Confusion Matrix for Bagged DT (Random Forest): D = ' + str(d) + 'K = ' + str(k))
             print(conf_matrix)
+
+    # # scikit-learn boosting
+    # for d in [1, 2]:
+    #     for k in [20, 40]:
+    #         # Learn a weighted ensemble of k Decision Trees each of depth d
+    #         h_ens = boosting(Xtrn, ytrn, d, k)
+
+    #         y_pred = [predict_example_boosting(x, h_ens) for x in Xtst]
+
+    #         conf_matrix = get_confusion_matrix(ytst, y_pred)
+
+    #         print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
+    #         print(conf_matrix)
 
