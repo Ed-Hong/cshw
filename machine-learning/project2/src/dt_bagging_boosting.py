@@ -600,18 +600,33 @@ def get_confusion_matrix(y_true, y_pred):
         if ytrue == 1: 
             if ypred == 1:
                 true_positives += 1
+            else:
                 false_negatives += 1
 
         if ytrue == 0:
             if ypred == 1:
                 false_positives += 1
+            else:
                 true_negatives += 1
 
     n_positives = true_positives + false_positives
     n_negatives = true_negatives + false_negatives
 
-    matrix.append([true_positives / n_positives, false_negatives / n_negatives])
-    matrix.append([false_positives / n_positives, true_negatives / n_negatives])
+    tpr = None
+    fpr = None
+    fnr = None
+    tnr = None
+
+    if n_positives != 0:
+        tpr = true_positives / n_positives
+        fpr = false_positives / n_positives
+
+    if n_negatives != 0:
+        fnr = false_negatives / n_negatives
+        tnr = true_negatives / n_negatives
+
+    matrix.append([tpr, fnr])
+    matrix.append([fpr, tnr])
 
     return matrix
 
@@ -813,5 +828,16 @@ if __name__ == '__main__':
     ytst = M[:, 0]
     Xtst = M[:, 1:]
 
-    boosting(Xtrn, ytrn, 1, 5)
+    print('---------- PART A ----------')
+    for d in [3, 5]:
+        for k in [10, 20]:
+            # Learn a bagged ensemble of k Decision Trees each of depth d
+            bagged_model = bagging(Xtrn, ytrn, d, k)
+
+            y_pred = [predict_example_bagging(x, bagged_model) for x in Xtst]
+
+            conf_matrix = get_confusion_matrix(ytst, y_pred)
+
+            print('Confusion Matrix for Bagged DT: D = ' + str(d) + 'K = ' + str(k))
+            print(conf_matrix)
 
