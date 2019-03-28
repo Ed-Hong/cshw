@@ -1,4 +1,5 @@
 import random
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import tree
@@ -560,6 +561,24 @@ def compute_error(y_true, y_pred):
     return (1 / n) * total_errors
 
 
+def compute_error_weighted(y_true, y_pred, d):
+    """
+    Computes the weighted error between the true labels (y_true) and the predicted labels (y_pred)
+
+    Returns the weighted error = (1/sum of weights) * weighted_count(y_true != y_pred)
+    """
+
+    weighted_errors = 0
+    n = len(y_true)
+
+    for i, ytrue in enumerate(y_true):
+        if ytrue != y_pred[i]:
+            # Add the weight of the example to the weighted error 
+            weighted_errors += d[i]
+
+    return (1 / sum(d)) * weighted_errors
+
+
 def get_confusion_matrix(y_true, y_pred):
     """
     Generates the confusion matrix given the true labels and predicted labels
@@ -686,9 +705,42 @@ def boosting(x, y, max_depth, num_stumps):
     """
     Performs a AdaBoost algorithm on the ID3 learner, iterating up to num_stumps
 
-    Returns a list of the hypotheses generated for each of the N samples
-    In this case N many ID3 Decision Trees (represented as nested dictionaries) are returned
+    Returns an ensemble of hypotheses with their associated alphas, represented as a list of pairs, ie:
+    [ (a_1, h_1), (a_2, h_2), … , (a_L, h_L) ]
     """
+
+    h_ens = []
+
+    # Initialize example weight distribution to be uniform
+    d = [1/len(x) for i in range(len(x))]
+
+    for l in range(num_stumps):
+        # learn a hypothesis h_l
+        h_l = id3_boosting(x, y, d, max_depth=max_depth)
+
+        # generate predictions for the hypothesis
+        predictions = [predict_example(ex, h_l) for ex in x]
+
+        # compute the error of the hypothesis on examples and the weighted distribution
+        error = compute_error_weighted(y, predictions, d)
+        
+        # compute alpha
+        alpha_l = 0.5 * np.log((1 - error) / error)
+
+        # add the hypothesis and the alpha to our ensemble
+        h_ens.append((h_l, alpha_l))
+
+        # update the weighted distribution
+        for i in range(len(d)):
+            if predictions[i] != y[i]:
+                d[i] *= math.exp(alpha_l)
+            else:
+                d[i] *= math.exp(-alpha_l)
+
+        # normalize
+        d = [float(i)/sum(d) for i in d]
+
+    return h_ens
 
 
 def predict_example_bagging(x, bag):
@@ -732,4 +784,5 @@ if __name__ == '__main__':
     ytst = M[:, 0]
     Xtst = M[:, 1:]
 
+    boosting(Xtrn, ytrn, 1, 5)
 
