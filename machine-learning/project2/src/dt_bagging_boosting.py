@@ -740,7 +740,7 @@ def boosting(x, y, max_depth, num_stumps):
         error = compute_error_weighted(y, predictions, d)
         
         # compute alpha
-        alpha_l = 0.5 * np.log((1 - error) / error)
+        alpha_l = 0.5 * math.log((1 - error) / error)
 
         # add the hypothesis and the alpha to our ensemble
         h_ens.append((alpha_l, h_l))
@@ -828,16 +828,29 @@ if __name__ == '__main__':
     ytst = M[:, 0]
     Xtst = M[:, 1:]
 
-    print('---------- PART A ----------')
-    for d in [3, 5]:
-        for k in [10, 20]:
-            # Learn a bagged ensemble of k Decision Trees each of depth d
-            bagged_model = bagging(Xtrn, ytrn, d, k)
+    # print('---------- PART A ----------')
+    # for d in [3, 5]:
+    #     for k in [10, 20]:
+    #         # Learn a bagged ensemble of k Decision Trees each of depth d
+    #         bagged_model = bagging(Xtrn, ytrn, d, k)
 
-            y_pred = [predict_example_bagging(x, bagged_model) for x in Xtst]
+    #         y_pred = [predict_example_bagging(x, bagged_model) for x in Xtst]
+
+    #         conf_matrix = get_confusion_matrix(ytst, y_pred)
+
+    #         print('Confusion Matrix for Bagged DT: D = ' + str(d) + 'K = ' + str(k))
+    #         print(conf_matrix)
+
+    print('---------- PART B ----------')
+    for d in [1, 2]:
+        for k in [20, 40]:
+            # Learn a weighted ensemble of k Decision Trees each of depth d
+            h_ens = boosting(Xtrn, ytrn, d, k)
+
+            y_pred = [predict_example_boosting(x, h_ens) for x in Xtst]
 
             conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-            print('Confusion Matrix for Bagged DT: D = ' + str(d) + 'K = ' + str(k))
+            print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
             print(conf_matrix)
 
