@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import tree
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 
 def partition(x):
     """
@@ -830,30 +831,30 @@ if __name__ == '__main__':
     Xtst = M[:, 1:]
 
     # print('---------- PART A ----------')
-    # for d in [3, 5]:
-    #     for k in [10, 20]:
-    #         # Learn a bagged ensemble of k Decision Trees each of depth d
-    #         bagged_model = bagging(Xtrn, ytrn, d, k)
+    for d in [3, 5]:
+        for k in [10, 20]:
+            # Learn a bagged ensemble of k Decision Trees each of depth d
+            bagged_model = bagging(Xtrn, ytrn, d, k)
 
-    #         y_pred = [predict_example_bagging(x, bagged_model) for x in Xtst]
+            y_pred = [predict_example_bagging(x, bagged_model) for x in Xtst]
 
-    #         conf_matrix = get_confusion_matrix(ytst, y_pred)
+            conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-    #         print('Confusion Matrix for Bagged DT: D = ' + str(d) + 'K = ' + str(k))
-    #         print(conf_matrix)
+            print('Confusion Matrix for Bagged DT: D = ' + str(d) + 'K = ' + str(k))
+            print(conf_matrix)
 
     # print('---------- PART B ----------')
-    # for d in [1, 2]:
-    #     for k in [20, 40]:
-    #         # Learn a weighted ensemble of k Decision Trees each of depth d
-    #         h_ens = boosting(Xtrn, ytrn, d, k)
+    for d in [1, 2]:
+        for k in [20, 40]:
+            # Learn a weighted ensemble of k Decision Trees each of depth d
+            h_ens = boosting(Xtrn, ytrn, d, k)
 
-    #         y_pred = [predict_example_boosting(x, h_ens) for x in Xtst]
+            y_pred = [predict_example_boosting(x, h_ens) for x in Xtst]
 
-    #         conf_matrix = get_confusion_matrix(ytst, y_pred)
+            conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-    #         print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
-    #         print(conf_matrix)
+            print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
+            print(conf_matrix)
 
     print('---------- PART C ----------')
     # scikit-learn bagging
@@ -869,16 +870,16 @@ if __name__ == '__main__':
             print('Confusion Matrix for Bagged DT (Random Forest): D = ' + str(d) + 'K = ' + str(k))
             print(conf_matrix)
 
-    # # scikit-learn boosting
-    # for d in [1, 2]:
-    #     for k in [20, 40]:
-    #         # Learn a weighted ensemble of k Decision Trees each of depth d
-    #         h_ens = boosting(Xtrn, ytrn, d, k)
+    # scikit-learn boosting
+    for d in [1, 2]:
+        for k in [20, 40]:
+            clf_boosting = AdaBoostClassifier(n_estimators=k)
+            clf_boosting.fit(Xtrn, ytrn)
 
-    #         y_pred = [predict_example_boosting(x, h_ens) for x in Xtst]
+            y_pred = clf_boosting.predict(Xtst)
 
-    #         conf_matrix = get_confusion_matrix(ytst, y_pred)
+            conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-    #         print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
-    #         print(conf_matrix)
+            print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
+            print(conf_matrix)
 
