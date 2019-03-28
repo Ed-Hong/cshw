@@ -840,7 +840,7 @@ if __name__ == '__main__':
 
             conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-            print('Confusion Matrix for Bagged DT: D = ' + str(d) + 'K = ' + str(k))
+            print('Confusion Matrix for Bagged DT: D = ' + str(d) + ' K = ' + str(k))
             print(conf_matrix)
 
     # print('---------- PART B ----------')
@@ -853,7 +853,7 @@ if __name__ == '__main__':
 
             conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-            print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
+            print('Confusion Matrix for Boosted DT: D = ' + str(d) + ' K = ' + str(k))
             print(conf_matrix)
 
     print('---------- PART C ----------')
@@ -867,7 +867,7 @@ if __name__ == '__main__':
 
             conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-            print('Confusion Matrix for Bagged DT (Random Forest): D = ' + str(d) + 'K = ' + str(k))
+            print('Confusion Matrix for Bagged DT (Random Forest): D = ' + str(d) + ' K = ' + str(k))
             print(conf_matrix)
 
     # scikit-learn boosting
@@ -880,6 +880,6 @@ if __name__ == '__main__':
 
             conf_matrix = get_confusion_matrix(ytst, y_pred)
 
-            print('Confusion Matrix for Boosted DT: D = ' + str(d) + 'K = ' + str(k))
+            print('Confusion Matrix for Boosted DT: D = ' + str(d) + ' K = ' + str(k))
             print(conf_matrix)
 
