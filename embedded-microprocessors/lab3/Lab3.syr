@@ -1,18 +1,21 @@
-Release 14.7 - xst P.20131013 (nt64)
+Release 14.7 - xst P.20131013 (lin64)
 Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
---> Parameter TMPDIR set to xst/projnav.tmp
+--> 
+Parameter TMPDIR set to xst/projnav.tmp
 
 
-Total REAL time to Xst completion: 1.00 secs
-Total CPU time to Xst completion: 1.07 secs
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.09 secs
  
---> Parameter xsthdpdir set to xst
+--> 
+Parameter xsthdpdir set to xst
 
 
-Total REAL time to Xst completion: 1.00 secs
-Total CPU time to Xst completion: 1.07 secs
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.09 secs
  
---> Reading design: Lab3.prj
+--> 
+Reading design: Lab3.prj
 
 TABLE OF CONTENTS
   1) Synthesis Options Summary
@@ -105,12 +108,12 @@ Slice Utilization Ratio Delta      : 5
 =========================================================================
 *                          HDL Parsing                                  *
 =========================================================================
-Analyzing Verilog file "C:\Users\exh150330\Desktop\Lab3\LEDprogram.v" into library work
+Analyzing Verilog file "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/LEDprogram.v" into library work
 Parsing module <LEDprogram>.
 Parsing module <jtag_loader_6>.
-Analyzing Verilog file "C:\Users\exh150330\Desktop\Lab3\KCPSM6_Release9_30Sept14\Verilog\kcpsm6.v" into library work
+Analyzing Verilog file "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/KCPSM6_Release9_30Sept14/Verilog/kcpsm6.v" into library work
 Parsing module <kcpsm6>.
-Analyzing Verilog file "C:\Users\exh150330\Desktop\Lab3\Lab3.v" into library work
+Analyzing Verilog file "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" into library work
 Parsing module <Lab3>.
 
 =========================================================================
@@ -206,14 +209,14 @@ Elaborating module <LUT6(INIT=64'b1011111110111100100011111000110010110011101100
 Elaborating module <LUT6(INIT=64'b1111111100000000111100001111000011001100110011001010101010101010)>.
 
 Elaborating module <RAM64M(INIT_A=64'b0,INIT_B=64'b0,INIT_C=64'b0,INIT_D=64'b0)>.
-WARNING:HDLCompiler:1127 - "C:\Users\exh150330\Desktop\Lab3\Lab3.v" Line 49: Assignment to k_write_strobe ignored, since the identifier is never used
-WARNING:HDLCompiler:1127 - "C:\Users\exh150330\Desktop\Lab3\Lab3.v" Line 51: Assignment to read_strobe ignored, since the identifier is never used
-WARNING:HDLCompiler:1127 - "C:\Users\exh150330\Desktop\Lab3\Lab3.v" Line 54: Assignment to interrupt_ack ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" Line 53: Assignment to k_write_strobe ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" Line 55: Assignment to read_strobe ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" Line 58: Assignment to interrupt_ack ignored, since the identifier is never used
 
 Elaborating module <LEDprogram(C_FAMILY="S6",C_RAM_SIZE_KWORDS=1,C_JTAG_LOADER_ENABLE=1)>.
 
 Elaborating module
-<RAMB16BWER(DATA_WIDTH_A=18,DOA_REG=0,EN_RSTRAM_A="FALSE",INIT_A=9'b0,RST_PRIORITY_A="CE",SRVAL_A=9'b0,WRITE_MODE_A="WRITE_FIRST",DATA_WIDTH_B=18,DOB_REG=0,EN_RSTRAM_B="FALSE",INIT_B=9'b0,RST_PRIORITY_B="CE",SRVAL_B=9'b0,WRITE_MODE_B="WRITE_FIRST",RSTTYPE="SYNC",INIT_FILE="NONE",SIM_COLLISION_CHECK="ALL",SIM_DEVICE="SPARTAN6",INIT_00=256'b0100000000000001101000100000010110100000000000100010001000000000001000010010011,INIT_01=256'b0,INIT_02=256'b0,INIT_03=256'b0,INIT_04=256'b0,INIT_05=256'b0,INIT_06=256'b0,INIT_07=256'b0,INIT_08=256'b0,INIT_09=256'b0,INIT_0A=256'b0,INIT_0B=256'b0,INIT_0C=256'b0,INIT_0D=256'b0,INIT_0E=256'b0,INIT_0F=256'b0,INIT_10=256'b0,INIT_11=256'b0,INIT_12=256'b0,INIT_13=256'b0,INIT_14=256'b0,INIT_15=256'b0,INIT_16=256'b0,INIT_17=256'b0,INIT_18=256'b0,INIT_19=256'b0,INIT_1A=256'b0,INIT_1B=256'b0,INIT_1C=256'b0,INIT_1D=256'b0,INIT_1E=256'b0,INIT_1F=256'b0,INIT_20=256'b0,INIT_21=256'b0,INIT_22=256'b0,INIT_23=256'b0,INIT_24=256'b0,INIT_25=256'b0,INIT_26=256'b0,INIT_27=256'b0,INIT_28=256'b0,INI
+<RAMB16BWER(DATA_WIDTH_A=18,DOA_REG=0,EN_RSTRAM_A="FALSE",INIT_A=9'b0,RST_PRIORITY_A="CE",SRVAL_A=9'b0,WRITE_MODE_A="WRITE_FIRST",DATA_WIDTH_B=18,DOB_REG=0,EN_RSTRAM_B="FALSE",INIT_B=9'b0,RST_PRIORITY_B="CE",SRVAL_B=9'b0,WRITE_MODE_B="WRITE_FIRST",RSTTYPE="SYNC",INIT_FILE="NONE",SIM_COLLISION_CHECK="ALL",SIM_DEVICE="SPARTAN6",INIT_00=256'b0100000000000001101000100000010110100000000000100010001000000000001000010010010,INIT_01=256'b0,INIT_02=256'b0,INIT_03=256'b0,INIT_04=256'b0,INIT_05=256'b0,INIT_06=256'b0,INIT_07=256'b0,INIT_08=256'b0,INIT_09=256'b0,INIT_0A=256'b0,INIT_0B=256'b0,INIT_0C=256'b0,INIT_0D=256'b0,INIT_0E=256'b0,INIT_0F=256'b0,INIT_10=256'b0,INIT_11=256'b0,INIT_12=256'b0,INIT_13=256'b0,INIT_14=256'b0,INIT_15=256'b0,INIT_16=256'b0,INIT_17=256'b0,INIT_18=256'b0,INIT_19=256'b0,INIT_1A=256'b0,INIT_1B=256'b0,INIT_1C=256'b0,INIT_1D=256'b0,INIT_1E=256'b0,INIT_1F=256'b0,INIT_20=256'b0,INIT_21=256'b0,INIT_22=256'b0,INIT_23=256'b0,INIT_24=256'b0,INIT_25=256'b0,INIT_26=256'b0,INIT_27=256'b0,INIT_28=256'b0,INI
 T_29=256'b0,INIT_2A=256'b0,INIT_2B=256'b0,INIT_2C=256'b0,INIT_2D=256'b0,INIT_2E=256'b0,INIT_2F=256'b0,INIT_30=256'b0,INIT_31=256'b0,INIT_32=256'b0,INIT_33=256'b0,INIT_34=256'b0,INIT_35=256'b0,INIT_36=256'b0,INIT_37=256'b0,INIT_38=256'b0,INIT_39=256'b0,INIT_3A=256'b0,INIT_3B=256'b0,INIT_3C=256'b0,INIT_3D=256'b0,INIT_3E=256'b0,INIT_3F=256'b0,INITP_00=256'b01010100000,INITP_01=256'b0,INITP_02=256'b0,INITP_03=256'b0,INITP_04=256'b0,INITP_05=256'b0,INITP_06=256'b0,INITP_07=256'b0)>.
 
 Elaborating module <jtag_loader_6(C_FAMILY="S6",C_NUM_PICOBLAZE=1,C_JTAG_LOADER_ENABLE=1,C_BRAM_MAX_ADDR_WIDTH=32'sb01010,C_ADDR_WIDTH_0=32'sb01010)>.
@@ -221,26 +224,25 @@ Elaborating module <jtag_loader_6(C_FAMILY="S6",C_NUM_PICOBLAZE=1,C_JTAG_LOADER_
 Elaborating module <BSCAN_SPARTAN6(JTAG_CHAIN=2)>.
 
 Elaborating module <BUFG>.
-WARNING:HDLCompiler:634 - "C:\Users\exh150330\Desktop\Lab3\Lab3.v" Line 29: Net <in_port[7]> does not have a driver.
 
 =========================================================================
 *                           HDL Synthesis                               *
 =========================================================================
 
 Synthesizing Unit <Lab3>.
-    Related source file is "C:\Users\exh150330\Desktop\Lab3\Lab3.v".
-INFO:Xst:3210 - "C:\Users\exh150330\Desktop\Lab3\Lab3.v" line 43: Output port <k_write_strobe> of the instance <processor> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\exh150330\Desktop\Lab3\Lab3.v" line 43: Output port <read_strobe> of the instance <processor> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "C:\Users\exh150330\Desktop\Lab3\Lab3.v" line 43: Output port <interrupt_ack> of the instance <processor> is unconnected or connected to loadless signal.
-WARNING:Xst:653 - Signal <in_port> is used but never assigned. This sourceless signal will be automatically connected to value GND.
-    Found 4-bit register for signal <an>.
+    Related source file is "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v".
+INFO:Xst:3210 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" line 47: Output port <k_write_strobe> of the instance <processor> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" line 47: Output port <read_strobe> of the instance <processor> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" line 47: Output port <interrupt_ack> of the instance <processor> is unconnected or connected to loadless signal.
     Found 8-bit register for signal <out>.
+    Found 4-bit register for signal <an>.
+    Found 8-bit register for signal <in_port>.
     Summary:
-	inferred  12 D-type flip-flop(s).
+	inferred  20 D-type flip-flop(s).
 Unit <Lab3> synthesized.
 
 Synthesizing Unit <kcpsm6>.
-    Related source file is "C:\Users\exh150330\Desktop\Lab3\KCPSM6_Release9_30Sept14\Verilog\kcpsm6.v".
+    Related source file is "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/KCPSM6_Release9_30Sept14/Verilog/kcpsm6.v".
         hwbuild = 8'b00000000
         interrupt_vector = 12'b001111111111
         scratch_pad_memory_size = 64
@@ -470,7 +472,7 @@ Synthesizing Unit <kcpsm6>.
 Unit <kcpsm6> synthesized.
 
 Synthesizing Unit <LEDprogram>.
-    Related source file is "C:\Users\exh150330\Desktop\Lab3\LEDprogram.v".
+    Related source file is "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/LEDprogram.v".
         C_JTAG_LOADER_ENABLE = 1
         C_FAMILY = "S6"
         C_RAM_SIZE_KWORDS = 1
@@ -480,7 +482,7 @@ Synthesizing Unit <LEDprogram>.
 Unit <LEDprogram> synthesized.
 
 Synthesizing Unit <jtag_loader_6>.
-    Related source file is "C:\Users\exh150330\Desktop\Lab3\LEDprogram.v".
+    Related source file is "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/LEDprogram.v".
         C_JTAG_LOADER_ENABLE = 1
         C_FAMILY = "S6"
         C_NUM_PICOBLAZE = 1
@@ -537,11 +539,11 @@ Unit <jtag_loader_6> synthesized.
 HDL Synthesis Report
 
 Macro Statistics
-# Registers                                            : 26
+# Registers                                            : 27
  1-bit register                                        : 22
  10-bit register                                       : 1
  4-bit register                                        : 1
- 8-bit register                                        : 2
+ 8-bit register                                        : 3
 # Multiplexers                                         : 27
  1-bit 2-to-1 multiplexer                              : 20
  18-bit 2-to-1 multiplexer                             : 1
@@ -558,8 +560,8 @@ Macro Statistics
 Advanced HDL Synthesis Report
 
 Macro Statistics
-# Registers                                            : 134
- Flip-Flops                                            : 134
+# Registers                                            : 142
+ Flip-Flops                                            : 142
 # Multiplexers                                         : 27
  1-bit 2-to-1 multiplexer                              : 20
  18-bit 2-to-1 multiplexer                             : 1
@@ -610,8 +612,8 @@ Final Macro Processing ...
 Final Register Report
 
 Macro Statistics
-# Registers                                            : 130
- Flip-Flops                                            : 130
+# Registers                                            : 138
+ Flip-Flops                                            : 138
 
 =========================================================================
 WARNING:Xst:1293 - FF/Latch <processor/sync_interrupt_flop> has a constant value of 0 in block <Lab3>. This FF/Latch will be trimmed during the optimization process.
@@ -649,8 +651,8 @@ Primitive and Black Box Usage:
 #      MUXCY                       : 29
 #      VCC                         : 1
 #      XORCY                       : 27
-# FlipFlops/Latches                : 130
-#      FD                          : 48
+# FlipFlops/Latches                : 138
+#      FD                          : 56
 #      FDE                         : 44
 #      FDR                         : 24
 #      FDRE                        : 14
@@ -661,7 +663,8 @@ Primitive and Black Box Usage:
 # Clock Buffers                    : 2
 #      BUFG                        : 1
 #      BUFGP                       : 1
-# IO Buffers                       : 12
+# IO Buffers                       : 20
+#      IBUF                        : 8
 #      OBUF                        : 12
 # Others                           : 1
 #      BSCAN_SPARTAN6              : 1
@@ -673,22 +676,22 @@ Selected Device : 6slx16csg324-2
 
 
 Slice Logic Utilization: 
- Number of Slice Registers:             130  out of  18224     0%  
+ Number of Slice Registers:             138  out of  18224     0%  
  Number of Slice LUTs:                  131  out of   9112     1%  
     Number used as Logic:               107  out of   9112     1%  
     Number used as Memory:               24  out of   2176     1%  
        Number used as RAM:               24
 
 Slice Logic Distribution: 
- Number of LUT Flip Flop pairs used:    186
-   Number with an unused Flip Flop:      56  out of    186    30%  
-   Number with an unused LUT:            55  out of    186    29%  
-   Number of fully used LUT-FF pairs:    75  out of    186    40%  
+ Number of LUT Flip Flop pairs used:    192
+   Number with an unused Flip Flop:      54  out of    192    28%  
+   Number with an unused LUT:            61  out of    192    31%  
+   Number of fully used LUT-FF pairs:    77  out of    192    40%  
    Number of unique control sets:        12
 
 IO Utilization: 
- Number of IOs:                          13
- Number of bonded IOBs:                  13  out of    232     5%  
+ Number of IOs:                          21
+ Number of bonded IOBs:                  21  out of    232     9%  
 
 Specific Feature Utilization:
  Number of Block RAM/FIFO:                1  out of     32     3%  
@@ -716,7 +719,7 @@ Clock Information:
 ------------------------------------------------------+---------------------------------------------------------------------------+-------+
 Clock Signal                                          | Clock buffer(FF name)                                                     | Load  |
 ------------------------------------------------------+---------------------------------------------------------------------------+-------+
-clk                                                   | BUFGP                                                                     | 101   |
+clk                                                   | BUFGP                                                                     | 109   |
 program_rom/jtag_clk                                  | NONE(program_rom/instantiate_loader.jtag_loader_6_inst/control_dout_int_7)| 6     |
 program_rom/instantiate_loader.jtag_loader_6_inst/drck| BUFG                                                                      | 31    |
 ------------------------------------------------------+---------------------------------------------------------------------------+-------+
@@ -742,7 +745,7 @@ All values displayed in nanoseconds (ns)
 =========================================================================
 Timing constraint: Default period analysis for Clock 'clk'
   Clock period: 8.961ns (frequency: 111.595MHz)
-  Total number of paths / destination ports: 7485 / 243
+  Total number of paths / destination ports: 7517 / 243
 -------------------------------------------------------------------------
 Delay:               8.961ns (Levels of Logic = 9)
   Source:            program_rom/ram_1k_generate.s6.kcpsm6_rom (RAM)
@@ -812,6 +815,25 @@ Delay:               3.834ns (Levels of Logic = 1)
     ----------------------------------------
     Total                      3.834ns (1.062ns logic, 2.772ns route)
                                        (27.7% logic, 72.3% route)
+
+=========================================================================
+Timing constraint: Default OFFSET IN BEFORE for Clock 'clk'
+  Total number of paths / destination ports: 8 / 8
+-------------------------------------------------------------------------
+Offset:              2.083ns (Levels of Logic = 1)
+  Source:            sw<0> (PAD)
+  Destination:       in_port_0 (FF)
+  Destination Clock: clk rising
+
+  Data Path: sw<0> to in_port_0
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     IBUF:I->O             1   1.328   0.681  sw_0_IBUF (sw_0_IBUF)
+     FD:D                      0.074          in_port_0
+    ----------------------------------------
+    Total                      2.083ns (1.402ns logic, 0.681ns route)
+                                       (67.3% logic, 32.7% route)
 
 =========================================================================
 Timing constraint: Default OFFSET IN BEFORE for Clock 'program_rom/jtag_clk'
@@ -926,14 +948,15 @@ program_rom/jtag_clk                                  |    1.855|         |     
 =========================================================================
 
 
-Total REAL time to Xst completion: 22.00 secs
-Total CPU time to Xst completion: 21.62 secs
+Total REAL time to Xst completion: 9.00 secs
+Total CPU time to Xst completion: 8.84 secs
  
 --> 
 
-Total memory usage is 295432 kilobytes
+
+Total memory usage is 486892 kilobytes
 
 Number of errors   :    0 (   0 filtered)
-Number of warnings :   31 (   0 filtered)
+Number of warnings :   29 (   0 filtered)
 Number of infos    :    5 (   0 filtered)
 

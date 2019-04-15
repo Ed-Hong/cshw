@@ -53,3 +53,9 @@ map -intstyle ise -p xc6slx16-csg324-2 -w -logic_opt off -ol high -t 1 -xt 0 -re
 par -w -intstyle ise -ol high -mt off Lab3_map.ncd Lab3.ncd Lab3.pcf 
 trce -intstyle ise -v 3 -s 2 -n 3 -fastpaths -xml Lab3.twx Lab3.ncd -o Lab3.twr Lab3.pcf -ucf Nexys3_master.ucf 
 bitgen -intstyle ise -f Lab3.ut Lab3.ncd 
+xst -intstyle ise -ifn "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.xst" -ofn "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.syr" 
+ngdbuild -intstyle ise -dd _ngo -nt timestamp -uc Nexys3_master.ucf -p xc6slx16-csg324-2 Lab3.ngc Lab3.ngd  
+map -intstyle ise -p xc6slx16-csg324-2 -w -logic_opt off -ol high -t 1 -xt 0 -register_duplication off -r 4 -global_opt off -mt off -ir off -pr off -lc off -power off -o Lab3_map.ncd Lab3.ngd Lab3.pcf 
+par -w -intstyle ise -ol high -mt off Lab3_map.ncd Lab3.ncd Lab3.pcf 
+trce -intstyle ise -v 3 -s 2 -n 3 -fastpaths -xml Lab3.twx Lab3.ncd -o Lab3.twr Lab3.pcf -ucf Nexys3_master.ucf 
+bitgen -intstyle ise -f Lab3.ut Lab3.ncd 

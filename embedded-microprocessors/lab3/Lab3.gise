@@ -25,8 +25,11 @@
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="LEDprogram.prj"/>
     <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="LEDprogram.stx"/>
     <file xil_pn:fileType="FILE_XST" xil_pn:name="LEDprogram.xst"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_REPORT" xil_pn:name="Lab3.bgn" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BIT" xil_pn:name="Lab3.bit" xil_pn:subbranch="FPGAConfiguration"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGDBUILD_LOG" xil_pn:name="Lab3.bld"/>
     <file xil_pn:fileType="FILE_CMD_LOG" xil_pn:name="Lab3.cmd_log"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_DRC" xil_pn:name="Lab3.drc" xil_pn:subbranch="FPGAConfiguration"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_LSO" xil_pn:name="Lab3.lso"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NCD" xil_pn:name="Lab3.ncd" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGC" xil_pn:name="Lab3.ngc"/>
@@ -45,6 +48,7 @@
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_REPORT" xil_pn:name="Lab3.ut" xil_pn:subbranch="FPGAConfiguration"/>
     <file xil_pn:fileType="FILE_XPI" xil_pn:name="Lab3.xpi"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="Lab3.xst"/>
+    <file xil_pn:fileType="FILE_HTML" xil_pn:name="Lab3_envsettings.html"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="Lab3_guide.ncd" xil_pn:origination="imported"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="Lab3_map.map" xil_pn:subbranch="Map"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="Lab3_map.mrp" xil_pn:subbranch="Map"/>
@@ -180,13 +184,11 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1554938666" xil_pn:in_ck="-601142235507338635" xil_pn:name="TRANEXT_xstsynthesize_spartan6" xil_pn:prop_ck="2212408275109297556" xil_pn:start_ts="1554938640">
+    <transform xil_pn:end_ts="1555295650" xil_pn:in_ck="-601142235507338635" xil_pn:name="TRANEXT_xstsynthesize_spartan6" xil_pn:prop_ck="2212408275109297556" xil_pn:start_ts="1555295636">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="Lab3.lso"/>
       <outfile xil_pn:name="Lab3.ngc"/>
@@ -202,33 +204,23 @@
       <outfile xil_pn:name="webtalk_pn.xml"/>
       <outfile xil_pn:name="xst"/>
     </transform>
-    <transform xil_pn:end_ts="1554938666" xil_pn:in_ck="-5481817853030847" xil_pn:name="TRAN_compileBCD2" xil_pn:prop_ck="123229027434741444" xil_pn:start_ts="1554938666">
+    <transform xil_pn:end_ts="1555295650" xil_pn:in_ck="-5481817853030847" xil_pn:name="TRAN_compileBCD2" xil_pn:prop_ck="123229027434741444" xil_pn:start_ts="1555295650">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="InputChanged"/>
     </transform>
-    <transform xil_pn:end_ts="1554938681" xil_pn:in_ck="-621055035613697655" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="5967375297079672902" xil_pn:start_ts="1554938666">
+    <transform xil_pn:end_ts="1555295659" xil_pn:in_ck="-621055035613697655" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="5967375297079672902" xil_pn:start_ts="1555295650">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
-      <status xil_pn:value="InputChanged"/>
       <outfile xil_pn:name="Lab3.bld"/>
       <outfile xil_pn:name="Lab3.ngd"/>
       <outfile xil_pn:name="Lab3_ngdbuild.xrpt"/>
       <outfile xil_pn:name="_ngo"/>
       <outfile xil_pn:name="_xmsgs/ngdbuild.xmsgs"/>
     </transform>
-    <transform xil_pn:end_ts="1554938712" xil_pn:in_ck="2270293338317736874" xil_pn:name="TRANEXT_map_spartan6" xil_pn:prop_ck="-3180699873896808002" xil_pn:start_ts="1554938681">
+    <transform xil_pn:end_ts="1555295677" xil_pn:in_ck="2270293338317736874" xil_pn:name="TRANEXT_map_spartan6" xil_pn:prop_ck="-3180699873896808002" xil_pn:start_ts="1555295659">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
-      <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputChanged"/>
-      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="Lab3.pcf"/>
       <outfile xil_pn:name="Lab3_map.map"/>
       <outfile xil_pn:name="Lab3_map.mrp"/>
@@ -239,12 +231,9 @@
       <outfile xil_pn:name="Lab3_usage.xml"/>
       <outfile xil_pn:name="_xmsgs/map.xmsgs"/>
     </transform>
-    <transform xil_pn:end_ts="1554938756" xil_pn:in_ck="-4794874394919445405" xil_pn:name="TRANEXT_par_spartan6" xil_pn:prop_ck="-1178055513630676559" xil_pn:start_ts="1554938712">
+    <transform xil_pn:end_ts="1555295700" xil_pn:in_ck="-4794874394919445405" xil_pn:name="TRANEXT_par_spartan6" xil_pn:prop_ck="-1178055513630676559" xil_pn:start_ts="1555295677">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
-      <status xil_pn:value="InputChanged"/>
       <outfile xil_pn:name="Lab3.ncd"/>
       <outfile xil_pn:name="Lab3.pad"/>
       <outfile xil_pn:name="Lab3.par"/>
@@ -256,25 +245,21 @@
       <outfile xil_pn:name="Lab3_par.xrpt"/>
       <outfile xil_pn:name="_xmsgs/par.xmsgs"/>
     </transform>
-    <transform xil_pn:end_ts="1554938792" xil_pn:in_ck="3368171585989" xil_pn:name="TRANEXT_bitFile_spartan6" xil_pn:prop_ck="5341574683187206424" xil_pn:start_ts="1554938756">
+    <transform xil_pn:end_ts="1555295716" xil_pn:in_ck="3368171585989" xil_pn:name="TRANEXT_bitFile_spartan6" xil_pn:prop_ck="5341574683187206424" xil_pn:start_ts="1555295700">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <outfile xil_pn:name="Lab3.bgn"/>
+      <outfile xil_pn:name="Lab3.bit"/>
+      <outfile xil_pn:name="Lab3.drc"/>
       <outfile xil_pn:name="Lab3.ut"/>
       <outfile xil_pn:name="_xmsgs/bitgen.xmsgs"/>
-      <outfile xil_pn:name="lab3.bgn"/>
-      <outfile xil_pn:name="lab3.bit"/>
-      <outfile xil_pn:name="lab3.drc"/>
       <outfile xil_pn:name="usage_statistics_webtalk.html"/>
       <outfile xil_pn:name="webtalk.log"/>
       <outfile xil_pn:name="webtalk_pn.xml"/>
     </transform>
-    <transform xil_pn:end_ts="1554938756" xil_pn:in_ck="7993933527268962982" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416184" xil_pn:start_ts="1554938740">
+    <transform xil_pn:end_ts="1555295700" xil_pn:in_ck="7993933527268962982" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416184" xil_pn:start_ts="1555295692">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
-      <status xil_pn:value="InputChanged"/>
       <outfile xil_pn:name="Lab3.twr"/>
       <outfile xil_pn:name="Lab3.twx"/>
       <outfile xil_pn:name="_xmsgs/trce.xmsgs"/>

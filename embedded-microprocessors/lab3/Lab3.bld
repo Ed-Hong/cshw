@@ -1,11 +1,12 @@
-Release 14.7 ngdbuild P.20131013 (nt64)
+Release 14.7 ngdbuild P.20131013 (lin64)
 Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
 
-Command Line: C:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\ngdbuild.exe
+Command Line: /proj/cad/xilinx_14.7/14.7/ISE_DS/ISE/bin/lin64/unwrapped/ngdbuild
 -intstyle ise -dd _ngo -nt timestamp -uc Nexys3_master.ucf -p xc6slx16-csg324-2
 Lab3.ngc Lab3.ngd
 
-Reading NGO file "C:/Users/exh150330/Desktop/Lab3/Lab3.ngc" ...
+Reading NGO file
+"/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.ngc" ...
 Gathering constraint information from source properties...
 Done.
 
@@ -33,10 +34,10 @@ NGDBUILD Design Results Summary:
   Number of errors:     0
   Number of warnings:   3
 
-Total memory usage is 166408 kilobytes
+Total memory usage is 497968 kilobytes
 
 Writing NGD file "Lab3.ngd" ...
-Total REAL time to NGDBUILD completion:  10 sec
+Total REAL time to NGDBUILD completion:  5 sec
 Total CPU time to NGDBUILD completion:   4 sec
 
 Writing NGDBUILD log file "Lab3.bld"...
