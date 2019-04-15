@@ -1,0 +1,9 @@
+       CONSTANT Acheck, 10010011'b
+       CONSTANT an, 00000000'b
+       CONSTANT NUM_PORT, 01
+       CONSTANT AN_PORT, 02
+start: LOAD s0, Acheck
+       LOAD s1, an
+       OUTPUT s0, NUM_PORT
+       OUTPUT s1, AN_PORT
+       JUMP start
