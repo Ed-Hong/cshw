@@ -19,8 +19,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module Lab3( 	output reg [7:0] out, 
-					output reg [3:0] an, 
 					input wire [7:0] sw, 
+					output reg [3:0] an,
 					input clk
 				);
 	 
@@ -105,10 +105,11 @@ module Lab3( 	output reg [7:0] out,
 	//---OUTPUTS---
       // 'write_strobe' is used to qualify all writes to general output ports.
       if (write_strobe == 1'b1) begin
+		
         // Write to out at port address 01 hex
-        if (port_id[0] == 1'b1) begin
-          out <= out_port;
-        end
+//        if (port_id[0] == 1'b1) begin
+//          out <= out_port;
+//        end
 		  
 		 // Write to out at port address 02 hex
 //        if (port_id[1] == 1'b1) begin
@@ -118,6 +119,11 @@ module Lab3( 	output reg [7:0] out,
 		 // Write to out at port address 08 hex
         if (port_id[3] == 1'b1) begin
           an <= out_port[3:0];
+        end
+		  
+		 // Write to out at port address 10 hex (16 decimal)
+        if (port_id[4] == 1'b1) begin
+          out <= out_port;
         end
 		  
       end

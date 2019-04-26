@@ -1,21 +1,18 @@
-Release 14.7 - xst P.20131013 (lin64)
+Release 14.7 - xst P.20131013 (nt64)
 Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
---> 
-Parameter TMPDIR set to xst/projnav.tmp
+--> Parameter TMPDIR set to xst/projnav.tmp
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.09 secs
+Total CPU time to Xst completion: 0.55 secs
  
---> 
-Parameter xsthdpdir set to xst
+--> Parameter xsthdpdir set to xst
 
 
 Total REAL time to Xst completion: 0.00 secs
-Total CPU time to Xst completion: 0.09 secs
+Total CPU time to Xst completion: 0.56 secs
  
---> 
-Reading design: Lab3.prj
+--> Reading design: Lab3.prj
 
 TABLE OF CONTENTS
   1) Synthesis Options Summary
@@ -108,12 +105,12 @@ Slice Utilization Ratio Delta      : 5
 =========================================================================
 *                          HDL Parsing                                  *
 =========================================================================
-Analyzing Verilog file "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/LEDprogram.v" into library work
+Analyzing Verilog file "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\LEDprogram.v" into library work
 Parsing module <LEDprogram>.
 Parsing module <jtag_loader_6>.
-Analyzing Verilog file "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/KCPSM6_Release9_30Sept14/Verilog/kcpsm6.v" into library work
+Analyzing Verilog file "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\KCPSM6_Release9_30Sept14\Verilog\kcpsm6.v" into library work
 Parsing module <kcpsm6>.
-Analyzing Verilog file "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" into library work
+Analyzing Verilog file "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\Lab3.v" into library work
 Parsing module <Lab3>.
 
 =========================================================================
@@ -209,15 +206,16 @@ Elaborating module <LUT6(INIT=64'b1011111110111100100011111000110010110011101100
 Elaborating module <LUT6(INIT=64'b1111111100000000111100001111000011001100110011001010101010101010)>.
 
 Elaborating module <RAM64M(INIT_A=64'b0,INIT_B=64'b0,INIT_C=64'b0,INIT_D=64'b0)>.
-WARNING:HDLCompiler:1127 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" Line 53: Assignment to k_write_strobe ignored, since the identifier is never used
-WARNING:HDLCompiler:1127 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" Line 55: Assignment to read_strobe ignored, since the identifier is never used
-WARNING:HDLCompiler:1127 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" Line 58: Assignment to interrupt_ack ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\Lab3.v" Line 53: Assignment to k_write_strobe ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\Lab3.v" Line 55: Assignment to read_strobe ignored, since the identifier is never used
+WARNING:HDLCompiler:1127 - "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\Lab3.v" Line 58: Assignment to interrupt_ack ignored, since the identifier is never used
 
 Elaborating module <LEDprogram(C_FAMILY="S6",C_RAM_SIZE_KWORDS=1,C_JTAG_LOADER_ENABLE=1)>.
 
 Elaborating module
-<RAMB16BWER(DATA_WIDTH_A=18,DOA_REG=0,EN_RSTRAM_A="FALSE",INIT_A=9'b0,RST_PRIORITY_A="CE",SRVAL_A=9'b0,WRITE_MODE_A="WRITE_FIRST",DATA_WIDTH_B=18,DOB_REG=0,EN_RSTRAM_B="FALSE",INIT_B=9'b0,RST_PRIORITY_B="CE",SRVAL_B=9'b0,WRITE_MODE_B="WRITE_FIRST",RSTTYPE="SYNC",INIT_FILE="NONE",SIM_COLLISION_CHECK="ALL",SIM_DEVICE="SPARTAN6",INIT_00=256'b0100000000000001101000100000010110100000000000100010001000000000001000010010010,INIT_01=256'b0,INIT_02=256'b0,INIT_03=256'b0,INIT_04=256'b0,INIT_05=256'b0,INIT_06=256'b0,INIT_07=256'b0,INIT_08=256'b0,INIT_09=256'b0,INIT_0A=256'b0,INIT_0B=256'b0,INIT_0C=256'b0,INIT_0D=256'b0,INIT_0E=256'b0,INIT_0F=256'b0,INIT_10=256'b0,INIT_11=256'b0,INIT_12=256'b0,INIT_13=256'b0,INIT_14=256'b0,INIT_15=256'b0,INIT_16=256'b0,INIT_17=256'b0,INIT_18=256'b0,INIT_19=256'b0,INIT_1A=256'b0,INIT_1B=256'b0,INIT_1C=256'b0,INIT_1D=256'b0,INIT_1E=256'b0,INIT_1F=256'b0,INIT_20=256'b0,INIT_21=256'b0,INIT_22=256'b0,INIT_23=256'b0,INIT_24=256'b0,INIT_25=256'b0,INIT_26=256'b0,INIT_27=256'b0,INIT_28=256'b0,INI
-T_29=256'b0,INIT_2A=256'b0,INIT_2B=256'b0,INIT_2C=256'b0,INIT_2D=256'b0,INIT_2E=256'b0,INIT_2F=256'b0,INIT_30=256'b0,INIT_31=256'b0,INIT_32=256'b0,INIT_33=256'b0,INIT_34=256'b0,INIT_35=256'b0,INIT_36=256'b0,INIT_37=256'b0,INIT_38=256'b0,INIT_39=256'b0,INIT_3A=256'b0,INIT_3B=256'b0,INIT_3C=256'b0,INIT_3D=256'b0,INIT_3E=256'b0,INIT_3F=256'b0,INITP_00=256'b01010100000,INITP_01=256'b0,INITP_02=256'b0,INITP_03=256'b0,INITP_04=256'b0,INITP_05=256'b0,INITP_06=256'b0,INITP_07=256'b0)>.
+<RAMB16BWER(DATA_WIDTH_A=18,DOA_REG=0,EN_RSTRAM_A="FALSE",INIT_A=9'b0,RST_PRIORITY_A="CE",SRVAL_A=9'b0,WRITE_MODE_A="WRITE_FIRST",DATA_WIDTH_B=18,DOB_REG=0,EN_RSTRAM_B="FALSE",INIT_B=9'b0,RST_PRIORITY_B="CE",SRVAL_B=9'b0,WRITE_MODE_B="WRITE_FIRST",RSTTYPE="SYNC",INIT_FILE="NONE",SIM_COLLISION_CHECK="ALL",SIM_DEVICE="SPARTAN6",INIT_00=256'b1111111100000111000111111111100011111111000001100001111110000010111111110000010100011111100100101111111100000100000111111001100111111111000000110001111110110000111111110000001000011111101001001111111100000001000111111111100111111111000000000001111111000000,INIT_01=256'b1111111100001111000111111000111011111111000011100001111110000110111111110000110100011111101000011111111100001100000111111100011011111111000010110001111110000011111111110000101000011111100010001111111100001001000111111001000011111111000010000001111110000000,INIT_02=256'b01000010000011100100001000001110010000100000111000100010010000000001001011110000000000110001000001100000001001111101111011111111000111100000000
+11101100000001000000110000000111011010101000101101010010100010000001000010100000000010001000011111001010000000000,INIT_03=256'b01111000000001110110000000100000011000000010111101010100010110101001011010000000101010001100000001101000001111000000110010000001100000001101011101111011111111000111100000000111011000000010000001100000001101110101010001011010100101001000000100001000001110,INIT_04=256'b010000000000000011000000100110011011110111111110001111000000001110110000000100000011000000001111101010100010110101001011011000001001011000011100100101100001110010010110000111001001011000011100010101100110000000110111111000001100000001111111101111011111111,INIT_05=256'b0,INIT_06=256'b0,INIT_07=256'b0,INIT_08=256'b0,INIT_09=256'b0,INIT_0A=256'b0,INIT_0B=256'b0,INIT_0C=256'b0,INIT_0D=256'b0,INIT_0E=256'b0,INIT_0F=256'b0,INIT_10=256'b0,INIT_11=256'b0,INIT_12=256'b0,INIT_13=256'b0,INIT_14=256'b0,INIT_15=256'b0,INIT_16=256'b0,INIT_17=256'b0,INIT_18=256'b0,INIT_19=256'b0,INIT_1A=256'b0,INIT_1B=256'b0,INIT_1C=256'b0,INIT_1D=256'b
+0,INIT_1E=256'b0,INIT_1F=256'b0,INIT_20=256'b0,INIT_21=256'b0,INIT_22=256'b0,INIT_23=256'b0,INIT_24=256'b0,INIT_25=256'b0,INIT_26=256'b0,INIT_27=256'b0,INIT_28=256'b0,INIT_29=256'b0,INIT_2A=256'b0,INIT_2B=256'b0,INIT_2C=256'b0,INIT_2D=256'b0,INIT_2E=256'b0,INIT_2F=256'b0,INIT_30=256'b0,INIT_31=256'b0,INIT_32=256'b0,INIT_33=256'b0,INIT_34=256'b0,INIT_35=256'b0,INIT_36=256'b0,INIT_37=256'b0,INIT_38=256'b0,INIT_39=256'b0,INIT_3A=256'b0,INIT_3B=256'b0,INIT_3C=256'b0,INIT_3D=256'b0,INIT_3E=256'b0,INIT_3F=256'b0,INITP_00=256'b01011010110001000010101010000110101100010000000011101011000100001010101000000110101100010000000001000100010001000100010001000100010001000100010001000100010001000,INITP_01=256'b0,INITP_02=256'b0,INITP_03=256'b0,INITP_04=256'b0,INITP_05=256'b0,INITP_06=256'b0,INITP_07=256'b0)>.
 
 Elaborating module <jtag_loader_6(C_FAMILY="S6",C_NUM_PICOBLAZE=1,C_JTAG_LOADER_ENABLE=1,C_BRAM_MAX_ADDR_WIDTH=32'sb01010,C_ADDR_WIDTH_0=32'sb01010)>.
 
@@ -230,19 +228,19 @@ Elaborating module <BUFG>.
 =========================================================================
 
 Synthesizing Unit <Lab3>.
-    Related source file is "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v".
-INFO:Xst:3210 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" line 47: Output port <k_write_strobe> of the instance <processor> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" line 47: Output port <read_strobe> of the instance <processor> is unconnected or connected to loadless signal.
-INFO:Xst:3210 - "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.v" line 47: Output port <interrupt_ack> of the instance <processor> is unconnected or connected to loadless signal.
-    Found 8-bit register for signal <out>.
+    Related source file is "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\Lab3.v".
+INFO:Xst:3210 - "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\Lab3.v" line 47: Output port <k_write_strobe> of the instance <processor> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\Lab3.v" line 47: Output port <read_strobe> of the instance <processor> is unconnected or connected to loadless signal.
+INFO:Xst:3210 - "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\Lab3.v" line 47: Output port <interrupt_ack> of the instance <processor> is unconnected or connected to loadless signal.
     Found 4-bit register for signal <an>.
+    Found 8-bit register for signal <out>.
     Found 8-bit register for signal <in_port>.
     Summary:
 	inferred  20 D-type flip-flop(s).
 Unit <Lab3> synthesized.
 
 Synthesizing Unit <kcpsm6>.
-    Related source file is "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/KCPSM6_Release9_30Sept14/Verilog/kcpsm6.v".
+    Related source file is "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\KCPSM6_Release9_30Sept14\Verilog\kcpsm6.v".
         hwbuild = 8'b00000000
         interrupt_vector = 12'b001111111111
         scratch_pad_memory_size = 64
@@ -472,7 +470,7 @@ Synthesizing Unit <kcpsm6>.
 Unit <kcpsm6> synthesized.
 
 Synthesizing Unit <LEDprogram>.
-    Related source file is "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/LEDprogram.v".
+    Related source file is "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\LEDprogram.v".
         C_JTAG_LOADER_ENABLE = 1
         C_FAMILY = "S6"
         C_RAM_SIZE_KWORDS = 1
@@ -482,7 +480,7 @@ Synthesizing Unit <LEDprogram>.
 Unit <LEDprogram> synthesized.
 
 Synthesizing Unit <jtag_loader_6>.
-    Related source file is "/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/LEDprogram.v".
+    Related source file is "\\mars.utdallas.edu\exh150330\microprocessors-lab\Lab3\LEDprogram.v".
         C_JTAG_LOADER_ENABLE = 1
         C_FAMILY = "S6"
         C_NUM_PICOBLAZE = 1
@@ -948,13 +946,12 @@ program_rom/jtag_clk                                  |    1.855|         |     
 =========================================================================
 
 
-Total REAL time to Xst completion: 9.00 secs
-Total CPU time to Xst completion: 8.84 secs
+Total REAL time to Xst completion: 13.00 secs
+Total CPU time to Xst completion: 12.95 secs
  
 --> 
 
-
-Total memory usage is 486892 kilobytes
+Total memory usage is 275400 kilobytes
 
 Number of errors   :    0 (   0 filtered)
 Number of warnings :   29 (   0 filtered)

@@ -1,8 +1,8 @@
 INTSTYLE=ise
-INFILE=/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.ncd
-OUTFILE=/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3/Lab3.bit
+INFILE=H:\microprocessors-lab\Lab3\Lab3.ncd
+OUTFILE=H:\microprocessors-lab\Lab3\Lab3.bit
 FAMILY=Spartan6
 PART=xc6slx16-2csg324
-WORKINGDIR=/home/011/e/ex/exh150330/repos/cshw/embedded-microprocessors/lab3
+WORKINGDIR=H:\microprocessors-lab\Lab3
 LICENSE=ISE
 USER_INFO=179751441_1777485790_210569052_147
