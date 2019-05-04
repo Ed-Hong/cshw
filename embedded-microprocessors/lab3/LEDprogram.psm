@@ -1,0 +1,158 @@
+; 7-seg display mappings
+CONSTANT DISP_0, 11000000'b
+CONSTANT DISP_1, 11111001'b
+CONSTANT DISP_2, 10100100'b
+CONSTANT DISP_3, 10110000'b
+CONSTANT DISP_4, 10011001'b
+CONSTANT DISP_5, 10010010'b
+CONSTANT DISP_6, 10000010'b
+CONSTANT DISP_7, 11111000'b
+CONSTANT DISP_8, 10000000'b
+CONSTANT DISP_9, 10010000'b
+CONSTANT DISP_A, 10001000'b
+CONSTANT DISP_B, 10000011'b
+CONSTANT DISP_C, 11000110'b
+CONSTANT DISP_D, 10100001'b
+CONSTANT DISP_E, 10000110'b
+CONSTANT DISP_F, 10001110'b
+
+; 7-seg anode mappings
+CONSTANT ANODE_0, 00001110'b
+CONSTANT ANODE_1, 00001101'b
+CONSTANT ANODE_2, 00001011'b
+CONSTANT ANODE_3, 00000111'b
+
+; output ports
+CONSTANT NUM1_OUT_PORT, 01
+CONSTANT NUM2_OUT_PORT, 02
+CONSTANT OUT_PORT, 16
+CONSTANT ANODE_PORT, 08
+
+; input ports
+CONSTANT SW_IN_PORT, 00
+
+start : 
+		; Create lookup table for 7-seg display
+		LOAD sf, DISP_0
+		STORE sf, 0'd 
+		LOAD sf, DISP_1
+		STORE sf, 1'd 
+		LOAD sf, DISP_2
+		STORE sf, 2'd 
+		LOAD sf, DISP_3
+		STORE sf, 3'd 
+		LOAD sf, DISP_4
+		STORE sf, 4'd 
+		LOAD sf, DISP_5
+		STORE sf, 5'd 
+		LOAD sf, DISP_6
+		STORE sf, 6'd 
+		LOAD sf, DISP_7
+		STORE sf, 7'd 
+		LOAD sf, DISP_8
+		STORE sf, 8'd 
+		LOAD sf, DISP_9
+		STORE sf, 9'd 
+		LOAD sf, DISP_A
+		STORE sf, 10'd 
+		LOAD sf, DISP_B
+		STORE sf, 11'd 
+		LOAD sf, DISP_C
+		STORE sf, 12'd
+		LOAD sf, DISP_D
+		STORE sf, 13'd 
+		LOAD sf, DISP_E
+		STORE sf, 14'd 
+		LOAD sf, DISP_F
+		STORE sf, 15'd
+		
+		; Get 8-bit switch input
+		INPUT s4, SW_IN_PORT
+		
+		; num1 - Mask off bottom 4 bits of switch input
+		LOAD s1, 00001111'b
+		AND s1, s4
+		
+		; Fetch the decoded 7-seg value for num1
+		FETCH s5, (s1)
+		
+		; Output value of num1 and corresponding 7-seg anode
+		OUTPUT s5, OUT_PORT
+		LOAD s8, ANODE_0
+		OUTPUT s8, ANODE_PORT
+
+		; Delay
+delay1:	ADD se, 1'd
+		COMPARE se, 255'd
+		JUMP NZ, delay1
+		
+		; Copy num1 to sum register s3
+		LOAD s3, s1
+
+		; num 2 - Mask off top 4 bits of switch input
+		LOAD s2, 11110000'b
+		AND s2, s4
+
+		; Right shift
+		SR0 s2
+		SR0 s2
+		SR0 s2
+		SR0 s2
+		
+		; Fetch the decoded 7-seg value for num2
+		FETCH s5, (s2)
+		
+		; Output value of num2 and corresponding 7-seg anode
+		OUTPUT s5, OUT_PORT
+		LOAD s8, ANODE_1
+		OUTPUT s8, ANODE_PORT
+
+		; Delay
+delay2:	ADD se, 1'd
+		COMPARE se, 255'd
+		JUMP NZ, delay2
+	
+		; Add num1+num2 and store in s3
+		ADD s3, s2
+		
+		; sum[3:0] - Mask off bottom 4 bits of sum
+		LOAD sa, 00001111'b
+		AND sa, s3
+		
+		; Fetch the decoded 7-seg value for sum[3:0]
+		FETCH s5, (sa)
+		
+		; Output value of sum[3:0] and corresponding 7-seg anode
+		OUTPUT s5, OUT_PORT
+		LOAD s8, ANODE_2
+		OUTPUT s8, ANODE_PORT
+		
+		; Delay
+delay3:	ADD se, 1'd
+		COMPARE se, 255'd
+		JUMP NZ, delay3
+		
+		; sum[7:4] - Mask off top 4 bits of sum
+		LOAD sb, 11110000'b
+		AND sb, s3
+
+		; Right shift
+		SR0 sb
+		SR0 sb
+		SR0 sb
+		SR0 sb
+		
+		; Fetch the decoded 7-seg value for sum[7:4]
+		FETCH s5, (sb)
+		
+		; Output value of sum[7:4] and corresponding 7-seg anode
+		OUTPUT s5, OUT_PORT
+		LOAD s8, ANODE_3
+		OUTPUT s8, ANODE_PORT
+
+		; Delay
+delay4:	ADD se, 1'd
+		COMPARE se, 255'd
+		JUMP NZ, delay4
+		
+JUMP start

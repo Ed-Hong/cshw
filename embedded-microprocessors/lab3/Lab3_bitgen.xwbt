@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=H:\microprocessors-lab\Lab3\Lab3.ncd
+OUTFILE=H:\microprocessors-lab\Lab3\Lab3.bit
+FAMILY=Spartan6
+PART=xc6slx16-2csg324
+WORKINGDIR=H:\microprocessors-lab\Lab3
+LICENSE=ISE
+USER_INFO=179751441_1777485790_210569052_147

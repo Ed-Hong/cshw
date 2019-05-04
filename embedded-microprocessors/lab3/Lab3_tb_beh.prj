@@ -1,0 +1,5 @@
+verilog work "LEDprogram.v"
+verilog work "KCPSM6_Release9_30Sept14/Verilog/kcpsm6.v"
+verilog work "Lab3.v"
+verilog work "Lab3_tb.v"
+verilog work "C:/Xilinx/14.7/ISE_DS/ISE//verilog/src/glbl.v"

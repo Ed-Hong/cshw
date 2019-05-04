@@ -1,0 +1,5 @@
+verilog isim_temp "LEDprogram.v"
+verilog isim_temp "KCPSM6_Release9_30Sept14/Verilog/kcpsm6.v"
+verilog isim_temp "Lab3.v"
+verilog isim_temp "Lab3_tb.v"
+verilog isim_temp "C:/Xilinx/14.7/ISE_DS/ISE//verilog/src/glbl.v"
