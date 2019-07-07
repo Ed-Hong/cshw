@@ -118,6 +118,7 @@ public class Node {
 	}
 
 	private static void init(String currentHostname) {
+		// Init self node definition
 		for (Integer id : nodes.keySet()) {
 			Node n = nodes.get(id);
 			if (n.hostName.equals(currentHostname)) {
