@@ -392,6 +392,13 @@ class Client extends Thread {
 				String msg = "Message from Node " + self.id;
 				threads.get(destNode.id).send(msg);
 				randomMsgCount--;
+
+				try {
+					// Wait MIN_SEND_DELAY ms before sending again
+					Thread.sleep(Node.MIN_SEND_DELAY);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			self.isActive = false;
 		}
