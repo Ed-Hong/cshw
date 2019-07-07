@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /*
@@ -26,6 +27,12 @@ public class Node {
 	public static int MIN_SEND_DELAY;
 	public static int SNAPSHOT_DELAY;
 	public static int MAX_NUMBER;
+
+	// Index of All Nodes
+	public static Node[] nodes;
+
+	// Topology Map for debug
+	public static HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();
 
 	public int id;
 	public String hostName;
@@ -70,6 +77,16 @@ public class Node {
 
 		// Read config file and setup
 		config(cfgScanner, hostname);
+
+		//debugging network topology
+		for (Integer key : map.keySet()) {
+			ArrayList<Integer> neighbors = map.get(key);
+			System.out.println("Node " + key + " neighbors: ");
+			for (Integer neighbor : neighbors) {
+				System.out.print(neighbor + " ");
+			}
+			System.out.println();
+		}
 	}
 
 	private static void config(Scanner cfg, String currentHostname) {
@@ -87,10 +104,6 @@ public class Node {
 			boolean isValidLine = true;
 			int tokenNum = 0;
 
-			//debug
-			System.out.println(lineStr);
-			//System.out.println(lineNum);
-
 			// Read each token within a line
 			while(line.hasNext()) {
 				String token = line.next();
@@ -103,21 +116,16 @@ public class Node {
 
 				// Skip over comments
 				if (token.equals("#")) break;
-				
-				//debug
-				//System.out.println(token);
 
 				// Assign Global Parameters
 				if (lineNum == 0) {
-					//debug
-					//System.out.println("token = " + token);
 					params[tokenNum] = Integer.parseInt(token);
 				}
 
 				// Definitions of N Nodes
 				if (lineNum > 0 && lineNum <= NUM_NODES) {
 					switch(tokenNum) {
-						//debug
+						//debug --- todo populate index
 						case 0:
 							System.out.println("NodeId = " + token);
 						break;
@@ -134,7 +142,16 @@ public class Node {
 
 				// Neighbors of N Nodes
 				if (lineNum > NUM_NODES && lineNum <= 2*NUM_NODES) {
-					System.out.println("Node " + (lineNum - NUM_NODES) + " Neighbors:" + token);
+					int nodeId = lineNum - NUM_NODES;
+					int neighborId = Integer.parseInt(token);
+
+					//debug - populating topology map
+					if(map.get(nodeId) == null) {
+						map.put(nodeId, new ArrayList<Integer>());
+					}
+					map.get(nodeId).add(neighborId);
+
+					//todo populate self's neighbors
 				}
 
 				tokenNum++;
@@ -173,14 +190,5 @@ public class Node {
 		MIN_SEND_DELAY 	= params[3];
 		SNAPSHOT_DELAY 	= params[4];
 		MAX_NUMBER 		= params[5];
-
-		//debug
-		// System.out.println("NUM_NODES = " + NUM_NODES);
-		// System.out.println("MIN_PER_ACTIVE = " + MIN_PER_ACTIVE);
-		// System.out.println("MAX_PER_ACTIVE = " + MAX_PER_ACTIVE);
-		// System.out.println("MIN_SEND_DELAY = " + MIN_SEND_DELAY);
-		// System.out.println("SNAPSHOT_DELAY = " + SNAPSHOT_DELAY);
-		// System.out.println("MAX_NUMBER = " + MAX_NUMBER);
-
 	}
 }
