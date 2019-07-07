@@ -50,15 +50,28 @@ public class Node {
 	public String hostName;
 	public int listenPort;
 	public ArrayList<Node> neighbors;
-	public boolean isActive;
+
+	// MAP Protocol Variables
+	private boolean _isActive;
+	public int sentMessageCount;
 
 	public Node(int id, String hostName, int listenPort) {
 		this.id = id;
 		this.hostName = hostName;
 		this.listenPort = listenPort;
 		this.neighbors = new ArrayList<>();
-		this.isActive = id == startingNodeId ? true : false;
+
+		this._isActive = id == startingNodeId ? true : false;
+		this.sentMessageCount = 0;
 	}
+
+	public synchronized void setActive(boolean active) {
+        _isActive = active;
+    }
+
+    public synchronized boolean isActive() {
+        return _isActive;
+    }
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("\n* Configuring node...");
@@ -287,7 +300,7 @@ class Server extends Thread {
 				DataInputStream in = new DataInputStream(sock.getInputStream());	
 				DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
 				
-				new ServerThread(sock, in, out).start();
+				new ServerThread(sock, in, out, self).start();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -296,14 +309,16 @@ class Server extends Thread {
 }
 
 class ServerThread extends Thread { 
+	final Node self;
 	final Socket sock; 
 	final DataInputStream in; 
     final DataOutputStream out; 
         
-    public ServerThread (Socket s, DataInputStream is, DataOutputStream os) { 
+    public ServerThread (Socket s, DataInputStream is, DataOutputStream os, Node n) { 
         this.sock = s; 
         this.in = is; 
-        this.out = os; 
+		this.out = os; 
+		this.self = n;
     } 
   
     @Override
@@ -312,6 +327,11 @@ class ServerThread extends Thread {
 			try {
 				String request = in.readUTF();
 				System.out.println("  Received: " + request);
+
+				if(!self.isActive() && self.sentMessageCount < Node.MAX_NUMBER) {
+					self.setActive(true);
+				}
+
 				if (request.equals("END")) {
 					break;
 				}
@@ -378,29 +398,40 @@ class Client extends Thread {
 				}
 			}
 		}
+
 		// Start all threads
 		for(Integer id : threads.keySet()) {
 			threads.get(id).start();
 		}
 
 		// Once all channels established, begin MAP 
-		while(self.isActive) {			
-			int randomMsgCount = new Random().ints(1, Node.MIN_PER_ACTIVE, Node.MAX_PER_ACTIVE + 1).findFirst().getAsInt();
-			while(randomMsgCount > 0) {
-				int randomIndex = new Random().nextInt(threads.keySet().size());
-				Node destNode = self.neighbors.get(randomIndex);				
-				String msg = "Message from Node " + self.id;
-				threads.get(destNode.id).send(msg);
-				randomMsgCount--;
-
-				try {
-					// Wait MIN_SEND_DELAY ms before sending again
-					Thread.sleep(Node.MIN_SEND_DELAY);
-				} catch (Exception e) {
-					e.printStackTrace();
+		while(true) {
+			if(self.isActive()) {
+				System.out.println("ACTIVE");
+				int randomMsgCount = new Random().ints(1, Node.MIN_PER_ACTIVE, Node.MAX_PER_ACTIVE + 1).findFirst().getAsInt();
+				while(randomMsgCount > 0) {
+					if(self.sentMessageCount >= Node.MAX_NUMBER) {
+						self.setActive(false);
+						break;
+					}
+					int randomIndex = new Random().nextInt(threads.keySet().size());
+					Node destNode = self.neighbors.get(randomIndex);				
+					String msg = "Message from Node " + self.id;
+					threads.get(destNode.id).send(msg);
+					randomMsgCount--;
+	
+					try {
+						// Wait MIN_SEND_DELAY ms before sending again
+						Thread.sleep(Node.MIN_SEND_DELAY);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
+				self.setActive(false);
+			} else {
+				//debug
+				//System.out.print(".");
 			}
-			self.isActive = false;
 		}
     }
 }
@@ -429,6 +460,7 @@ class ClientThread extends Thread {
 				} catch (IOException i) {
 					i.printStackTrace();
 				}
+				self.sentMessageCount++;
 			} else {
 				try {
 					// Wait 5ms and check again
