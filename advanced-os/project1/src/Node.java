@@ -7,9 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -118,7 +120,8 @@ public class Node {
 		// Spawn a Server-side thread, which then spawns client handler threads
 		new Server(self).start();
 
-		//todo Spawn a Client-side thread, which spawns client threads to neighbors
+		// Spawn a Client-side thread, which spawns client threads to neighbors
+		new Client(self).start();
 	}
 
 	private static void init(String currentHostname) {
@@ -285,9 +288,9 @@ class Server extends Thread {
 }
 
 class ServerThread extends Thread { 
-    final DataInputStream in; 
+	final Socket sock; 
+	final DataInputStream in; 
     final DataOutputStream out; 
-    final Socket sock; 
         
     public ServerThread (Socket s, DataInputStream is, DataOutputStream os) { 
         this.sock = s; 
@@ -308,7 +311,7 @@ class ServerThread extends Thread {
 				try {
 					// No bytes in the buffer; wait 5ms and check again
 					Thread.sleep(5);	
-				} catch (Exception e) {
+				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			} catch (IOException e ) {
@@ -325,4 +328,73 @@ class ServerThread extends Thread {
 			e.printStackTrace();
 		}
     }
-} 
+}
+
+class Client extends Thread {
+	final Node self;
+
+	public Client(Node n) {
+		this.self = n;
+	}
+
+    @Override
+    public void run() {
+		HashSet<Integer> neighborsConnected = new HashSet<>();
+		while(true) {
+			if (neighborsConnected.size() == self.neighbors.size()) break;
+
+			// Spawn a new thread for each channel to each neighbor
+			for (Node neighbor : self.neighbors) {
+				if (neighborsConnected.contains(neighbor.id)) continue;
+				try {
+					//todo set hostname
+					Socket sock = new Socket("localhost", neighbor.listenPort);
+					DataInputStream in = new DataInputStream(sock.getInputStream());	
+					DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
+					neighborsConnected.add(neighbor.id);
+					new ClientThread(sock, in, out, self).start();
+				} catch (ConnectException c) {
+					try {
+						//debug
+						//System.out.print(".");
+						// Wait 50ms and try again
+						Thread.sleep(50);	
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+    }
+}
+
+class ClientThread extends Thread { 
+	final Node client;
+	final Socket sock; 
+	final DataInputStream in; 
+    final DataOutputStream out; 
+
+	public ClientThread (Socket s, DataInputStream is, DataOutputStream os, Node cl) { 
+        this.sock = s; 
+        this.in = is; 
+		this.out = os; 
+		this.client = cl;
+    } 
+
+    @Override
+    public void run() {
+		while(true) {
+			String str = "Node " + client.id + " connected!";
+			try {
+				out.writeUTF(str);
+			} catch (IOException i) {
+				i.printStackTrace();
+			}
+
+			//debug jesus lets avoid an implosion here
+			break;
+		}
+	}
+}
