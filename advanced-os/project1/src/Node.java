@@ -29,10 +29,9 @@ public class Node {
 	public static int MAX_NUMBER;
 
 	// Index of All Nodes
-	//todo make this a hashmap
-	public static ArrayList<Node> nodes = new ArrayList<>();
+	public static HashMap<Integer, Node> nodes = new HashMap<>();
 
-	// Topology Map for debug
+	// Adjacency List of All Nodes
 	public static HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();
 
 	// The Node on the current host
@@ -41,13 +40,13 @@ public class Node {
 	public int id;
 	public String hostName;
 	public int listenPort;
-	public HashMap<Integer, Node> neighbors;
+	public ArrayList<Node> neighbors;
 
 	public Node(int id, String hostName, int listenPort) {
 		this.id = id;
 		this.hostName = hostName;
 		this.listenPort = listenPort;
-		this.neighbors = new HashMap<>();
+		this.neighbors = new ArrayList<>();
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -68,7 +67,8 @@ public class Node {
 		config(cfgScanner);
 
 		//debugging nodes index
-		for (Node n : nodes) {
+		for (Integer id : nodes.keySet()) {
+			Node n = nodes.get(id);
 			System.out.println("NodeId: " + n.id + " HostName: " + n.hostName + " listenPort: " + n.listenPort);
 		}
 
@@ -97,19 +97,38 @@ public class Node {
 			return;
 		}
 
-		//debug
-		hostname = args[1] == null ? "dc05" : args[1];
+		//DEBUG
+		try {
+			hostname = args[1];
+		} catch (Exception e) {
+			System.out.println("DEBUG: Please input a mock hostname for development purposes.");
+			return;
+		}
+
 		init(hostname);
 
 		//debug self
 		System.out.println(" Self-nodeId: " + self.id + " Self-hostName: " + self.hostName + " Self-NodeId: " + self.listenPort);
+
+		//debug self's neighbors
+		System.out.println("Self-neighbors: ");
+		for(Node n : self.neighbors) {
+			System.out.println(n.id + " ");
+		}
 	}
 
 	private static void init(String currentHostname) {
-		for (Node n : nodes) {
+		for (Integer id : nodes.keySet()) {
+			Node n = nodes.get(id);
 			if (n.hostName.equals(currentHostname)) {
 				self = new Node(n.id, n.hostName, n.listenPort);
+				break;
 			}
+		}
+
+		// Populate list of neighbors for self
+		for (Integer neighborId : map.get(self.id)) {
+			self.neighbors.add(nodes.get(neighborId));
 		}
 	}
 
@@ -167,7 +186,7 @@ public class Node {
 
 					if (nodeId != null && hostName != null && listenPort != null) {
 						Node newNode = new Node(nodeId, hostName, listenPort);
-						nodes.add(newNode);
+						nodes.put(nodeId, newNode);
 
 						// Reset for next node definition
 						nodeId = null;
@@ -178,7 +197,7 @@ public class Node {
 
 				// Neighbors of N Nodes
 				if (lineNum > NUM_NODES && lineNum <= 2*NUM_NODES) {
-					int id = lineNum - NUM_NODES;
+					int id = lineNum - NUM_NODES - 1;
 					int neighborId = Integer.parseInt(token);
 
 					//debug - populating topology map
