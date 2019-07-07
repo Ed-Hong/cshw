@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.InetAddress;
@@ -114,37 +115,29 @@ public class Node {
 		// 	System.out.println(n.id + " ");
 		// }
 
+		//todo spawn Server-side thread, which then spawns client handler threads, and
+		//spawn client-side thread, which then spawns client threads.
 		self.listen();
 	}
 
 	public void listen() throws Exception {
 		System.out.println("Listening on port " + self.listenPort);
 				
-		// Open a ServerSocket (TCP) using the specified port number.
+		// Open a ServerSocket on self node's port number
 		ServerSocket serverSock = new ServerSocket(self.listenPort);
-		
-		// Wait and listen for a connection.
-		// Note that the below line is a blocking call until a client has connected.
-		Socket sock = serverSock.accept();
 
-		System.out.println("Client connected!");
-		DataInputStream in = new DataInputStream(sock.getInputStream());		
 		while(true) {
-			try {
-				String request = in.readUTF();
-				System.out.println("Echo: " + request);
-				if (request.equals("END")) {
-					break;
-				}
-			} catch(EOFException e) {
-				// End of File Exception means that there are no bytes in the buffer.
-				// Therefore, if we check the buffer and nothing is there, wait 5ms and check again.
-				Thread.sleep(5);
-			}			
-		}
+			// Wait for a connection
+			Socket sock = serverSock.accept();
 
-		System.out.println("Closing connection.");
-		serverSock.close();
+			System.out.println("Client connected!");
+			DataInputStream in = new DataInputStream(sock.getInputStream());	
+			DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
+			
+			System.out.println("Spawning new Server thread...");
+			Thread t = new ServerThread(sock, in, out);
+			t.start();
+		}
 	}
 
 	private static void init(String currentHostname) {
@@ -278,3 +271,47 @@ public class Node {
 		MAX_NUMBER 		= params[5];
 	}
 }
+
+class ServerThread extends Thread  
+{ 
+    final DataInputStream in; 
+    final DataOutputStream out; 
+    final Socket sock; 
+        
+    public ServerThread (Socket s, DataInputStream is, DataOutputStream os) { 
+        this.sock = s; 
+        this.in = is; 
+        this.out = os; 
+    } 
+  
+    @Override
+    public void run() { 
+		while(true) {
+			try {
+				String request = in.readUTF();
+				System.out.println("Thread " + Thread.currentThread().getId() + " Echo: " + request);
+				if (request.equals("END")) {
+					break;
+				}
+			} catch(EOFException eof) {
+				try {
+					// No bytes in the buffer; wait 5ms and check again
+					Thread.sleep(5);	
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} catch (IOException e ) {
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println("Closing a client connection");
+		try {
+			sock.close();
+			in.close();
+			out.close();	
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    } 
+} 
