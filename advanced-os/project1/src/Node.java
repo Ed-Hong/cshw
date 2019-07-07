@@ -31,6 +31,8 @@ public class Node {
 	public static int SNAPSHOT_DELAY;
 	public static int MAX_NUMBER;
 
+	public static int startingNodeId = Integer.MAX_VALUE;
+
 	// Index of All Nodes
 	public static HashMap<Integer, Node> nodes = new HashMap<>();
 
@@ -44,12 +46,14 @@ public class Node {
 	public String hostName;
 	public int listenPort;
 	public ArrayList<Node> neighbors;
+	public boolean isActive;
 
 	public Node(int id, String hostName, int listenPort) {
 		this.id = id;
 		this.hostName = hostName;
 		this.listenPort = listenPort;
 		this.neighbors = new ArrayList<>();
+		this.isActive = id == startingNodeId ? true : false;
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -197,6 +201,11 @@ public class Node {
 					if (nodeId != null && hostName != null && listenPort != null) {
 						Node newNode = new Node(nodeId, hostName, listenPort);
 						nodes.put(nodeId, newNode);
+
+						// Starting node is the node with lowest id
+						if (nodeId < startingNodeId) {
+							startingNodeId = nodeId;
+						}
 
 						// Reset for next node definition
 						nodeId = null;
