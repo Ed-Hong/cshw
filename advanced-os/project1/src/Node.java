@@ -200,13 +200,11 @@ public class Node {
 					int id = lineNum - NUM_NODES - 1;
 					int neighborId = Integer.parseInt(token);
 
-					//debug - populating topology map
+					// Populating topology map
 					if(map.get(id) == null) {
 						map.put(id, new ArrayList<Integer>());
 					}
 					map.get(id).add(neighborId);
-
-					//todo populate self's neighbors
 				}
 
 				tokenNum++;
