@@ -29,7 +29,7 @@ public class Node {
 	public static int MAX_NUMBER;
 
 	// Index of All Nodes
-	public static Node[] nodes;
+	public static ArrayList<Node> nodes = new ArrayList<>();
 
 	// Topology Map for debug
 	public static HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();
@@ -78,6 +78,11 @@ public class Node {
 		// Read config file and setup
 		config(cfgScanner, hostname);
 
+		//debugging nodes index
+		for (Node n : nodes) {
+			System.out.println("NodeId: " + n.id + " HostName: " + n.hostName + " listenPort: " + n.listenPort);
+		}
+
 		//debugging network topology
 		for (Integer key : map.keySet()) {
 			ArrayList<Integer> neighbors = map.get(key);
@@ -104,6 +109,11 @@ public class Node {
 			boolean isValidLine = true;
 			int tokenNum = 0;
 
+			// Temp variables for Node definitions
+			Integer nodeId = null;
+			String hostName = null;
+			Integer listenPort = null;
+
 			// Read each token within a line
 			while(line.hasNext()) {
 				String token = line.next();
@@ -125,31 +135,38 @@ public class Node {
 				// Definitions of N Nodes
 				if (lineNum > 0 && lineNum <= NUM_NODES) {
 					switch(tokenNum) {
-						//debug --- todo populate index
 						case 0:
-							System.out.println("NodeId = " + token);
+							nodeId = new Integer(Integer.parseInt(token));
 						break;
-
 						case 1:
-						System.out.println("hostName = " + token);
+							hostName = token;
 						break;
-
 						case 2:
-						System.out.println("listenPort = " + token);
+							listenPort = new Integer(Integer.parseInt(token));
 						break;
+					}
+
+					if (nodeId != null && hostName != null && listenPort != null) {
+						Node newNode = new Node(nodeId, hostName, listenPort);
+						nodes.add(newNode);
+
+						// Reset for next node definition
+						nodeId = null;
+						hostName = null;
+						listenPort = null;
 					}
 				}
 
 				// Neighbors of N Nodes
 				if (lineNum > NUM_NODES && lineNum <= 2*NUM_NODES) {
-					int nodeId = lineNum - NUM_NODES;
+					int id = lineNum - NUM_NODES;
 					int neighborId = Integer.parseInt(token);
 
 					//debug - populating topology map
-					if(map.get(nodeId) == null) {
-						map.put(nodeId, new ArrayList<Integer>());
+					if(map.get(id) == null) {
+						map.put(id, new ArrayList<Integer>());
 					}
-					map.get(nodeId).add(neighborId);
+					map.get(id).add(neighborId);
 
 					//todo populate self's neighbors
 				}
