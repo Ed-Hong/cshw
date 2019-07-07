@@ -29,10 +29,14 @@ public class Node {
 	public static int MAX_NUMBER;
 
 	// Index of All Nodes
+	//todo make this a hashmap
 	public static ArrayList<Node> nodes = new ArrayList<>();
 
 	// Topology Map for debug
 	public static HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();
+
+	// The Node on the current host
+	static Node self;
 
 	public int id;
 	public String hostName;
@@ -60,23 +64,8 @@ public class Node {
 			return;
 		}
 
-		// Get the hostname
-		String hostname = null;
-		try {
-			InetAddress ip = InetAddress.getLocalHost();
-			hostname = ip.getHostName();
-			System.out.println("Current IP address: " + ip);
-			System.out.println("Current Hostname: " + hostname);
-			System.out.println();
-		} catch (UnknownHostException e) {
-			System.out.println("Error attempting to get hostname.");
-			e.printStackTrace();
-			cfgScanner.close();
-			return;
-		}
-
-		// Read config file and setup
-		config(cfgScanner, hostname);
+		// Read config file
+		config(cfgScanner);
 
 		//debugging nodes index
 		for (Node n : nodes) {
@@ -92,17 +81,47 @@ public class Node {
 			}
 			System.out.println();
 		}
+
+		// Get the hostname
+		String hostname = null;
+		try {
+			InetAddress ip = InetAddress.getLocalHost();
+			hostname = ip.getHostName();
+			System.out.println("Current IP address: " + ip);
+			System.out.println("Current Hostname: " + hostname);
+			System.out.println();
+		} catch (UnknownHostException e) {
+			System.out.println("Error attempting to get hostname.");
+			e.printStackTrace();
+			cfgScanner.close();
+			return;
+		}
+
+		//debug
+		hostname = args[1] == null ? "dc05" : args[1];
+		init(hostname);
+
+		//debug self
+		System.out.println(" Self-nodeId: " + self.id + " Self-hostName: " + self.hostName + " Self-NodeId: " + self.listenPort);
 	}
 
-	private static void config(Scanner cfg, String currentHostname) {
-		int[] params = new int[6];
+	private static void init(String currentHostname) {
+		for (Node n : nodes) {
+			if (n.hostName.equals(currentHostname)) {
+				self = new Node(n.id, n.hostName, n.listenPort);
+			}
+		}
+	}
 
-		System.out.println("Configuring this node...");
+	private static void config(Scanner cfg) {
+		System.out.println("Reading config...");
+
+		int[] params = new int[6];
 		Scanner line = null;
 		int lineNum = 0;
+		boolean isFirstPass = true;
 
 		// Read each line
-		boolean isFirstPass = true;
 		while (cfg.hasNextLine()) {
 			String lineStr = cfg.nextLine();
 			line = new Scanner(lineStr);
