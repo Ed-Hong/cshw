@@ -26,6 +26,8 @@ import java.util.HashMap;
  */
 
 public class Node {
+	// Constants
+	public static final String APP_MESSAGE = "APP message sent from Node ";
 
 	// Global Parameters
 	public static int NUM_NODES;
@@ -328,7 +330,8 @@ class ServerThread extends Thread {
 				String request = in.readUTF();
 				System.out.println("  Received: " + request);
 
-				if(!self.isActive() && self.sentMessageCount < Node.MAX_NUMBER) {
+				// MAP Protocol messages are application messages and begin with "APP"
+				if(request.startsWith("APP") && !self.isActive() && self.sentMessageCount < Node.MAX_NUMBER) {
 					self.setActive(true);
 				}
 
@@ -415,9 +418,8 @@ class Client extends Thread {
 						break;
 					}
 					int randomIndex = new Random().nextInt(threads.keySet().size());
-					Node destNode = self.neighbors.get(randomIndex);				
-					String msg = "Message from Node " + self.id;
-					threads.get(destNode.id).send(msg);
+					Node destNode = self.neighbors.get(randomIndex);
+					threads.get(destNode.id).send(appMessage(self.id));
 					randomMsgCount--;
 	
 					try {
@@ -433,7 +435,11 @@ class Client extends Thread {
 				//System.out.print(".");
 			}
 		}
-    }
+	}
+	
+	private static String appMessage(int senderId) {
+		return Node.APP_MESSAGE + senderId;
+	}
 }
 
 class ClientThread extends Thread { 
