@@ -27,7 +27,8 @@ import java.util.HashMap;
 
 public class Node {
 	// Constants
-	public static final String APP_MESSAGE = "APP message sent from Node ";
+	public static final String APP_MESSAGE = "APP from Node ";
+	public static final String MARK_MESSAGE = "MARK from Node ";
 
 	// Global Parameters
 	public static int NUM_NODES;
@@ -57,6 +58,11 @@ public class Node {
 	private boolean _isActive;
 	public int sentMessageCount;
 
+	// CL Protocol Variables
+	private boolean _isRed;
+	public int markerMessageCount;
+	public HashMap<Integer, ArrayList<String>> channels = new HashMap<>();
+
 	public Node(int id, String hostName, int listenPort) {
 		this.id = id;
 		this.hostName = hostName;
@@ -65,6 +71,10 @@ public class Node {
 
 		this._isActive = id == startingNodeId ? true : false;
 		this.sentMessageCount = 0;
+
+		// todo Naive way of deciding when to start snapshot for testing
+		this._isRed = false;
+		this.markerMessageCount = 0;
 	}
 
 	public synchronized void setActive(boolean active) {
@@ -73,7 +83,21 @@ public class Node {
 
     public synchronized boolean isActive() {
         return _isActive;
+	}
+
+	public synchronized void setRed(boolean red) {
+        _isRed = red;
     }
+
+    public synchronized boolean isRed() {
+        return _isRed;
+	}
+	
+	//todo elaborate this method?
+	public void recordLocalState() {
+		String state = "NodeId=" + self.id + " isActive=" + self.isActive() + " sentMessageCount=" + self.sentMessageCount;
+		System.out.println(state);
+	}
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("\n* Configuring node...");
@@ -145,6 +169,8 @@ public class Node {
 
 		// Spawn a Client-side thread, which spawns client threads to neighbors
 		new Client(self).start();
+
+		//todo start task to start snapshot
 	}
 
 	private static void init(String currentHostname) {
@@ -331,8 +357,39 @@ class ServerThread extends Thread {
 				System.out.println("  Received: " + request);
 
 				// MAP Protocol messages are application messages and begin with "APP"
+
+				// Record app messages received while red as channel state
+				//todo once i've recorded all my channel states then i'm done
+				if (self.isRed() && request.startsWith("APP")) {
+
+					// Application messages are stamped by sender at the end
+					int channel = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
+					self.channels.get(channel).add(request);
+				}
+
 				if(request.startsWith("APP") && !self.isActive() && self.sentMessageCount < Node.MAX_NUMBER) {
 					self.setActive(true);
+				}
+
+				// Snapshot Protocol messages are system messages and begin with "MARK"
+				if(request.startsWith("MARK")) {
+					self.markerMessageCount++;
+					// Change color from blue to red
+					if(!self.isRed()) {
+						System.out.println("  COLOR CHANGE TO RED");
+						self.setRed(true);
+						self.recordLocalState();
+
+						// Init channel states
+						for (Node neighbor : self.neighbors) {
+							self.channels.put(neighbor.id, new ArrayList<String>());
+						}
+					} else if (self.markerMessageCount == self.channels.keySet().size() ||
+							  (self.id == Node.startingNodeId && self.markerMessageCount - 1 == self.channels.keySet().size())) {
+							// Once this node has received all marker messages from all neighbors (the root receiving one from itself)
+							System.out.println("---------- DONE ----------");
+							throw new IOException("done lol");
+					}
 				}
 
 				if (request.equals("END")) {
@@ -410,7 +467,7 @@ class Client extends Thread {
 		// Once all channels established, begin MAP 
 		while(true) {
 			if(self.isActive()) {
-				System.out.println("ACTIVE");
+				System.out.println("  ACTIVE");
 				int randomMsgCount = new Random().ints(1, Node.MIN_PER_ACTIVE, Node.MAX_PER_ACTIVE + 1).findFirst().getAsInt();
 				while(randomMsgCount > 0) {
 					if(self.sentMessageCount >= Node.MAX_NUMBER) {
@@ -430,15 +487,23 @@ class Client extends Thread {
 					}
 				}
 				self.setActive(false);
-			} else {
-				//debug
-				//System.out.print(".");
+			} else if(self.isRed()) {
+				self.recordLocalState();
+
+				// Cast MARK message to all neighbors
+				for(Integer id : threads.keySet()) {
+					threads.get(id).send(markMessage(self.id));
+				}
 			}
 		}
 	}
 	
 	private static String appMessage(int senderId) {
 		return Node.APP_MESSAGE + senderId;
+	}
+	
+	private static String markMessage(int senderId) {
+		return Node.MARK_MESSAGE + senderId;
 	}
 }
 
@@ -454,7 +519,11 @@ class ClientThread extends Thread {
         this.in = is;
 		this.out = os;
 		this.self = n;
-    }
+	}
+	
+	public void send(String msg) {
+		this.messages.add(msg);
+	}
 
     @Override
     public void run() {
@@ -477,8 +546,34 @@ class ClientThread extends Thread {
 			}
 		}
 	}
+}
 
-	public void send(String msg) {
-		this.messages.add(msg);
+class Snapshot extends Thread { 
+	final long delay;
+	final Node self;
+
+	public Snapshot (long millis, Node n) { 
+		this.delay = millis;
+		this.self = n;
+    }
+
+    @Override
+    public void run() {
+		while(true) {
+			try {
+				// Delay then attempt a snapshot
+				Thread.sleep(delay);	
+
+				// If I am the root, send self MARK to begin snapshot
+				if(self.id == Node.startingNodeId) {
+					Socket sock = new Socket("localhost", self.listenPort);
+					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+					out.writeUTF("MARK");
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
