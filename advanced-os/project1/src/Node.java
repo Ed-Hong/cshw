@@ -57,7 +57,7 @@ public class Node {
 	}
 
 	public static void main(String[] args) throws Exception {
-		System.out.println();
+		System.out.println("\n* Configuring node...");
 
 		// Create scanner for config file - filename of config is passed as args[0]
 		Scanner cfgScanner = null;
@@ -65,8 +65,8 @@ public class Node {
 			File configFile = new File(args[0]);
 			cfgScanner = new Scanner(configFile);
 		} catch (Exception e) {
-			System.out.println("Error reading config file.");
-			System.out.println("Pass name of config file as an argument, and ensure that it is correct.");
+			System.out.println("! Error reading config file.");
+			System.out.println("> Pass name of config file as an argument, and ensure that it is correct.");
 			return;
 		}
 
@@ -94,11 +94,9 @@ public class Node {
 		try {
 			InetAddress ip = InetAddress.getLocalHost();
 			hostname = ip.getHostName();
-			System.out.println("Current IP address: " + ip);
-			System.out.println("Current Hostname: " + hostname);
-			System.out.println();
+			System.out.println("  Current Hostname: " + hostname);
 		} catch (UnknownHostException e) {
-			System.out.println("Error attempting to get hostname.");
+			System.out.println("! Error attempting to get hostname.");
 			e.printStackTrace();
 			cfgScanner.close();
 			return;
@@ -113,6 +111,8 @@ public class Node {
 		}
 
 		init(hostname);
+
+		System.out.println("> Configuration Finished.\n");
 
 		//debug self and self's neighbors
 		// System.out.println(" Self-nodeId: " + self.id + " Self-hostName: " + self.hostName + " Self-NodeId: " + self.listenPort);
@@ -129,8 +129,6 @@ public class Node {
 	}
 
 	private static void init(String currentHostname) {
-		System.out.println("Initializing this node...");
-
 		// Init self node definition
 		for (Integer id : nodes.keySet()) {
 			Node n = nodes.get(id);
@@ -147,8 +145,6 @@ public class Node {
 	}
 
 	private static void config(Scanner cfg) {
-		System.out.println("Reading config...");
-
 		int[] params = new int[6];
 		Scanner line = null;
 		int lineNum = 0;
@@ -274,7 +270,7 @@ class Server extends Thread {
 
     @Override
     public void run() { 
-		System.out.println("Listening on port " + self.listenPort);
+		System.out.println("* Listening on port " + self.listenPort + "...");
 		
 		try {
 			// Open a ServerSocket on self node's port number
@@ -283,11 +279,10 @@ class Server extends Thread {
 				// Wait for a connection
 				Socket sock = serverSock.accept();
 
-				System.out.println("Client connected!");
+				System.out.println("> Client connected.");
 				DataInputStream in = new DataInputStream(sock.getInputStream());	
 				DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
 				
-				System.out.println("Spawning new Server thread...");
 				new ServerThread(sock, in, out).start();
 			}
 		} catch (Exception e) {
@@ -312,7 +307,7 @@ class ServerThread extends Thread {
 		while(true) {
 			try {
 				String request = in.readUTF();
-				System.out.println("Thread " + Thread.currentThread().getId() + " Echo: " + request);
+				System.out.println("  Received: " + request);
 				if (request.equals("END")) {
 					break;
 				}
@@ -328,7 +323,7 @@ class ServerThread extends Thread {
 			}
 		}
 
-		System.out.println("Closing a client connection");
+		System.out.println("> Closing client connection.");
 		try {
 			sock.close();
 			in.close();
