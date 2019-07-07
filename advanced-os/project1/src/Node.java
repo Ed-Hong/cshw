@@ -89,7 +89,7 @@ public class Node {
 
 			//debug
 			System.out.println(lineStr);
-			System.out.println(lineNum);
+			//System.out.println(lineNum);
 
 			// Read each token within a line
 			while(line.hasNext()) {
@@ -105,12 +105,12 @@ public class Node {
 				if (token.equals("#")) break;
 				
 				//debug
-				System.out.println(token);
+				//System.out.println(token);
 
 				// Assign Global Parameters
 				if (lineNum == 0) {
 					//debug
-					System.out.println("token = " + token);
+					//System.out.println("token = " + token);
 					params[tokenNum] = Integer.parseInt(token);
 				}
 
@@ -130,6 +130,11 @@ public class Node {
 						System.out.println("listenPort = " + token);
 						break;
 					}
+				}
+
+				// Neighbors of N Nodes
+				if (lineNum > NUM_NODES && lineNum <= 2*NUM_NODES) {
+					System.out.println("Node " + (lineNum - NUM_NODES) + " Neighbors:" + token);
 				}
 
 				tokenNum++;
@@ -170,12 +175,12 @@ public class Node {
 		MAX_NUMBER 		= params[5];
 
 		//debug
-		System.out.println("NUM_NODES = " + NUM_NODES);
-		System.out.println("MIN_PER_ACTIVE = " + MIN_PER_ACTIVE);
-		System.out.println("MAX_PER_ACTIVE = " + MAX_PER_ACTIVE);
-		System.out.println("MIN_SEND_DELAY = " + MIN_SEND_DELAY);
-		System.out.println("SNAPSHOT_DELAY = " + SNAPSHOT_DELAY);
-		System.out.println("MAX_NUMBER = " + MAX_NUMBER);
+		// System.out.println("NUM_NODES = " + NUM_NODES);
+		// System.out.println("MIN_PER_ACTIVE = " + MIN_PER_ACTIVE);
+		// System.out.println("MAX_PER_ACTIVE = " + MAX_PER_ACTIVE);
+		// System.out.println("MIN_SEND_DELAY = " + MIN_SEND_DELAY);
+		// System.out.println("SNAPSHOT_DELAY = " + SNAPSHOT_DELAY);
+		// System.out.println("MAX_NUMBER = " + MAX_NUMBER);
 
 	}
 }
