@@ -9,7 +9,6 @@ import java.util.Scanner;
 
 /*
  * Author: Edward Hong
- * Class:  CS 6378.001
  * 
  */
 

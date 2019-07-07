@@ -9,7 +9,6 @@ import java.net.Socket;
 
 /*
  * Author: Edward Hong
- * Class:  CS 6378.001
  * 
  */
 

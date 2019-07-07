@@ -67,20 +67,20 @@ public class Node {
 		config(cfgScanner);
 
 		//debugging nodes index
-		for (Integer id : nodes.keySet()) {
-			Node n = nodes.get(id);
-			System.out.println("NodeId: " + n.id + " HostName: " + n.hostName + " listenPort: " + n.listenPort);
-		}
+		// for (Integer id : nodes.keySet()) {
+		// 	Node n = nodes.get(id);
+		// 	System.out.println("NodeId: " + n.id + " HostName: " + n.hostName + " listenPort: " + n.listenPort);
+		// }
 
 		//debugging network topology
-		for (Integer key : map.keySet()) {
-			ArrayList<Integer> neighbors = map.get(key);
-			System.out.println("Node " + key + " neighbors: ");
-			for (Integer neighbor : neighbors) {
-				System.out.print(neighbor + " ");
-			}
-			System.out.println();
-		}
+		// for (Integer key : map.keySet()) {
+		// 	ArrayList<Integer> neighbors = map.get(key);
+		// 	System.out.println("Node " + key + " neighbors: ");
+		// 	for (Integer neighbor : neighbors) {
+		// 		System.out.print(neighbor + " ");
+		// 	}
+		// 	System.out.println();
+		// }
 
 		// Get the hostname
 		String hostname = null;
@@ -107,17 +107,49 @@ public class Node {
 
 		init(hostname);
 
-		//debug self
-		System.out.println(" Self-nodeId: " + self.id + " Self-hostName: " + self.hostName + " Self-NodeId: " + self.listenPort);
+		//debug self and self's neighbors
+		// System.out.println(" Self-nodeId: " + self.id + " Self-hostName: " + self.hostName + " Self-NodeId: " + self.listenPort);
+		// System.out.println("Self-neighbors: ");
+		// for(Node n : self.neighbors) {
+		// 	System.out.println(n.id + " ");
+		// }
 
-		//debug self's neighbors
-		System.out.println("Self-neighbors: ");
-		for(Node n : self.neighbors) {
-			System.out.println(n.id + " ");
+		self.listen();
+	}
+
+	public void listen() throws Exception {
+		System.out.println("Listening on port " + self.listenPort);
+				
+		// Open a ServerSocket (TCP) using the specified port number.
+		ServerSocket serverSock = new ServerSocket(self.listenPort);
+		
+		// Wait and listen for a connection.
+		// Note that the below line is a blocking call until a client has connected.
+		Socket sock = serverSock.accept();
+
+		System.out.println("Client connected!");
+		DataInputStream in = new DataInputStream(sock.getInputStream());		
+		while(true) {
+			try {
+				String request = in.readUTF();
+				System.out.println("Echo: " + request);
+				if (request.equals("END")) {
+					break;
+				}
+			} catch(EOFException e) {
+				// End of File Exception means that there are no bytes in the buffer.
+				// Therefore, if we check the buffer and nothing is there, wait 5ms and check again.
+				Thread.sleep(5);
+			}			
 		}
+
+		System.out.println("Closing connection.");
+		serverSock.close();
 	}
 
 	private static void init(String currentHostname) {
+		System.out.println("Initializing this node...");
+
 		// Init self node definition
 		for (Integer id : nodes.keySet()) {
 			Node n = nodes.get(id);

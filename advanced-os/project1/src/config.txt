@@ -9,11 +9,11 @@ test
 # six global parameters
 5 6 10 100 2000 15
 
-0 dc02 1234     # nodeID hostName listenPort
-1 dc03 1233
-2 dc04 1233
-3 dc05 1232
-4 dc06 1233
+0 dc02 34197     # nodeID hostName listenPort
+1 dc03 34196
+2 dc04 34196
+3 dc05 34195
+4 dc06 34196
 
 1 4             # space delimited list of neighbors for node 0
 0 2 3           # space delimited list of neighbors for node 1
