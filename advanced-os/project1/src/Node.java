@@ -77,14 +77,19 @@ public class Node {
 
 		System.out.println("Configuring this node...");
 		Scanner line = null;
+		int lineNum = 0;
 
 		// Read each line
-		int lineNum = 0;
+		boolean isFirstPass = true;
 		while (cfg.hasNextLine()) {
 			String lineStr = cfg.nextLine();
 			line = new Scanner(lineStr);
 			boolean isValidLine = true;
 			int tokenNum = 0;
+
+			//debug
+			System.out.println(lineStr);
+			System.out.println(lineNum);
 
 			// Read each token within a line
 			while(line.hasNext()) {
@@ -100,28 +105,51 @@ public class Node {
 				if (token.equals("#")) break;
 				
 				//debug
-				System.out.println(lineNum);
+				System.out.println(token);
 
 				// Assign Global Parameters
 				if (lineNum == 0) {
+					//debug
 					System.out.println("token = " + token);
 					params[tokenNum] = Integer.parseInt(token);
+				}
+
+				// Definitions of N Nodes
+				if (lineNum > 0 && lineNum <= NUM_NODES) {
+					switch(tokenNum) {
+						//debug
+						case 0:
+							System.out.println("NodeId = " + token);
+						break;
+
+						case 1:
+						System.out.println("hostName = " + token);
+						break;
+
+						case 2:
+						System.out.println("listenPort = " + token);
+						break;
+					}
 				}
 
 				tokenNum++;
 			}
 
 			// Make sure the line is valid and has at least 1 token
-			if(isValidLine && tokenNum > 0) {
+			if (isValidLine && tokenNum > 0) {
 				lineNum++;
+			}
+
+			if (isFirstPass && lineNum == 1) {
+				isFirstPass = false;
+
+				// Re-assigning Global Parameters to named constants
+				aliasGlobalParams(params);
 			}
 		}
 
 		if(cfg != null) cfg.close();
 		if(line != null) line.close();
-
-		// Re-assigning Global Parameters to named constants
-		aliasGlobalParams(params);
 	}
 
 	private static boolean isUnsignedInt(String str) {
@@ -141,6 +169,7 @@ public class Node {
 		SNAPSHOT_DELAY 	= params[4];
 		MAX_NUMBER 		= params[5];
 
+		//debug
 		System.out.println("NUM_NODES = " + NUM_NODES);
 		System.out.println("MIN_PER_ACTIVE = " + MIN_PER_ACTIVE);
 		System.out.println("MAX_PER_ACTIVE = " + MAX_PER_ACTIVE);
