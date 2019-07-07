@@ -11,7 +11,11 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -336,6 +340,7 @@ class ServerThread extends Thread {
 
 class Client extends Thread {
 	final Node self;
+	final HashMap<Integer, ClientThread> threads = new HashMap<>();
 
 	public Client(Node n) {
 		this.self = n;
@@ -343,20 +348,22 @@ class Client extends Thread {
 
     @Override
     public void run() {
-		HashSet<Integer> neighborsConnected = new HashSet<>();
 		while(true) {
-			if (neighborsConnected.size() == self.neighbors.size()) break;
+			if (threads.keySet().size() == self.neighbors.size()) break;	// Break once all channels established
 
 			// Spawn a new thread for each channel to each neighbor
 			for (Node neighbor : self.neighbors) {
-				if (neighborsConnected.contains(neighbor.id)) continue;
+				if (threads.keySet().contains(neighbor.id)) continue;
 				try {
 					//todo set hostname
+
+					// Connect to neighbors
 					Socket sock = new Socket("localhost", neighbor.listenPort);
 					DataInputStream in = new DataInputStream(sock.getInputStream());	
-					DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
-					neighborsConnected.add(neighbor.id);
-					new ClientThread(sock, in, out, self).start();
+					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+					
+					// Build index of channels to neighbors
+					threads.put(neighbor.id, new ClientThread(sock, in, out, self));
 				} catch (ConnectException c) {
 					try {
 						//debug
@@ -371,34 +378,62 @@ class Client extends Thread {
 				}
 			}
 		}
+		// Start all threads
+		for(Integer id : threads.keySet()) {
+			threads.get(id).start();
+		}
+
+		// Once all channels established, begin MAP 
+		while(self.isActive) {			
+			int randomMsgCount = new Random().ints(1, Node.MIN_PER_ACTIVE, Node.MAX_PER_ACTIVE + 1).findFirst().getAsInt();
+			while(randomMsgCount > 0) {
+				int randomIndex = new Random().nextInt(threads.keySet().size());
+				Node destNode = self.neighbors.get(randomIndex);				
+				String msg = "Message from Node " + self.id;
+				threads.get(destNode.id).send(msg);
+				randomMsgCount--;
+			}
+			self.isActive = false;
+		}
     }
 }
 
 class ClientThread extends Thread { 
-	final Node client;
+	final Node self;
 	final Socket sock; 
 	final DataInputStream in; 
-    final DataOutputStream out; 
+	final DataOutputStream out; 
+	Queue<String> messages = new LinkedList<>();
 
-	public ClientThread (Socket s, DataInputStream is, DataOutputStream os, Node cl) { 
+	public ClientThread (Socket s, DataInputStream is, DataOutputStream os, Node n) { 
         this.sock = s; 
-        this.in = is; 
-		this.out = os; 
-		this.client = cl;
-    } 
+        this.in = is;
+		this.out = os;
+		this.self = n;
+    }
 
     @Override
     public void run() {
 		while(true) {
-			String str = "Node " + client.id + " connected!";
-			try {
-				out.writeUTF(str);
-			} catch (IOException i) {
-				i.printStackTrace();
+			if (!messages.isEmpty()) {
+				String msg = messages.remove();
+				try {
+					out.writeUTF(msg);
+				} catch (IOException i) {
+					i.printStackTrace();
+				}
+			} else {
+				try {
+					// Wait 5ms and check again
+					Thread.sleep(5);	
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-
-			//debug jesus lets avoid an implosion here
-			break;
 		}
+	}
+
+	public void send(String msg) {
+		this.messages.add(msg);
 	}
 }
