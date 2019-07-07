@@ -115,29 +115,10 @@ public class Node {
 		// 	System.out.println(n.id + " ");
 		// }
 
-		//todo spawn Server-side thread, which then spawns client handler threads, and
-		//spawn client-side thread, which then spawns client threads.
-		self.listen();
-	}
+		// Spawn a Server-side thread, which then spawns client handler threads
+		new Server(self).start();
 
-	public void listen() throws Exception {
-		System.out.println("Listening on port " + self.listenPort);
-				
-		// Open a ServerSocket on self node's port number
-		ServerSocket serverSock = new ServerSocket(self.listenPort);
-
-		while(true) {
-			// Wait for a connection
-			Socket sock = serverSock.accept();
-
-			System.out.println("Client connected!");
-			DataInputStream in = new DataInputStream(sock.getInputStream());	
-			DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
-			
-			System.out.println("Spawning new Server thread...");
-			Thread t = new ServerThread(sock, in, out);
-			t.start();
-		}
+		//todo Spawn a Client-side thread, which spawns client threads to neighbors
 	}
 
 	private static void init(String currentHostname) {
@@ -272,8 +253,38 @@ public class Node {
 	}
 }
 
-class ServerThread extends Thread  
-{ 
+class Server extends Thread {
+	final Node self;
+
+	public Server(Node n) {
+		this.self = n;
+	}
+
+    @Override
+    public void run() { 
+		System.out.println("Listening on port " + self.listenPort);
+		
+		try {
+			// Open a ServerSocket on self node's port number
+			ServerSocket serverSock = new ServerSocket(self.listenPort);
+			while(true) {
+				// Wait for a connection
+				Socket sock = serverSock.accept();
+
+				System.out.println("Client connected!");
+				DataInputStream in = new DataInputStream(sock.getInputStream());	
+				DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
+				
+				System.out.println("Spawning new Server thread...");
+				new ServerThread(sock, in, out).start();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+}
+
+class ServerThread extends Thread { 
     final DataInputStream in; 
     final DataOutputStream out; 
     final Socket sock; 
@@ -313,5 +324,5 @@ class ServerThread extends Thread
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    } 
+    }
 } 
