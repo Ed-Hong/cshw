@@ -383,7 +383,6 @@ class Server extends Thread {
     @Override
     public void run() { 
 		System.out.println("* Listening on port " + self.listenPort + "...");
-		
 		try {
 			// Open a ServerSocket on self node's port number
 			ServerSocket serverSock = new ServerSocket(self.listenPort);
@@ -396,7 +395,6 @@ class Server extends Thread {
 				DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
 				
 				new ServerThread(sock, in, out, self).start();
-				//todo the serverSocket can be cleaned up since we know the number of threads to be spawned
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -628,9 +626,13 @@ class Client extends Thread {
 						threads.get(id).addMessage(doneMessage(self.id));
 					}
 				}
-				System.out.println("YOU HAVE BEEN TERMINATED");
-				self.setTerminated(true);
-				break;
+				
+				// todo root has to wait for all other processes before terminating
+				if (self.id != Node.startingNodeId) {
+					System.out.println("YOU HAVE BEEN TERMINATED.");
+					self.setTerminated(true);
+					break;
+				}
 			}
 
 			if (self.isTerminated()) {
