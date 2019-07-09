@@ -219,7 +219,7 @@ public class Node {
 		try {
 			hostname = args[1];
 		} catch (Exception e) {
-			System.out.println("DEBUG: Please input a mock hostname for development purposes.");
+			System.out.println("DEBUG: Please input a mock hostname for development purposes.\n");
 			return;
 		}
 
