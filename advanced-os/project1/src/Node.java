@@ -141,7 +141,7 @@ public class Node {
 	}
 
 	public synchronized void addFinMessageToSet(int id) {
-		if(self.id == Node.startingNodeId) {
+		if(self.isRoot) {
 			_finMessagesSet.add(id);
 
 			if(!_globalFinishDebounce && _finMessagesSet.size() == NUM_NODES - 1) {
@@ -388,7 +388,7 @@ class Snapshot extends Thread {
 			Thread.sleep(delay);	
 
 			// If I am the root, send self MARK to begin snapshot
-			if(self.id == Node.startingNodeId) {
+			if(self.isRoot) {
 				Socket sock = new Socket("localhost", self.listenPort);
 				DataOutputStream out = new DataOutputStream(sock.getOutputStream());
 				out.writeUTF("MARK " + Node.startingNodeId);
