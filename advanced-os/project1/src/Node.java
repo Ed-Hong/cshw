@@ -1,17 +1,9 @@
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
-import java.util.stream.IntStream;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -22,7 +14,7 @@ import java.util.HashMap;
 /*
  * Author: Edward Hong
  * Class:  CS 6378.0U1
- * 
+ * Advanced Operating Systems - Project 1
  */
 
 public class Node {
@@ -40,6 +32,7 @@ public class Node {
 	public static int SNAPSHOT_DELAY;
 	public static int MAX_NUMBER;
 
+	// Root Node Id
 	public static int startingNodeId = Integer.MAX_VALUE;
 
 	// Index of All Nodes
@@ -51,10 +44,12 @@ public class Node {
 	// The Node on the current host
 	static Node self;
 
+	// Node properties
 	public int id;
 	public String hostName;
 	public int listenPort;
 	public ArrayList<Node> neighbors;
+	public final boolean isRoot;
 
 	// MAP Protocol Variables
 	private boolean _isActive;
@@ -79,8 +74,9 @@ public class Node {
 		this.hostName = hostName;
 		this.listenPort = listenPort;
 		this.neighbors = new ArrayList<>();
+		this.isRoot = id == startingNodeId;
 
-		this._isActive = id == startingNodeId ? true : false;
+		this._isActive = isRoot;
 		this.sentMessageCount = 0;
 
 		this._isRed = false;
@@ -181,6 +177,7 @@ public class Node {
 
 	//todo elaborate this method?
 	public void recordLocalState() {
+		//todo fix this
 		if (!recorded) {
 			String state = "NodeId=" + self.id + " isActive=" + self.isActive() + " sentMessageCount=" + self.sentMessageCount;
 			System.out.println(state);
@@ -198,7 +195,7 @@ public class Node {
 			cfgScanner = new Scanner(configFile);
 		} catch (Exception e) {
 			System.out.println("! Error reading config file.");
-			System.out.println("> Pass name of config file as an argument, and ensure that it is correct.");
+			System.out.println("> Pass name of config file as an argument, and ensure that it is correct.\n");
 			return;
 		}
 
@@ -373,366 +370,7 @@ public class Node {
 	}
 }
 
-class Server extends Thread {
-	final Node self;
 
-	public Server(Node n) {
-		this.self = n;
-	}
-
-    @Override
-    public void run() { 
-		System.out.println("* Listening on port " + self.listenPort + "...");
-		try {
-			// Open a ServerSocket on self node's port number
-			ServerSocket serverSock = new ServerSocket(self.listenPort);
-			while(true) {
-				// Wait for a connection
-				Socket sock = serverSock.accept();
-
-				System.out.println("> Client connected.");
-				DataInputStream in = new DataInputStream(sock.getInputStream());	
-				DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
-				
-				new ServerThread(sock, in, out, self).start();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    }
-}
-
-class ServerThread extends Thread { 
-	final Node self;
-	final Socket sock; 
-	final DataInputStream in; 
-    final DataOutputStream out; 
-        
-    public ServerThread (Socket s, DataInputStream is, DataOutputStream os, Node n) { 
-        this.sock = s; 
-        this.in = is; 
-		this.out = os; 
-		this.self = n;
-    } 
-  
-    @Override
-    public void run() { 
-		while(true) {
-			try {
-				String request = in.readUTF();
-				System.out.println("  Received: " + request);
-
-				// MAP Protocol messages are application messages and begin with "APP"
-
-				// Record app messages received while red as channel state
-				//todo once i've recorded all my channel states then i'm done
-				if (self.isRed() && request.startsWith("APP")) {
-
-					// Application messages are stamped by sender at the end
-					int channel = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
-					self.channels.get(channel).add(request);
-				}
-
-				if(request.startsWith("APP") && !self.isActive() && self.sentMessageCount < Node.MAX_NUMBER) {
-					self.setActive(true);
-				}
-
-				// Snapshot Protocol messages are system messages and begin with "MARK"
-				if(request.startsWith("MARK")) {
-					int nodeId = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
-					self.receiveMarkerMessage(nodeId);
-					
-					// Change color from blue to red
-					if(!self.isRed()) {
-						System.out.println("  COLOR CHANGE TO RED");
-						for (Node neighbor : self.neighbors) {
-							self.addMarker(neighbor.id);	
-						}
-						self.setRed(true);
-
-						// Init channel states
-						for (Node neighbor : self.neighbors) {
-							self.channels.put(neighbor.id, new ArrayList<String>());
-						}
-					} else if (!self.isFinishedLocal() && 
-							  (self.id != Node.startingNodeId && self.getReceivedMarkerCount() >= self.channels.keySet().size() ||
-							  (self.id == Node.startingNodeId && self.getReceivedMarkerCount() > self.channels.keySet().size()))) {
-							// Once this node has received all marker messages from all neighbors (the root receiving one from itself)
-							self.setFinishedLocal(true);
-							System.out.println("  LOCALLY FINISHED");
-							
-							// Multicast FIN message to all neighbors (if not root node)
-							if (self.id != Node.startingNodeId) {
-								for(Node n : self.neighbors) {
-									//todo attach extra data to fin message like clock, etc
-									self.addFinMessage(n.id);
-								}
-						}
-					}
-				}
-
-				// Non-root Nodes forward FIN messages to the root
-				if (request.startsWith("FIN") && !self.hasDoneMessage()) {
-					int nodeId = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
-
-					// Root Node receives accounts for FIN messages
-					if(self.id == Node.startingNodeId) {
-						self.addFinMessageToSet(nodeId);
-					} else {
-						System.out.println("Received FIN from " + nodeId + ". Forwarding.");
-						self.addFinMessage(nodeId);
-					}
-				}
-
-				// Receiving DONE message begins termination
-				if (request.startsWith("DONE")) {
-					int nodeId = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
-
-					self.addDoneMessage(nodeId);
-					//break;
-				}
-
-				if (self.isTerminated()) {
-					break;
-				}
-
-			} catch(EOFException eof) {
-				try {
-					// No bytes in the buffer; wait 5ms and check again
-					Thread.sleep(5);	
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			//cleanup
-			// try {
-			// 	sock.close();
-			// 	in.close();
-			// 	out.close();
-			// } catch (IOException e) {
-			// 	e.printStackTrace();
-			// }
-		}
-    }
-}
-
-class Client extends Thread {
-	final Node self;
-	final HashMap<Integer, ClientThread> threads = new HashMap<>();
-
-	public Client(Node n) {
-		this.self = n;
-	}
-
-    @Override
-    public void run() {
-		while(true) {
-			if (threads.keySet().size() == self.neighbors.size()) break;	// Break once all channels established
-
-			// Spawn a new thread for each channel to each neighbor
-			for (Node neighbor : self.neighbors) {
-				if (threads.keySet().contains(neighbor.id)) continue;
-				try {
-					//todo set hostname
-
-					// Connect to neighbors
-					Socket sock = new Socket("localhost", neighbor.listenPort);
-					DataInputStream in = new DataInputStream(sock.getInputStream());	
-					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-					
-					// Build index of channels to neighbors
-					threads.put(neighbor.id, new ClientThread(sock, in, out, self));
-				} catch (ConnectException c) {
-					try {
-						//debug
-						//System.out.print(".");
-						// Wait 50ms and try again
-						Thread.sleep(50);	
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		// Start all threads
-		for(Integer id : threads.keySet()) {
-			threads.get(id).start();
-		}
-
-		// Once all channels established, begin MAP 
-		while(true) {
-			if(self.isActive()) {
-				System.out.println("  ACTIVE");
-				int randomMsgCount = new Random().ints(1, Node.MIN_PER_ACTIVE, Node.MAX_PER_ACTIVE + 1).findFirst().getAsInt();
-				while(randomMsgCount > 0) {
-					if(self.sentMessageCount >= Node.MAX_NUMBER) {
-						self.setActive(false);
-						break;
-					}
-					int randomIndex = new Random().nextInt(threads.keySet().size());
-					Node destNode = self.neighbors.get(randomIndex);
-					threads.get(destNode.id).addMessage(appMessage(self.id));
-					randomMsgCount--;
-	
-					try {
-						// Wait MIN_SEND_DELAY ms before sending again
-						Thread.sleep(Node.MIN_SEND_DELAY);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				self.setActive(false);
-			}
-			
-			// On Color Change from Blue to Red if we have marker messages to send, send them
-			if(self.hasMarker()) {
-				self.recordLocalState();
-
-				// Multicast MARK message to all neighbors
-				while(self.hasMarker()) {
-					int id = self.removeMarker();
-					threads.get(id).addMessage(markMessage(self.id));
-				}
-			}
-
-			// Finished recording local state and channel state - sending FIN message to neighbors
-			if(self.hasFinMessage()) {
-				while(self.hasFinMessage()) {
-					int id = self.removeFinMessage();
-					threads.get(id).addMessage(finMessage(self.id));
-				}
-			}
-
-			// Node termination
-			if(self.hasDoneMessage()) { 
-				// Root node initiates
-				if(self.id == Node.startingNodeId) {
-					while(self.hasDoneMessage()) {
-						self.removeDoneMessage();
-						for (Node neighbor : self.neighbors) {
-							threads.get(neighbor.id).addMessage(doneMessage(self.id));							
-						}
-					}
-				} else {
-					// Multicast DONE message to all neighbors
-					while(self.hasDoneMessage()) {
-						int id = self.removeDoneMessage();
-						threads.get(id).addMessage(doneMessage(self.id));
-					}
-				}
-				
-				// todo root has to wait for all other processes before terminating
-				if (self.id != Node.startingNodeId) {
-					System.out.println("YOU HAVE BEEN TERMINATED.");
-					self.setTerminated(true);
-					break;
-				}
-			}
-
-			if (self.isTerminated()) {
-				break;
-			}
-		}
-		//cleanup
-		//threads.clear();
-	}
-	
-	private static String appMessage(int senderId) {
-		return Node.APP_MESSAGE + senderId;
-	}
-	
-	private static String markMessage(int senderId) {
-		return Node.MARK_MESSAGE + senderId;
-	}
-
-	private static String finMessage(int senderId) {
-		return Node.FIN_MESSAGE + senderId;
-	}
-
-	private static String doneMessage(int senderId) {
-		return Node.DONE_MESSAGE + senderId;
-	}
-}
-
-class ClientThread extends Thread { 
-	final Node self;
-	final Socket sock; 
-	final DataInputStream in; 
-	final DataOutputStream out; 
-	private final Queue<String> _messages = new LinkedList<>();
-
-	public ClientThread (Socket s, DataInputStream is, DataOutputStream os, Node n) { 
-        this.sock = s; 
-        this.in = is;
-		this.out = os;
-		this.self = n;
-	}
-	
-	public synchronized boolean hasMessage() {
-		return !_messages.isEmpty();
-	}
-
-	public synchronized void addMessage(String msg) {
-		_messages.add(msg);
-	}
-
-	public synchronized String getNextMessage() {
-		return _messages.poll();
-	}
-
-    @Override
-    public void run() {
-		while(true) {
-			if (hasMessage()) {
-				String msg = getNextMessage();
-				try {
-					out.writeUTF(msg);
-				} catch (IOException i) {
-					i.printStackTrace();
-				}
-				self.sentMessageCount++;
-			} else {
-				try {
-					// Wait 5ms and check again
-					Thread.sleep(5);	
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			// Begin termination with root node
-			if(!self.isTerminated() && self.id == Node.startingNodeId && self.hasDoneMessage()) {
-				while(self.hasDoneMessage()) {
-					self.removeDoneMessage();
-					try {
-						Socket sock = new Socket("localhost", self.listenPort);
-						DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-						out.writeUTF("DONE " + Node.startingNodeId);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-			if (self.isTerminated()) {
-				break;
-			}
-		}
-	}
-
-	// protected void finalize() throws Throwable {
-	// 	//cleanup
-	// 	sock.close();
-	// 	in.close();
-	// 	out.close();
-	// }
-}
 
 class Snapshot extends Thread { 
 	final long delay;

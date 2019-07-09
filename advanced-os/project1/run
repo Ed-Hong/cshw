@@ -1,0 +1,5 @@
+#!/bin/bash
+
+./build
+cd bin
+java Node ../config.txt $1
