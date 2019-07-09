@@ -50,6 +50,7 @@ public class Node {
 	public int listenPort;
 	public ArrayList<Node> neighbors;
 	public final boolean isRoot;
+	public int[] clock;
 
 	// MAP Protocol Variables
 	private boolean _isActive;
@@ -75,6 +76,7 @@ public class Node {
 		this.listenPort = listenPort;
 		this.neighbors = new ArrayList<>();
 		this.isRoot = id == startingNodeId;
+		this.clock = new int[NUM_NODES];
 
 		this._isActive = isRoot;
 		this.sentMessageCount = 0;
