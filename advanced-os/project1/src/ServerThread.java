@@ -84,9 +84,7 @@ public class ServerThread extends Thread {
 							// Multicast FIN message to all neighbors (if not root node)
 							if (!self.isRoot) {
 								for(Node n : self.neighbors) {
-                                    //todo attach extra data to fin message like clock, etc
-                                    //send FIN message only to my parent which is the neighbor that I first receive a marker from
-                                    //flesh out FIN messages with actual channel states
+                                    //todo add FinMessage with the actual FinishMessage type
                                     self.addFinMessage(n.id);
 								}
 						}
@@ -102,9 +100,6 @@ public class ServerThread extends Thread {
 					if(self.id == Node.startingNodeId) {
                         //todo this logic needs to be changed to declare termination when
                         //all nodes are passive AND all channels are empty
-                        //todo make a Message super class and extend for all message types.
-                        //encode message as string of data, and delimit with _ 
-                        //then remember specific indices as being the locations of specific data points.
 						self.addFinMessageToSet(nodeId);
 					} else {
 						self.addFinMessage(nodeId);
