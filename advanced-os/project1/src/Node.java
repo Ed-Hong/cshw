@@ -18,11 +18,6 @@ import java.util.HashMap;
  */
 
 public class Node {
-	// Constants
-	public static final String APP_MESSAGE = "APP from Node ";
-	public static final String MARK_MESSAGE = "MARK from Node ";
-	public static final String FIN_MESSAGE = "FIN from Node ";
-	public static final String DONE_MESSAGE = "DONE from Node ";
 
 	// Global Parameters
 	public static int NUM_NODES;

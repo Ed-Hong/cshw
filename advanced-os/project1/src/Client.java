@@ -61,15 +61,22 @@ public class Client extends Thread {
 				// Multicast MARK message to all neighbors
 				while(self.hasMarker()) {
 					int id = self.removeMarker();
-					threads.get(id).addMessage(markMessage(self.id));
+					threads.get(id).addMessage(markMessage(id, self.id));
 				}
 			}
 
 			// Finished recording local state and channel state - sending FIN message to neighbors
 			if(self.hasFinMessage()) {
+
+                // Get total number of messages in channels
+                int numChannelMsgs = 0;
+                for (int key : self.channels.keySet()) {
+                    numChannelMsgs += self.channels.get(key).size();
+                }
+
 				while(self.hasFinMessage()) {
 					int id = self.removeFinMessage();
-					threads.get(id).addMessage(finMessage(self.id));
+					threads.get(id).addMessage(finMessage(id, self.id, numChannelMsgs));
 				}
 			}
 
@@ -80,14 +87,14 @@ public class Client extends Thread {
 					while(self.hasDoneMessage()) {
 						self.removeDoneMessage();
 						for (Node neighbor : self.neighbors) {
-							threads.get(neighbor.id).addMessage(doneMessage(self.id));							
+							threads.get(neighbor.id).addMessage(doneMessage(neighbor.id, self.id));							
 						}
 					}
 				} else {
 					// Multicast DONE message to all neighbors
 					while(self.hasDoneMessage()) {
 						int id = self.removeDoneMessage();
-						threads.get(id).addMessage(doneMessage(self.id));
+						threads.get(id).addMessage(doneMessage(id, self.id));
 					}
 				}
 				
@@ -144,15 +151,15 @@ public class Client extends Thread {
 		return "APP to " + destId + " from " + senderId;
 	}
 	
-	private static String markMessage(int senderId) {
-		return Node.MARK_MESSAGE + senderId;
+	private static String markMessage(int destId, int senderId) {
+		return "MARK to " + destId + " from " + senderId;
 	}
 
-	private static String finMessage(int senderId) {
-		return Node.FIN_MESSAGE + senderId;
+	private static String finMessage(int destId, int senderId, int numChannelMsgs) {
+		return "FIN to " + destId + " from " + senderId + ". numChannelMsgs = " + numChannelMsgs;
 	}
 
-	private static String doneMessage(int senderId) {
-		return Node.DONE_MESSAGE + senderId;
+	private static String doneMessage(int destId, int senderId) {
+		return "DONE to " + destId + " from " + senderId;
 	}
 }

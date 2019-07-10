@@ -34,10 +34,11 @@ public class ServerThread extends Thread {
 				// MAP Protocol messages are application messages and begin with "APP"
 
 				// Record app messages received while red as channel state
-				//todo once i've recorded all my channel states then i'm done
 				if (self.isRed() && request.startsWith("APP")) {
 
-					// Application messages are stamped by sender at the end
+                    // Application messages are stamped by sender at the end
+                    
+                    //todo channels needs to be thread safe / synchronized
 					int channel = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
 					self.channels.get(channel).add(request);
 				}
@@ -51,7 +52,8 @@ public class ServerThread extends Thread {
 					int nodeId = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
 					self.receiveMarkerMessage(nodeId);
 					
-					// Change color from blue to red
+                    // Change color from blue to red
+                    //todo this sometimes seems to cause issues
 					if(!self.isRed()) {
 						System.out.println("  COLOR CHANGE TO RED");
 						for (Node neighbor : self.neighbors) {
@@ -66,7 +68,8 @@ public class ServerThread extends Thread {
 					} else if (!self.isFinishedLocal() && 
 							  (!self.isRoot && self.getReceivedMarkerCount() >= self.channels.keySet().size() ||
 							  (self.isRoot && self.getReceivedMarkerCount() > self.channels.keySet().size()))) {
-							// Once this node has received all marker messages from all neighbors (the root receiving one from itself)
+                            // Node is finished recording local state and channel states
+                            // On receiving all marker messages from all neighbors (the root receiving one from itself)
 							self.setFinishedLocal(true);
 							System.out.println("  LOCALLY FINISHED");
                             
@@ -93,12 +96,18 @@ public class ServerThread extends Thread {
 					}
 				}
 
-				// Non-root Nodes forward FIN messages to the root
+				// Receiving FIN: Non-root Nodes forward FIN messages to the root
 				if (request.startsWith("FIN") && !self.hasDoneMessage()) {
-					int nodeId = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
+                    int index = request.lastIndexOf("from ") + 5;
+					int nodeId = Integer.parseInt(request.substring(index, index + 1));
 
-					// Root Node receives accounts for FIN messages
+					// Root Node accounts for FIN messages to determine termination
 					if(self.id == Node.startingNodeId) {
+                        //todo this logic needs to be changed to declare termination when
+                        //all nodes are passive AND all channels are empty
+                        //todo make a Message super class and extend for all message types.
+                        //encode message as string of data, and delimit with _ 
+                        //then remember specific indices as being the locations of specific data points.
 						self.addFinMessageToSet(nodeId);
 					} else {
 						self.addFinMessage(nodeId);
