@@ -21,36 +21,8 @@ public class Client extends Thread {
 
     @Override
     public void run() {
-		while(true) {
-			if (threads.keySet().size() == self.neighbors.size()) break;	// Break once all channels established
 
-			// Spawn a new thread for each channel to each neighbor
-			for (Node neighbor : self.neighbors) {
-				if (threads.keySet().contains(neighbor.id)) continue;
-				try {
-					//todo set hostname
-
-					// Connect to neighbors
-					Socket sock = new Socket("localhost", neighbor.listenPort);
-					DataInputStream in = new DataInputStream(sock.getInputStream());	
-					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-					
-					// Build index of channels to neighbors
-					threads.put(neighbor.id, new ClientThread(sock, in, out, self));
-				} catch (ConnectException c) {
-					try {
-						//debug
-						//System.out.print(".");
-						// Wait 50ms and try again
-						Thread.sleep(50);	
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
+        setupChannels();
 
 		// Start all threads
 		for(Integer id : threads.keySet()) {
@@ -69,7 +41,7 @@ public class Client extends Thread {
 					}
 					int randomIndex = new Random().nextInt(threads.keySet().size());
 					Node destNode = self.neighbors.get(randomIndex);
-					threads.get(destNode.id).addMessage(appMessage(self.id));
+					threads.get(destNode.id).addMessage(appMessage(destNode.id, self.id));
 					randomMsgCount--;
 	
 					try {
@@ -104,7 +76,7 @@ public class Client extends Thread {
 			// Node termination
 			if(self.hasDoneMessage()) { 
 				// Root node initiates
-				if(self.id == Node.startingNodeId) {
+				if(self.isRoot) {
 					while(self.hasDoneMessage()) {
 						self.removeDoneMessage();
 						for (Node neighbor : self.neighbors) {
@@ -120,7 +92,7 @@ public class Client extends Thread {
 				}
 				
 				// todo root has to wait for all other processes before terminating
-				if (self.id != Node.startingNodeId) {
+				if (!self.isRoot) {
 					System.out.println("YOU HAVE BEEN TERMINATED.");
 					self.setTerminated(true);
 					break;
@@ -133,10 +105,43 @@ public class Client extends Thread {
 		}
 		//cleanup
 		//threads.clear();
-	}
+    }
+    
+    private void setupChannels() {
+        while(true) {
+			if (threads.keySet().size() == self.neighbors.size()) break;	// Break once all channels established
+
+			// Spawn a new thread for each channel to each neighbor
+			for (Node neighbor : self.neighbors) {
+				if (threads.keySet().contains(neighbor.id)) continue;
+				try {
+					//todo set hostname
+
+					// Connect to neighbors
+					Socket sock = new Socket("localhost", neighbor.listenPort);
+					DataInputStream in = new DataInputStream(sock.getInputStream());	
+					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+					
+					// Build index of channels to neighbors
+					threads.put(neighbor.id, new ClientThread(sock, in, out, self));
+				} catch (ConnectException c) {
+					try {
+						//debug
+						//System.out.print(".");
+						// Wait 50ms and try again
+						Thread.sleep(50);	
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+    }
 	
-	private static String appMessage(int senderId) {
-		return Node.APP_MESSAGE + senderId;
+	private static String appMessage(int destId, int senderId) {
+		return "APP to " + destId + " from " + senderId;
 	}
 	
 	private static String markMessage(int senderId) {

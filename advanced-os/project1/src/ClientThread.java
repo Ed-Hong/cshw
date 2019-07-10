@@ -43,6 +43,9 @@ public class ClientThread extends Thread {
 			if (hasMessage()) {
 				String msg = getNextMessage();
 				try {
+                    //debug
+                    System.out.println("  Sending: " + msg);
+
 					out.writeUTF(msg);
 				} catch (IOException i) {
 					i.printStackTrace();
@@ -58,7 +61,7 @@ public class ClientThread extends Thread {
 			}
 
 			// Begin termination with root node
-			if(!self.isTerminated() && self.id == Node.startingNodeId && self.hasDoneMessage()) {
+			if(!self.isTerminated() && self.isRoot && self.hasDoneMessage()) {
 				while(self.hasDoneMessage()) {
 					self.removeDoneMessage();
 					try {

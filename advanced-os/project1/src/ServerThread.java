@@ -64,17 +64,30 @@ public class ServerThread extends Thread {
 							self.channels.put(neighbor.id, new ArrayList<String>());
 						}
 					} else if (!self.isFinishedLocal() && 
-							  (self.id != Node.startingNodeId && self.getReceivedMarkerCount() >= self.channels.keySet().size() ||
-							  (self.id == Node.startingNodeId && self.getReceivedMarkerCount() > self.channels.keySet().size()))) {
+							  (!self.isRoot && self.getReceivedMarkerCount() >= self.channels.keySet().size() ||
+							  (self.isRoot && self.getReceivedMarkerCount() > self.channels.keySet().size()))) {
 							// Once this node has received all marker messages from all neighbors (the root receiving one from itself)
 							self.setFinishedLocal(true);
 							System.out.println("  LOCALLY FINISHED");
-							
+                            
+                    
+                            // Get total number of messages in channels
+                            int numChannelMsgs = 0;
+                            for (int key : self.channels.keySet()) {
+                                numChannelMsgs += self.channels.get(key).size();
+                            }
+
+                            //debug
+                            System.out.println("Relaying FIN to Neighbors.");
+                            System.out.println("Messages in channels = " + numChannelMsgs);
+
 							// Multicast FIN message to all neighbors (if not root node)
-							if (self.id != Node.startingNodeId) {
+							if (!self.isRoot) {
 								for(Node n : self.neighbors) {
-									//todo attach extra data to fin message like clock, etc
-									self.addFinMessage(n.id);
+                                    //todo attach extra data to fin message like clock, etc
+                                    //todo send FIN message only to my parent which is the neighbor that I first receive a marker from
+                                    //todo flesh out FIN messages with actual channel states
+                                    self.addFinMessage(n.id);
 								}
 						}
 					}
@@ -88,7 +101,6 @@ public class ServerThread extends Thread {
 					if(self.id == Node.startingNodeId) {
 						self.addFinMessageToSet(nodeId);
 					} else {
-						System.out.println("Received FIN from " + nodeId + ". Forwarding.");
 						self.addFinMessage(nodeId);
 					}
 				}
