@@ -69,10 +69,7 @@ public class Client extends Thread {
 			if(self.hasFinMessage()) {
 
                 // Get total number of messages in channels
-                int numChannelMsgs = 0;
-                for (int key : self.channels.keySet()) {
-                    numChannelMsgs += self.channels.get(key).size();
-                }
+                int numChannelMsgs = self.countMessagesInChannels();
 
 				while(self.hasFinMessage()) {
 					int id = self.removeFinMessage();

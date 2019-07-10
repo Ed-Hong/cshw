@@ -117,6 +117,14 @@ public class Node {
         return _markerMessagesReceived.size();
 	}
 
+	public int countMessagesInChannels() {
+		int numChannelMsgs = 0;
+		for (int key : self.channels.keySet()) {
+			numChannelMsgs += self.channels.get(key).size();
+		}
+		return numChannelMsgs;
+	}
+
 	public synchronized void setFinishedLocal(boolean fin) {
         _isFinishedLocal = fin;
     }

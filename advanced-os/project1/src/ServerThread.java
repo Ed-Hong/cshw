@@ -38,7 +38,7 @@ public class ServerThread extends Thread {
 
                     // Application messages are stamped by sender at the end
                     
-                    //todo channels needs to be thread safe / synchronized
+                    //todo channels needs to be thread safe / synchronized?
 					int channel = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
 					self.channels.get(channel).add(request);
 				}
@@ -75,10 +75,7 @@ public class ServerThread extends Thread {
                             
                     
                             // Get total number of messages in channels
-                            int numChannelMsgs = 0;
-                            for (int key : self.channels.keySet()) {
-                                numChannelMsgs += self.channels.get(key).size();
-                            }
+                            int numChannelMsgs = self.countMessagesInChannels();
 
                             //debug
                             System.out.println("Relaying FIN to Neighbors.");
@@ -88,8 +85,8 @@ public class ServerThread extends Thread {
 							if (!self.isRoot) {
 								for(Node n : self.neighbors) {
                                     //todo attach extra data to fin message like clock, etc
-                                    //todo send FIN message only to my parent which is the neighbor that I first receive a marker from
-                                    //todo flesh out FIN messages with actual channel states
+                                    //send FIN message only to my parent which is the neighbor that I first receive a marker from
+                                    //flesh out FIN messages with actual channel states
                                     self.addFinMessage(n.id);
 								}
 						}
