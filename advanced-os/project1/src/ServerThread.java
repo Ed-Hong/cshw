@@ -54,9 +54,8 @@ public class ServerThread extends Thread {
 					
                     // Change color from blue to red
 					if(!self.isRed()) {
-                        self.setRed(true);
+                        self.setRed();
                         
-                        //todo this needs to NOT happen more than once
                         System.out.println("  COLOR CHANGE TO RED");
                         System.out.println("  SETTING PARENT ID = " + nodeId);
                         self.parentId = nodeId;

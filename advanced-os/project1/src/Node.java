@@ -90,8 +90,16 @@ public class Node {
         return _isActive;
 	}
 
-	public synchronized void setRed(boolean red) {
-        _isRed = red;
+	public synchronized void setRed() {
+		if(!_isRed) {
+			_isRed = true;
+		} else {
+			try {
+				Thread.sleep(5);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
     }
 
     public synchronized boolean isRed() {
@@ -172,7 +180,7 @@ public class Node {
 
 				// Root node begins termination protocol
 				self.addTerminateMessage(new TerminateMessage(self.id, self.id));
-				self.hasReceivedParentTerm();	
+				self.receivedParentTerm();	
 			}
 		}
 	}

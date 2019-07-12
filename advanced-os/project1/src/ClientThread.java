@@ -49,6 +49,7 @@ public class ClientThread extends Thread {
                 // If sending TERM-ACK to parent, then terminate after sending all remaining ACKs
                 boolean shouldTerminate = false;
                 if(msgType.equals("TACK") && destinationId == self.parentId && !hasMessage()) {
+                    //todo sometimes terminates before another thread has sent ACK
                     shouldTerminate = true;
                 }
 
