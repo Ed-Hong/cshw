@@ -45,7 +45,7 @@ public class Node {
 	public int listenPort;
 	public ArrayList<Node> neighbors;
 	public final boolean isRoot;
-	public int[] clock;	//todo update the clock
+	public int[] clock;	//todo update the clock (part 1.2)
 	public int parentId;
 
 	// MAP Protocol Variables
@@ -53,18 +53,18 @@ public class Node {
 	public int sentMessageCount;
 
 	// CL Protocol Variables
-	private boolean _isRed;
+	private boolean _isRed = false;
 	private Queue<Integer> _markerMessages = new LinkedList<>();
 	private HashSet<Integer> _markerMessagesReceived = new HashSet<>();
 	public HashMap<Integer, ArrayList<String>> channels = new HashMap<>();
 
-	private boolean _isFinishedLocal;
+	private boolean _isFinishedLocal = false;
 	private boolean _globalFinishDebounce = false;
 	private Queue<FinishMessage> _finMessages = new LinkedList<>();
 	private HashSet<Integer> _passiveNodesSet = new HashSet<>();
 	private HashSet<Integer> _nodesWithEmptyChannelsSet = new HashSet<>();
 
-	private boolean _isTerminated;
+	private boolean _isTerminated = false;
 	private Queue<TerminateMessage> _terminateMessages = new LinkedList<>();
 	private Queue<TermAckMessage> _termAckMessages = new LinkedList<>();
 	private HashSet<Integer> _termAckSet = new HashSet<>();
@@ -80,10 +80,6 @@ public class Node {
 
 		this._isActive = isRoot;
 		this.sentMessageCount = 0;
-
-		this._isRed = false;
-		this._isFinishedLocal = false;
-		this._isTerminated = false;
 	}
 
 	public synchronized void setActive(boolean active) {
@@ -236,7 +232,7 @@ public class Node {
 	//debug
 	private boolean recorded = false;
 
-	//todo elaborate this method?
+	//todo elaborate this method? (part 4)
 	public void recordLocalState() {
 		if (!recorded) {
 			String state = "NodeId=" + self.id + " isActive=" + self.isActive() + " sentMessageCount=" + self.sentMessageCount;
@@ -454,7 +450,7 @@ class Snapshot extends Thread {
 					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
 					out.writeUTF(new MarkerMessage(self.id, self.id).message);
 				}
-				
+
 				//todo perform more than one snapshot
 				break;
 			}

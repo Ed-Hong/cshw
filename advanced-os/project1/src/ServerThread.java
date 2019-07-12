@@ -37,7 +37,6 @@ public class ServerThread extends Thread {
 				if (self.isRed() && request.startsWith("APP")) {
                     String[] params = request.split("_");
 
-                    //todo channels needs to be thread safe / synchronized?
 					int channel = Integer.parseInt(params[Message.SOURCE_INDEX]);
 					self.channels.get(channel).add(request);
 				}
@@ -176,7 +175,7 @@ public class ServerThread extends Thread {
                         if(self.isRoot) {
                             System.out.println("ROOT RECEIVED ALL TERM-ACKS, ALL NODES HALTED");
                             //todo once all nodes halted, make sure the nodes actually stop
-                            //and output from root node.
+                            //and output from root node. (part 4)
                         } else {
                             System.out.println("ALL TERM-ACKs RECEIVED, sending ACK to parent");
                             self.addTermAckMessage(
