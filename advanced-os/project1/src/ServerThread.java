@@ -53,13 +53,15 @@ public class ServerThread extends Thread {
 					self.receiveMarkerMessage(nodeId);
 					
                     // Change color from blue to red
-                    //todo this sometimes seems to cause issues
 					if(!self.isRed()) {
-						System.out.println("  COLOR CHANGE TO RED");
+                        self.setRed(true);
+
+                        System.out.println("  COLOR CHANGE TO RED");
+                        System.out.println("  SETTING PARENT ID = " + nodeId);
+                        self.parentId = nodeId; //todo use this parentId for converge-cast 
 						for (Node neighbor : self.neighbors) {
 							self.addMarker(neighbor.id);	
 						}
-						self.setRed(true);
 
 						// Init channel states
 						for (Node neighbor : self.neighbors) {
@@ -73,12 +75,18 @@ public class ServerThread extends Thread {
 							self.setFinishedLocal(true);
 							System.out.println("  LOCALLY FINISHED");
 
-							// Multicast FIN message to all neighbors (if not root node)
-							if (!self.isRoot) {
-								for(Node n : self.neighbors) {
-                                    self.addFinMessage(new FinishMessage(self.id, n.id, self.isActive(), self.countMessagesInChannels(), self.clock));
-								}
-						}
+                            // Send FIN message to my parent, who will forward to Root
+                            if(!self.isRoot) {
+                                self.addFinMessage(
+                                    new FinishMessage(
+                                        self.id, 
+                                        self.parentId, 
+                                        self.isActive(), 
+                                        self.countMessagesInChannels(), 
+                                        self.clock)
+                                    );
+                            }
+                            
 					}
 				}
 
@@ -88,10 +96,6 @@ public class ServerThread extends Thread {
 
 					// Root Node accounts for FIN messages to determine termination
 					if(self.isRoot) {
-                        //todo this logic needs to be changed to declare termination when
-                        //all nodes are passive AND all channels are empty
-                        self.addFinMessageToSet(Integer.parseInt(params[Message.SOURCE_INDEX]));
-                        
                         self.receiveFinMessage(
                                 new FinishMessage(
                                     params[Message.SOURCE_INDEX], 
@@ -105,10 +109,11 @@ public class ServerThread extends Thread {
                         self.checkMAPTermination();
 
 					} else {
+                        // Receiving FIN message from child node, forward to my parent
                         self.addFinMessage(
                             new FinishMessage(
                                 params[Message.SOURCE_INDEX], 
-                                params[Message.DESTINATION_INDEX], 
+                                String.valueOf(self.parentId), 
                                 params[FinishMessage.IS_ACTIVE_INDEX],
                                 params[FinishMessage.NUM_CHANNEL_MSGS_INDEX], 
                                 params[FinishMessage.VECTOR_CLOCK_INDEX]

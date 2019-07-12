@@ -65,22 +65,12 @@ public class Client extends Thread {
 				}
 			}
 
-            // Finished recording local state and channel state - sending FIN message to neighbors
-            // And Forward any FIN messages received
+            // Finished recording local state and channel state - sending FIN message to parent
+            // And Forward any FIN messages received to parent
 			if(self.hasFinMessage()) {
 				while(self.hasFinMessage()) {
                     FinishMessage finMsg = self.removeFinMessage();
-
-                    // Multicast FIN messages to neighbors
-                    if(threads.keySet().contains(finMsg.destinationId)) {
-                        threads.get(finMsg.destinationId)
-                        .addMessage(new FinishMessage(self.id, finMsg.destinationId, self.isActive(), self.countMessagesInChannels(), self.clock).message);
-                    } else if(finMsg.destinationId == self.id) {
-                        for(Node n : self.neighbors) {
-                            // Forward FIN message to all neighbors
-                            self.addFinMessage(new FinishMessage(finMsg.sourceId, n.id, finMsg.isActive, finMsg.numChannelMsgs, finMsg.clock));
-                        }
-                    }
+                    threads.get(finMsg.destinationId).addMessage(finMsg.message);
 				}
 			}
 

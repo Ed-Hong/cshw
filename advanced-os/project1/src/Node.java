@@ -46,6 +46,7 @@ public class Node {
 	public ArrayList<Node> neighbors;
 	public final boolean isRoot;
 	public int[] clock;	//todo update the clock
+	public int parentId;
 
 	// MAP Protocol Variables
 	private boolean _isActive;
@@ -60,7 +61,6 @@ public class Node {
 	private boolean _isFinishedLocal;
 	private boolean _globalFinishDebounce = false;
 	private Queue<FinishMessage> _finMessages = new LinkedList<>();
-	private HashSet<Integer> _finMessagesSet = new HashSet<>();
 	private HashSet<Integer> _passiveNodesSet = new HashSet<>();
 	private HashSet<Integer> _nodesWithEmptyChannelsSet = new HashSet<>();
 
@@ -165,19 +165,17 @@ public class Node {
 
 	public void checkMAPTermination() {
 		System.out.println("Checking MAP Termination...");
-		if(_passiveNodesSet.size() == NUM_NODES - 1 && _nodesWithEmptyChannelsSet.size() == NUM_NODES - 1) {
-			System.out.println("MAP PROTOCOL HAS FINISHED - DECLARE TERMINATION!");
-		}
-	}
 
-	public synchronized void addFinMessageToSet(int id) {
-		if(self.isRoot) {
-			_finMessagesSet.add(id);
-
-			if(!_globalFinishDebounce && _finMessagesSet.size() == NUM_NODES - 1) {
-				System.out.println("--- GLOBAL FINISH ---");
-				addDoneMessage(Node.startingNodeId);
+		if(self.isRoot && !_globalFinishDebounce) {
+			if(_passiveNodesSet.size() == NUM_NODES - 1 && _nodesWithEmptyChannelsSet.size() == NUM_NODES - 1) {
+				System.out.println("MAP PROTOCOL HAS FINISHED - DECLARE TERMINATION!");
 				_globalFinishDebounce = true;
+				
+				//todo begin termination protocol to halt all nodes
+				//todo basically, root sends to its neighbors DONE
+				//onReceiveDone - if from parent, send all neighbors DONE and wait for all neighbors' DONE-ACK 
+				//				  if not from parent, then send DONE-ACK
+				//onReceiveDoneAck - if all neighbors have sent a DONE-ACK then send parent DONE-ACK, and terminate
 			}
 		}
 	}
