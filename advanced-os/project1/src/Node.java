@@ -293,7 +293,7 @@ public class Node {
 		// Spawn a Client-side thread, which spawns client threads to neighbors
 		new Client(self).start();
 
-		//naive solution: start task to start snapshot every 5 seconds
+		// Start a snapshot every 5 seconds
 		new Snapshot(5000, self).start();
 	}
 
@@ -444,20 +444,20 @@ class Snapshot extends Thread {
     @Override
     public void run() {
 		try {
-			//todo make this repeat
-			// Delay then attempt a snapshot
-			Thread.sleep(delay);	
+			while(true) {
+				// Delay then start a snapshot
+				Thread.sleep(delay);	
 
-			// If I am the root, send self MARK to begin snapshot
-			if(self.isRoot) {
-				Socket sock = new Socket("localhost", self.listenPort);
-				DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-				out.writeUTF(new MarkerMessage(self.id, self.id).message);
-
-				//debug - test single snapshot
-				//break;
+				// If I am the root, send self MARK to begin snapshot
+				if(self.isRoot) {
+					Socket sock = new Socket("localhost", self.listenPort);
+					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+					out.writeUTF(new MarkerMessage(self.id, self.id).message);
+				}
+				
+				//todo perform more than one snapshot
+				break;
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
