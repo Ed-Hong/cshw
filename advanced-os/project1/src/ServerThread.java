@@ -76,7 +76,7 @@ public class ServerThread extends Thread {
 							// Multicast FIN message to all neighbors (if not root node)
 							if (!self.isRoot) {
 								for(Node n : self.neighbors) {
-                                    self.addFinMessage(new FinishMessage(self.id, n.id, self.countMessagesInChannels(), self.clock));
+                                    self.addFinMessage(new FinishMessage(self.id, n.id, self.isActive(), self.countMessagesInChannels(), self.clock));
 								}
 						}
 					}
@@ -90,12 +90,26 @@ public class ServerThread extends Thread {
 					if(self.isRoot) {
                         //todo this logic needs to be changed to declare termination when
                         //all nodes are passive AND all channels are empty
-						self.addFinMessageToSet(Integer.parseInt(params[Message.SOURCE_INDEX]));
+                        self.addFinMessageToSet(Integer.parseInt(params[Message.SOURCE_INDEX]));
+                        
+                        self.receiveFinMessage(
+                                new FinishMessage(
+                                    params[Message.SOURCE_INDEX], 
+                                    params[Message.DESTINATION_INDEX], 
+                                    params[FinishMessage.IS_ACTIVE_INDEX],
+                                    params[FinishMessage.NUM_CHANNEL_MSGS_INDEX], 
+                                    params[FinishMessage.VECTOR_CLOCK_INDEX]
+                                )
+                        );
+
+                        self.checkMAPTermination();
+
 					} else {
                         self.addFinMessage(
                             new FinishMessage(
                                 params[Message.SOURCE_INDEX], 
                                 params[Message.DESTINATION_INDEX], 
+                                params[FinishMessage.IS_ACTIVE_INDEX],
                                 params[FinishMessage.NUM_CHANNEL_MSGS_INDEX], 
                                 params[FinishMessage.VECTOR_CLOCK_INDEX]
                                 )

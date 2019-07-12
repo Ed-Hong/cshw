@@ -17,6 +17,10 @@ public abstract class Message {
         this.message += "_" + paramInt;
     }
 
+    public void addParam(boolean paramBool) {
+        this.message += "_" + paramBool;
+    }
+
     public void addParam(String paramStr) {
         this.message += "_" + paramStr;
     }

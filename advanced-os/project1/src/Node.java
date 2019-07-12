@@ -61,6 +61,8 @@ public class Node {
 	private boolean _globalFinishDebounce = false;
 	private Queue<FinishMessage> _finMessages = new LinkedList<>();
 	private HashSet<Integer> _finMessagesSet = new HashSet<>();
+	private HashSet<Integer> _passiveNodesSet = new HashSet<>();
+	private HashSet<Integer> _nodesWithEmptyChannelsSet = new HashSet<>();
 
 	private boolean _isTerminated;
 	private Queue<Integer> _doneMessages = new LinkedList<>();
@@ -143,6 +145,29 @@ public class Node {
 
 	public synchronized FinishMessage removeFinMessage() {
 		return _finMessages.poll();
+	}
+
+	public synchronized void receiveFinMessage(FinishMessage msg) {
+		int nodeId = msg.sourceId;
+
+		if(!msg.isActive) {
+			_passiveNodesSet.add(nodeId);
+		} else if(_passiveNodesSet.contains(nodeId)) {
+			_passiveNodesSet.remove(nodeId);
+		}
+
+		if(msg.numChannelMsgs == 0) {
+			_nodesWithEmptyChannelsSet.add(nodeId);
+		} else if(_nodesWithEmptyChannelsSet.contains(nodeId)) {
+			_nodesWithEmptyChannelsSet.remove(nodeId);
+		}
+	}
+
+	public void checkMAPTermination() {
+		System.out.println("Checking MAP Termination...");
+		if(_passiveNodesSet.size() == NUM_NODES - 1 && _nodesWithEmptyChannelsSet.size() == NUM_NODES - 1) {
+			System.out.println("MAP PROTOCOL HAS FINISHED - DECLARE TERMINATION!");
+		}
 	}
 
 	public synchronized void addFinMessageToSet(int id) {

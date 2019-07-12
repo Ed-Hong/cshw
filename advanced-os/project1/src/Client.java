@@ -74,11 +74,11 @@ public class Client extends Thread {
                     // Multicast FIN messages to neighbors
                     if(threads.keySet().contains(finMsg.destinationId)) {
                         threads.get(finMsg.destinationId)
-                        .addMessage(new FinishMessage(self.id, finMsg.destinationId, self.countMessagesInChannels(), self.clock).message);
+                        .addMessage(new FinishMessage(self.id, finMsg.destinationId, self.isActive(), self.countMessagesInChannels(), self.clock).message);
                     } else if(finMsg.destinationId == self.id) {
                         for(Node n : self.neighbors) {
                             // Forward FIN message to all neighbors
-                            self.addFinMessage(new FinishMessage(finMsg.sourceId, n.id, finMsg.numChannelMsgs, finMsg.clock));
+                            self.addFinMessage(new FinishMessage(finMsg.sourceId, n.id, finMsg.isActive, finMsg.numChannelMsgs, finMsg.clock));
                         }
                     }
 				}
