@@ -65,15 +65,22 @@ public class Client extends Thread {
 				}
 			}
 
-			// Finished recording local state and channel state - sending FIN message to neighbors
+            // Finished recording local state and channel state - sending FIN message to neighbors
+            // And Forward any FIN messages received
 			if(self.hasFinMessage()) {
-
-                // Get total number of messages in channels
-                int numChannelMsgs = self.countMessagesInChannels();
-
 				while(self.hasFinMessage()) {
-					int id = self.removeFinMessage();
-					threads.get(id).addMessage(finMessage(id, self.id, numChannelMsgs));
+                    FinishMessage finMsg = self.removeFinMessage();
+
+                    // Multicast FIN messages to neighbors
+                    if(threads.keySet().contains(finMsg.destinationId)) {
+                        threads.get(finMsg.destinationId)
+                        .addMessage(new FinishMessage(self.id, finMsg.destinationId, self.countMessagesInChannels(), self.clock).message);
+                    } else if(finMsg.destinationId == self.id) {
+                        for(Node n : self.neighbors) {
+                            // Forward FIN message to all neighbors
+                            self.addFinMessage(new FinishMessage(finMsg.sourceId, n.id, finMsg.numChannelMsgs, finMsg.clock));
+                        }
+                    }
 				}
 			}
 
@@ -150,10 +157,6 @@ public class Client extends Thread {
 	
 	private static String markMessage(int destId, int senderId) {
 		return "MARK to " + destId + " from " + senderId;
-	}
-
-	private static String finMessage(int destId, int senderId, int numChannelMsgs) {
-		return "FIN to " + destId + " from " + senderId + ". numChannelMsgs = " + numChannelMsgs;
 	}
 
 	private static String doneMessage(int destId, int senderId) {

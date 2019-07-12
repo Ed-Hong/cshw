@@ -72,20 +72,11 @@ public class ServerThread extends Thread {
                             // On receiving all marker messages from all neighbors (the root receiving one from itself)
 							self.setFinishedLocal(true);
 							System.out.println("  LOCALLY FINISHED");
-                            
-                    
-                            // Get total number of messages in channels
-                            int numChannelMsgs = self.countMessagesInChannels();
-
-                            //debug
-                            System.out.println("Relaying FIN to Neighbors.");
-                            System.out.println("Messages in channels = " + numChannelMsgs);
 
 							// Multicast FIN message to all neighbors (if not root node)
 							if (!self.isRoot) {
 								for(Node n : self.neighbors) {
-                                    //todo add FinMessage with the actual FinishMessage type
-                                    self.addFinMessage(n.id);
+                                    self.addFinMessage(new FinishMessage(self.id, n.id, self.countMessagesInChannels(), self.clock));
 								}
 						}
 					}
@@ -93,16 +84,22 @@ public class ServerThread extends Thread {
 
 				// Receiving FIN: Non-root Nodes forward FIN messages to the root
 				if (request.startsWith("FIN") && !self.hasDoneMessage()) {
-                    int index = request.lastIndexOf("from ") + 5;
-					int nodeId = Integer.parseInt(request.substring(index, index + 1));
+                    String[] params = request.split("_");
 
 					// Root Node accounts for FIN messages to determine termination
-					if(self.id == Node.startingNodeId) {
+					if(self.isRoot) {
                         //todo this logic needs to be changed to declare termination when
                         //all nodes are passive AND all channels are empty
-						self.addFinMessageToSet(nodeId);
+						self.addFinMessageToSet(Integer.parseInt(params[Message.SOURCE_INDEX]));
 					} else {
-						self.addFinMessage(nodeId);
+                        self.addFinMessage(
+                            new FinishMessage(
+                                params[Message.SOURCE_INDEX], 
+                                params[Message.DESTINATION_INDEX], 
+                                params[FinishMessage.NUM_CHANNEL_MSGS_INDEX], 
+                                params[FinishMessage.VECTOR_CLOCK_INDEX]
+                                )
+                            );
 					}
 				}
 

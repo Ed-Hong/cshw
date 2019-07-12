@@ -45,7 +45,7 @@ public class Node {
 	public int listenPort;
 	public ArrayList<Node> neighbors;
 	public final boolean isRoot;
-	public int[] clock;
+	public int[] clock;	//todo update the clock
 
 	// MAP Protocol Variables
 	private boolean _isActive;
@@ -59,7 +59,7 @@ public class Node {
 
 	private boolean _isFinishedLocal;
 	private boolean _globalFinishDebounce = false;
-	private Queue<Integer> _finMessages = new LinkedList<>();
+	private Queue<FinishMessage> _finMessages = new LinkedList<>();
 	private HashSet<Integer> _finMessagesSet = new HashSet<>();
 
 	private boolean _isTerminated;
@@ -133,15 +133,15 @@ public class Node {
         return _isFinishedLocal;
 	}
 
-	public synchronized void addFinMessage(int id) {
-		_finMessages.add(id);
+	public synchronized void addFinMessage(FinishMessage msg) {
+		_finMessages.add(msg);
 	}
 	
 	public synchronized boolean hasFinMessage() {
 		return !_finMessages.isEmpty();
 	}
 
-	public synchronized int removeFinMessage() {
+	public synchronized FinishMessage removeFinMessage() {
 		return _finMessages.poll();
 	}
 
