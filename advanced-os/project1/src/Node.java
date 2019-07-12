@@ -45,8 +45,8 @@ public class Node {
 	public int listenPort;
 	public ArrayList<Node> neighbors;
 	public final boolean isRoot;
-	public int[] clock;	//todo update the clock (part 1.2)
 	public int parentId;
+	private int[] _clock;	//todo update the clock (part 1.2)
 
 	// MAP Protocol Variables
 	private boolean _isActive;
@@ -76,10 +76,25 @@ public class Node {
 		this.listenPort = listenPort;
 		this.neighbors = new ArrayList<>();
 		this.isRoot = id == startingNodeId;
-		this.clock = new int[NUM_NODES];
+		this._clock = new int[NUM_NODES];
 
 		this._isActive = isRoot;
 		this.sentMessageCount = 0;
+	}
+
+	public synchronized void incrementClock(int nodeId) {
+        _clock[nodeId]++;
+	}
+	
+	public synchronized int[] getClock() {
+		return _clock;
+	}
+
+	public synchronized void mergeClock(int[] clk) {
+		for(int i = 0; i < clk.length; i++) {
+			_clock[i] = Math.max(_clock[i], clk[i]);
+		}
+		incrementClock(self.id);
 	}
 
 	public synchronized void setActive(boolean active) {

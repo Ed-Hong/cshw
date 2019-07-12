@@ -40,10 +40,14 @@ public class Client extends Thread {
 						break;
 					}
 					int randomIndex = new Random().nextInt(threads.keySet().size());
-					Node destNode = self.neighbors.get(randomIndex);
-					threads.get(destNode.id).addMessage(new ApplicationMessage(self.id, destNode.id).message);
+                    Node destNode = self.neighbors.get(randomIndex);
+                    
+                    // Application Message send - increment my clock
+                    self.incrementClock(self.id);
+
+					threads.get(destNode.id).addMessage(new ApplicationMessage(self.id, destNode.id, self.getClock()).message);
 					randomMsgCount--;
-	
+                    
 					try {
 						// Wait MIN_SEND_DELAY ms before sending again
 						Thread.sleep(Node.MIN_SEND_DELAY);

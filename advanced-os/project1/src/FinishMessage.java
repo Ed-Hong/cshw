@@ -25,7 +25,7 @@ public class FinishMessage extends Message {
         this.addParam(destinationId);
         this.addParam(isActive);
         this.addParam(numChannelMsgs);
-        this.addParam(clock);
+        this.addParam(clk);
     }
 
     public FinishMessage(String sourceId, String destinationId, String isActive, String channelMsgs, String clk) {
@@ -45,6 +45,6 @@ public class FinishMessage extends Message {
         this.addParam(destinationId);
         this.addParam(isActive);
         this.addParam(numChannelMsgs);
-        this.addParam(clock);
+        this.addParam(clk);
     }
 }

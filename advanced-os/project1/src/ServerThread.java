@@ -31,7 +31,18 @@ public class ServerThread extends Thread {
 				String request = in.readUTF();
 				System.out.println("  Received: " + request);
 
-				// MAP Protocol messages are application messages and begin with "APP"
+                // MAP Protocol messages are application messages and begin with "APP"
+                // Receiving Application Message: Update clock with received vector timestamp
+                if(request.startsWith("APP")) {
+                    String[] params = request.split("_");                    
+                    String[] vals = params[ApplicationMessage.VECTOR_CLOCK_INDEX].split(",");
+                    int[] clkVals = new int[vals.length];
+                    for(int i = 0; i < vals.length; i++) {
+                        clkVals[i] = Integer.parseInt(vals[i]);
+                    }
+                    self.mergeClock(clkVals);
+                }
+
 
 				// Record app messages received while red as channel state
 				if (self.isRed() && request.startsWith("APP")) {
@@ -84,7 +95,7 @@ public class ServerThread extends Thread {
                                         self.parentId, 
                                         self.isActive(), 
                                         self.countMessagesInChannels(), 
-                                        self.clock)
+                                        self.getClock())
                                     );
                             }
                             
