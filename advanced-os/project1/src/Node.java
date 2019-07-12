@@ -1,4 +1,5 @@
 import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.File;
 import java.net.Socket;
 import java.net.InetAddress;
@@ -10,6 +11,9 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
 
 /*
  * Author: Edward Hong
@@ -26,6 +30,7 @@ public class Node {
 	public static int MIN_SEND_DELAY;
 	public static int SNAPSHOT_DELAY;
 	public static int MAX_NUMBER;
+	public static String CONFIG_NAME;
 
 	// Root Node Id
 	public static int startingNodeId = Integer.MAX_VALUE;
@@ -46,7 +51,8 @@ public class Node {
 	public ArrayList<Node> neighbors;
 	public final boolean isRoot;
 	public int parentId;
-	private int[] _clock;	//todo update the clock (part 1.2)
+	private int[] _clock;
+	private int[][] _clocks;
 
 	// MAP Protocol Variables
 	private boolean _isActive;
@@ -77,6 +83,7 @@ public class Node {
 		this.neighbors = new ArrayList<>();
 		this.isRoot = id == startingNodeId;
 		this._clock = new int[NUM_NODES];
+		this._clocks = new int[NUM_NODES][NUM_NODES];
 
 		this._isActive = isRoot;
 		this.sentMessageCount = 0;
@@ -183,6 +190,8 @@ public class Node {
 		} else if(_nodesWithEmptyChannelsSet.contains(nodeId)) {
 			_nodesWithEmptyChannelsSet.remove(nodeId);
 		}
+
+		_clocks[nodeId] = msg.clock;
 	}
 
 	public void checkMAPTermination() {
@@ -251,14 +260,45 @@ public class Node {
     public synchronized boolean isTerminated() {
         return _isTerminated;
 	}
-	
-	//debug
-	private boolean recorded = false;
 
-	//todo elaborate this method? (part 4)
+	public void output() throws IOException {
+		System.out.println("Writing OUTPUT Files!");
+		for(int nodeId : nodes.keySet()) {
+			Node n = nodes.get(nodeId);
+			String outputFileName = Node.CONFIG_NAME + "-" + nodeId + ".out";
+
+			File fout = new File(outputFileName);
+			FileOutputStream fos = new FileOutputStream(fout);
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+		 
+			// Write line per snapshot taken (currently only one)
+			for (int i = 0; i < 1; i++) {
+				if(nodeId == Node.startingNodeId) {
+					// Root knows its own clock
+					bw.write(getClockStr(self.getClock()));
+				} else {
+					bw.write(getClockStr(_clocks[nodeId]));
+				}
+				bw.newLine();
+			}
+		 
+			bw.close();
+		}
+		System.out.println("Done.");
+	}
+
+	private String getClockStr(int[] clk) {
+		String clockStr = "";
+		for (int i = 0; i < clk.length; i++) {
+			clockStr += clk[i] + " ";
+		}
+		return clockStr;
+	}
+	
+	private boolean recorded = false;
 	public void recordLocalState() {
 		if (!recorded) {
-			String state = "NodeId=" + self.id + " isActive=" + self.isActive() + " sentMessageCount=" + self.sentMessageCount;
+			String state = "NodeId=" + self.id + " isActive=" + self.isActive() + " sentMessageCount=" + self.sentMessageCount + " clock=" + self.getClock();
 			System.out.println(state);
 			recorded = true;
 		}
@@ -270,7 +310,9 @@ public class Node {
 		// Create scanner for config file - filename of config is passed as args[0]
 		Scanner cfgScanner = null;
 		try {
-			File configFile = new File(args[0]);
+			String fileName = args[0];
+			Node.CONFIG_NAME = fileName.substring(0, fileName.indexOf(".txt"));
+			File configFile = new File(fileName);
 			cfgScanner = new Scanner(configFile);
 		} catch (Exception e) {
 			System.out.println("! Error reading config file.");
