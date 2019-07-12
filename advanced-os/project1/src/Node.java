@@ -65,7 +65,10 @@ public class Node {
 	private HashSet<Integer> _nodesWithEmptyChannelsSet = new HashSet<>();
 
 	private boolean _isTerminated;
-	private Queue<Integer> _doneMessages = new LinkedList<>();
+	private Queue<TerminateMessage> _terminateMessages = new LinkedList<>();
+	private Queue<TermAckMessage> _termAckMessages = new LinkedList<>();
+	private HashSet<Integer> _termAckSet = new HashSet<>();
+	private boolean _hasReceivedParentTerm = false;
 
 	public Node(int id, String hostName, int listenPort) {
 		this.id = id;
@@ -170,26 +173,56 @@ public class Node {
 			if(_passiveNodesSet.size() == NUM_NODES - 1 && _nodesWithEmptyChannelsSet.size() == NUM_NODES - 1) {
 				System.out.println("MAP PROTOCOL HAS FINISHED - DECLARE TERMINATION!");
 				_globalFinishDebounce = true;
-				
-				//todo begin termination protocol to halt all nodes
-				//todo basically, root sends to its neighbors DONE
-				//onReceiveDone - if from parent, send all neighbors DONE and wait for all neighbors' DONE-ACK 
-				//				  if not from parent, then send DONE-ACK
-				//onReceiveDoneAck - if all neighbors have sent a DONE-ACK then send parent DONE-ACK, and terminate
+
+				// Root node begins termination protocol
+				self.addTerminateMessage(new TerminateMessage(self.id, self.id));
+				self.hasReceivedParentTerm();	
 			}
 		}
 	}
 
-	public synchronized boolean hasDoneMessage() {
-		return !_doneMessages.isEmpty();
+	public synchronized boolean hasTerminateMessage() {
+		return !_terminateMessages.isEmpty();
 	}
 
-	public synchronized void addDoneMessage(int id) {
-		_doneMessages.add(id);
+	public synchronized void addTerminateMessage(TerminateMessage termMsg) {
+		_terminateMessages.add(termMsg);
 	}
 
-	public synchronized int removeDoneMessage() {
-		return _doneMessages.poll();
+	public synchronized TerminateMessage removeTerminateMessage() {
+		return _terminateMessages.poll();
+	}
+
+	public synchronized void addTermAckMessage(TermAckMessage tackMsg) {
+		_termAckMessages.add(tackMsg);
+	}
+
+	public synchronized boolean hasTermAckMessage() {
+		return !_termAckMessages.isEmpty();
+	}
+
+	public synchronized TermAckMessage removeTermAckMessage() {
+		return _termAckMessages.poll();
+	}
+
+	public synchronized void addTermAckToSet(int sourceId) {
+		_termAckSet.add(sourceId);
+	}
+
+	public synchronized boolean receivedAllTermAcks() {
+		// Subtract 1 if not root since one of the neighbors is parent
+		return self.isRoot ? _termAckSet.size() == self.neighbors.size() : 
+							 _termAckSet.size() == self.neighbors.size() - 1;
+	}
+
+	public synchronized void receivedParentTerm() {
+        if(!_hasReceivedParentTerm) {
+			_hasReceivedParentTerm = true;
+		}
+    }
+
+    public synchronized boolean hasReceivedParentTerm() {
+        return _hasReceivedParentTerm;
 	}
 
 	public synchronized void setTerminated(boolean t) {
@@ -205,7 +238,6 @@ public class Node {
 
 	//todo elaborate this method?
 	public void recordLocalState() {
-		//todo fix this
 		if (!recorded) {
 			String state = "NodeId=" + self.id + " isActive=" + self.isActive() + " sentMessageCount=" + self.sentMessageCount;
 			System.out.println(state);
@@ -261,7 +293,7 @@ public class Node {
 		// Spawn a Client-side thread, which spawns client threads to neighbors
 		new Client(self).start();
 
-		//naive solution: start task to start snapshot (todo)
+		//naive solution: start task to start snapshot every 5 seconds
 		new Snapshot(5000, self).start();
 	}
 
@@ -412,6 +444,7 @@ class Snapshot extends Thread {
     @Override
     public void run() {
 		try {
+			//todo make this repeat
 			// Delay then attempt a snapshot
 			Thread.sleep(delay);	
 
@@ -419,7 +452,7 @@ class Snapshot extends Thread {
 			if(self.isRoot) {
 				Socket sock = new Socket("localhost", self.listenPort);
 				DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-				out.writeUTF("MARK " + Node.startingNodeId);
+				out.writeUTF(new MarkerMessage(self.id, self.id).message);
 
 				//debug - test single snapshot
 				//break;

@@ -41,12 +41,27 @@ public class ClientThread extends Thread {
     public void run() {
 		while(true) {
 			if (hasMessage()) {
-				String msg = getNextMessage();
+                String msg = getNextMessage();
+                String[] params = msg.split("_");
+                String msgType = params[Message.MESSAGE_TYPE_INDEX];
+                int destinationId = Integer.parseInt(params[Message.DESTINATION_INDEX]);
+
+                // If sending TERM-ACK to parent, then terminate after sending all remaining ACKs
+                boolean shouldTerminate = false;
+                if(msgType.equals("TACK") && destinationId == self.parentId && !hasMessage()) {
+                    shouldTerminate = true;
+                }
+
 				try {
                     //debug
                     System.out.println("  Sending: " + msg);
-
-					out.writeUTF(msg);
+                    out.writeUTF(msg);
+                    
+                    if(shouldTerminate) {
+                        // TERMINATE NODE
+                        System.out.println("YOU HAVE BEEN TERMINATED.");
+                        self.setTerminated(true);
+                    }
 				} catch (IOException i) {
 					i.printStackTrace();
 				}
@@ -57,20 +72,6 @@ public class ClientThread extends Thread {
 					Thread.sleep(5);	
 				} catch (Exception e) {
 					e.printStackTrace();
-				}
-			}
-
-			// Begin termination with root node
-			if(!self.isTerminated() && self.isRoot && self.hasDoneMessage()) {
-				while(self.hasDoneMessage()) {
-					self.removeDoneMessage();
-					try {
-						Socket sock = new Socket("localhost", self.listenPort);
-						DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-						out.writeUTF("DONE " + Node.startingNodeId);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
 				}
 			}
 

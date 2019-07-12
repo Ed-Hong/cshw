@@ -41,7 +41,7 @@ public class Client extends Thread {
 					}
 					int randomIndex = new Random().nextInt(threads.keySet().size());
 					Node destNode = self.neighbors.get(randomIndex);
-					threads.get(destNode.id).addMessage(appMessage(destNode.id, self.id));
+					threads.get(destNode.id).addMessage(new ApplicationMessage(self.id, destNode.id).message);
 					randomMsgCount--;
 	
 					try {
@@ -61,7 +61,7 @@ public class Client extends Thread {
 				// Multicast MARK message to all neighbors
 				while(self.hasMarker()) {
 					int id = self.removeMarker();
-					threads.get(id).addMessage(markMessage(id, self.id));
+					threads.get(id).addMessage(new MarkerMessage(self.id, id).message);
 				}
 			}
 
@@ -75,32 +75,37 @@ public class Client extends Thread {
 			}
 
 			// Node termination
-			if(self.hasDoneMessage()) { 
+			if(self.hasTerminateMessage()) {
 				// Root node initiates
 				if(self.isRoot) {
-					while(self.hasDoneMessage()) {
-						self.removeDoneMessage();
+					while(self.hasTerminateMessage()) {
+                        System.out.println("ROOT NODE initiating TERMINATION");
+						self.removeTerminateMessage();
 						for (Node neighbor : self.neighbors) {
-							threads.get(neighbor.id).addMessage(doneMessage(neighbor.id, self.id));							
+							threads.get(neighbor.id).addMessage(new TerminateMessage(self.id, neighbor.id).message);							
 						}
 					}
 				} else {
-					// Multicast DONE message to all neighbors
-					while(self.hasDoneMessage()) {
-						int id = self.removeDoneMessage();
-						threads.get(id).addMessage(doneMessage(id, self.id));
+                    // Multicast TERM message to all neighbors
+					while(self.hasTerminateMessage()) {
+                        System.out.println("Sending TERM");
+						TerminateMessage termMsg = self.removeTerminateMessage();
+						threads.get(termMsg.destinationId).addMessage(termMsg.message);
 					}
 				}
-				
-				// todo root has to wait for all other processes before terminating
-				if (!self.isRoot) {
-					System.out.println("YOU HAVE BEEN TERMINATED.");
-					self.setTerminated(true);
-					break;
-				}
-			}
+            }
+            
+            // Sending Term-Ack messages once Node has received TERM from parent
+            if(self.hasTermAckMessage() && self.hasReceivedParentTerm()) {
+                while(self.hasTermAckMessage()) {
+                    System.out.println("Sending TERM-ACK");
+                    TermAckMessage tackMsg = self.removeTermAckMessage();
+                    threads.get(tackMsg.destinationId).addMessage(tackMsg.message);
+                }
+            }
 
-			if (self.isTerminated()) {
+            // Terminate self once all remaining ACKs have been sent
+            if (self.isTerminated() && !self.hasTermAckMessage()) {
 				break;
 			}
 		}
@@ -140,16 +145,4 @@ public class Client extends Thread {
 			}
 		}
     }
-	
-	private static String appMessage(int destId, int senderId) {
-		return "APP to " + destId + " from " + senderId;
-	}
-	
-	private static String markMessage(int destId, int senderId) {
-		return "MARK to " + destId + " from " + senderId;
-	}
-
-	private static String doneMessage(int destId, int senderId) {
-		return "DONE to " + destId + " from " + senderId;
-	}
 }

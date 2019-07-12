@@ -35,11 +35,10 @@ public class ServerThread extends Thread {
 
 				// Record app messages received while red as channel state
 				if (self.isRed() && request.startsWith("APP")) {
+                    String[] params = request.split("_");
 
-                    // Application messages are stamped by sender at the end
-                    
                     //todo channels needs to be thread safe / synchronized?
-					int channel = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
+					int channel = Integer.parseInt(params[Message.SOURCE_INDEX]);
 					self.channels.get(channel).add(request);
 				}
 
@@ -49,16 +48,20 @@ public class ServerThread extends Thread {
 
 				// Snapshot Protocol messages are system messages and begin with "MARK"
 				if(request.startsWith("MARK")) {
-					int nodeId = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
+                    String[] params = request.split("_");
+
+					int nodeId = Integer.parseInt(params[Message.SOURCE_INDEX]);
 					self.receiveMarkerMessage(nodeId);
 					
                     // Change color from blue to red
 					if(!self.isRed()) {
                         self.setRed(true);
-
+                        
+                        //todo this needs to NOT happen more than once
                         System.out.println("  COLOR CHANGE TO RED");
                         System.out.println("  SETTING PARENT ID = " + nodeId);
-                        self.parentId = nodeId; //todo use this parentId for converge-cast 
+                        self.parentId = nodeId;
+                        
 						for (Node neighbor : self.neighbors) {
 							self.addMarker(neighbor.id);	
 						}
@@ -91,7 +94,7 @@ public class ServerThread extends Thread {
 				}
 
 				// Receiving FIN: Non-root Nodes forward FIN messages to the root
-				if (request.startsWith("FIN") && !self.hasDoneMessage()) {
+				if (request.startsWith("FIN")) {
                     String[] params = request.split("_");
 
 					// Root Node accounts for FIN messages to determine termination
@@ -122,17 +125,70 @@ public class ServerThread extends Thread {
 					}
 				}
 
-				// Receiving DONE message begins termination
-				if (request.startsWith("DONE")) {
-					int nodeId = Integer.parseInt(request.substring(request.lastIndexOf(" ") + 1));
+                //onReceiveDone - if from parent, send all neighbors DONE and wait for all neighbors' DONE-ACK 
+				//				  if not from parent, then send DONE-ACK
 
-					self.addDoneMessage(nodeId);
+                
+				// Receiving TERM message begins termination
+				if (request.startsWith("TERM")) {
+                    String[] params = request.split("_");
+                    int sourceId = Integer.parseInt(params[Message.SOURCE_INDEX]);
+                    
+                    // If TERM message is from parent
+                    if(sourceId == self.parentId) {
+                        System.out.println("Got TERM from parent");
+                        self.receivedParentTerm();
+                        // Add TERM messages for all neighbors to buffer
+                        for(Node neighbor : self.neighbors) {
+                            if(neighbor.id != self.parentId) {
+                                System.out.println("Add TERMs for all non-parent neighbors to buffer");
+                                self.addTerminateMessage(
+                                    new TerminateMessage(self.id, neighbor.id)
+                                );
+                            }
+                        }
+                    } else {
+                        System.out.println("Got TERM from neighbor (NOT PARENT)");
+                        System.out.println("Adding TERM-ACK for neighbor");
+                        // TERM message is not from parent, send a TERM-ACK (TACK)
+                        // if already received TERM from parent, otherwise buffer it.
+                        self.addTermAckMessage(
+                            new TermAckMessage(self.id, sourceId)
+                        );
+                    }
+
 					//break;
+                }
+                
+                //onReceiveDoneAck - 
+                //if all neighbors have sent a DONE-ACK then send parent DONE-ACK, and terminate
+
+
+                // Receiving TACK message
+				if (request.startsWith("TACK")) {
+                    String[] params = request.split("_");
+
+                    System.out.println("Got TERM-ACK, adding to set");
+                    self.addTermAckToSet(Integer.parseInt(params[Message.SOURCE_INDEX]));
+
+                    // Once all TERM-ACKs have been received, add TERM-ACK to buffer to send to parent
+                    if(self.receivedAllTermAcks()) {
+                        if(self.isRoot) {
+                            System.out.println("ROOT RECEIVED ALL TERM-ACKS, ALL NODES HALTED");
+                            //todo once all nodes halted, make sure the nodes actually stop
+                            //and output from root node.
+                        } else {
+                            System.out.println("ALL TERM-ACKs RECEIVED, sending ACK to parent");
+                            self.addTermAckMessage(
+                                new TermAckMessage(self.id, self.parentId)
+                            );
+                        }
+                    }
 				}
 
-				if (self.isTerminated()) {
-					break;
-				}
+                if (self.isTerminated()) {
+                    break;
+                }
 
 			} catch(EOFException eof) {
 				try {
