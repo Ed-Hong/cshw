@@ -210,7 +210,7 @@ public class Node {
 		if(cfg != null) cfg.close();
 		if(line != null) line.close();
 
-		//printConfig();
+		printConfig();
 	}
 
 	private static boolean isUnsignedInt(String str) {
