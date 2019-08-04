@@ -28,26 +28,23 @@ public class ServerThread extends Thread {
     public void run() { 
 		while(true) {
 			try {
-				String message = in.readUTF();
-                System.out.println("  Received: " + message);
-                
-
-
-
-
-
-
-
-			} catch(EOFException eof) {
-				try {
-					// No bytes in the buffer; wait 5ms and check again
-					Thread.sleep(5);	
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				if (in.available() > 0) {
+					String message = in.readUTF();
+					System.out.println("  Received: " + message);
+				} else {
+					idle(10);
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-    }
+	}
+	
+	private void idle(long millis) {
+		try {
+			Thread.sleep(millis);	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

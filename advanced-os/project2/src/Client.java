@@ -14,9 +14,18 @@ import java.util.HashMap;
 public class Client extends Thread {
 	final Node self;
 	final HashMap<Integer, ClientThread> threads = new HashMap<>();
+	private boolean _done = false;
 
 	public Client(Node n) {
 		this.self = n;
+	}
+
+	public synchronized boolean isDone() {
+		return _done;
+	}
+
+	private synchronized void Done() {
+		_done = true;
 	}
 
     @Override
@@ -24,26 +33,21 @@ public class Client extends Thread {
 
         setupChannels();
 
-		// Start all threads
-		for(Integer id : threads.keySet()) {
-			threads.get(id).start();
-		}
-
 		// Once all channels established, begin MAP 
-		while(true) {
-			broadcast("Hello from Node " + self.id);
-			break;
-		}
+		// while(true) {
+		// 		
+		// 	break;
+		// }
 
 		// Cleanup
-		threads.clear();
+		//threads.clear();
     }
 	
-	private void send(int destId, String message) {
-		threads.get(destId).addMessage(message);
+	public void send(int destId, String message) {
+		threads.get(destId).addMessage(message + " to Node " + destId);
 	}
 
-	private void broadcast(String message) {
+	public void broadcast(String message) {
 		for(Integer id : threads.keySet()) {
 			send(id, message);
 		}
@@ -69,16 +73,27 @@ public class Client extends Thread {
 					threads.put(nodeId, new ClientThread(sock, in, out, self));
 
 				} catch (ConnectException c) {
-					try {
-						// Wait 50ms and try again
-						Thread.sleep(50);	
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					idle(500);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
-    }
+
+		// Start all threads
+		for(Integer id : threads.keySet()) {
+			threads.get(id).start();
+		}
+
+		// Set Done flag
+		Done();
+	}
+	
+	private void idle(long millis) {
+		try {
+			Thread.sleep(millis);	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

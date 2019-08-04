@@ -97,20 +97,17 @@ public class Node {
 			return;
 		}
 
+		// Initialize this node with this machine's hostname
 		init(hostname);
-
 		System.out.println("> Configuration Finished.\n");
 
 
+		
+		// Initialize Mutex singleton instance
+		Mutex.init(self);
+
+		// Begin application
 		runApplication();
-
-
-		// Spawn a Server-side thread, which then spawns client handler threads
-		new Server(self).start();
-
-		// Spawn a Client-side thread, which spawns client threads to neighbors
-		new Client(self).start();
-
 	}
 
 	private static void runApplication() {
@@ -210,7 +207,7 @@ public class Node {
 		if(cfg != null) cfg.close();
 		if(line != null) line.close();
 
-		printConfig();
+		//printConfig();
 	}
 
 	private static boolean isUnsignedInt(String str) {

@@ -12,10 +12,19 @@ import java.io.DataOutputStream;
 public class Server extends Thread {
 	final Node self;
 	int threadCount;
+	private boolean _done = false;
 
 	public Server(Node n) {
 		this.self = n;
 		this.threadCount = 0;
+	}
+
+	public synchronized boolean isDone() {
+		return _done;
+	}
+
+	private synchronized void Done() {
+		_done = true;
 	}
 
     @Override
@@ -39,6 +48,10 @@ public class Server extends Thread {
 				threadCount++;
 			}
 			// Cleanup
+
+			// Set Done flag
+			Done();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

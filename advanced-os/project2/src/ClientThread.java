@@ -50,12 +50,7 @@ public class ClientThread extends Thread {
 					i.printStackTrace();
 				}
 			} else {
-				try {
-					// Wait 5ms and check again
-					Thread.sleep(5);	
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				idle(50);
 			}
 		}
 
@@ -63,6 +58,14 @@ public class ClientThread extends Thread {
 		// sock.close();
 		// in.close();
 		// out.close();
+	}
+
+	private void idle(long millis) {
+		try {
+			Thread.sleep(millis);	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	// protected void finalize() throws Throwable {
