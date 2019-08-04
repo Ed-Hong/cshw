@@ -1,0 +1,7 @@
+#!/bin/bash
+  
+
+# Build
+cd src
+javac -g Node.java
+mv *.class ../bin/

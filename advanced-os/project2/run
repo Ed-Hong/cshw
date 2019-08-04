@@ -2,11 +2,11 @@
   
 
 # Build
-cd src
-javac -g Node.java
-mv *.class ../bin/
+# cd src
+# javac -g Node.java
+# mv *.class ../bin/
 
 
 # Run
-cd ../bin
+cd bin
 java Node config.txt $1
