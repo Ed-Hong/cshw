@@ -79,7 +79,7 @@ public class Mutex {
         addRequest(req);
 
         // Send a reply
-        client.send(new Message(Type.REPLY, self.id, 0, req.timestamp));
+        client.send(new Message(Type.REPLY, self.id, req.sourceId, self.incrementClock()));
     }
 
     public void onReceiveReply(int sourceId) {
@@ -93,7 +93,7 @@ public class Mutex {
     }
 
     public void enter() {
-        Request req = new Request(self.id, self.clock);
+        Request req = new Request(self.id, self.incrementClock());
 
         // Insert the request into priority queue
         addRequest(req);
@@ -114,7 +114,7 @@ public class Mutex {
         getNextRequest();
 
         // Broadcast release
-        client.broadcast(new Message(Type.RELEASE, self.id, self.clock));
+        client.broadcast(new Message(Type.RELEASE, self.id, self.incrementClock()));
     }
 
     private void idle(long millis) {

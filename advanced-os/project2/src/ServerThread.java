@@ -33,8 +33,10 @@ public class ServerThread extends Thread {
 					// OnReceive
 					String message = in.readUTF();
 					//System.out.println(self.id + " < " + message + "	");
-					
 					Message msg = new Message(message);
+
+					// Update clock with message timestamp
+					self.setClock(Math.max(msg.timestamp, self.getClock()) + 1);
 
 					switch (msg.type) {
 						case REQUEST:

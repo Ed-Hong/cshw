@@ -49,13 +49,19 @@ public class Node {
 		this.clock = 0;
 	}
 
-	// public synchronized void incrementClock() {
-    //     _clock[nodeId]++;
-	// }
-	
-	// public synchronized int[] getClock() {
-	// 	return _clock;
-	// }
+	public synchronized int incrementClock() {
+		clock++;
+		return clock;
+	}
+
+	public synchronized int getClock() {
+		return clock;
+	}
+
+	public synchronized int setClock(int clk) {
+		clock = clk;
+		return clock;
+	}
 
 	public static void main(String[] args) throws Exception {
 		// Create scanner for config file - filename of config is passed as args[0]
@@ -236,6 +242,7 @@ public class Node {
 				// Executing critical section
 				waitTime = getRandomWaitTime(CS_EXECUTION_TIME);
 				System.out.print(self.id + ": cs_enter " + waitTime + " ms\n");
+				incrementClock();	// Internal Event
 				idle(waitTime);
 	
 
