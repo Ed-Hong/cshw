@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Building Project..."
+./scripts/build
+
+for i in dc02 dc03 dc06
+do
+    ( ./scripts/run "$i" & )
+done

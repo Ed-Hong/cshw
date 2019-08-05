@@ -1,0 +1,7 @@
+#!/bin/bash
+  
+clear
+
+# Run
+cd bin
+java Node config.txt $1
