@@ -74,7 +74,7 @@ public class Mutex {
         replyCount = 0;
     }
 
-    public void onReceiveRequest(Request req) {
+    public synchronized void onReceiveRequest(Request req) {
         // Insert request into queue
         addRequest(req);
 
@@ -82,12 +82,12 @@ public class Mutex {
         client.send(new Message(Type.REPLY, self.id, req.sourceId, self.incrementClock()));
     }
 
-    public void onReceiveReply(int sourceId) {
+    public synchronized void onReceiveReply(int sourceId) {
         //System.out.println(self.id + "got REPLY from " + sourceId);
         addReply();
     }
 
-    public void onReceiveRelease(int sourceId) {
+    public synchronized void onReceiveRelease(int sourceId) {
         removeRequest(new Request(sourceId));
         //System.out.println(self.id + ": Released - queue size = " + requests.size());
     }
@@ -112,7 +112,8 @@ public class Mutex {
     public void exit() {        
         // Remove request from the queue
         getNextRequest();
-
+        resetReplies();
+        
         // Broadcast release
         client.broadcast(new Message(Type.RELEASE, self.id, self.incrementClock()));
     }

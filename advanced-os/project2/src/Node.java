@@ -238,24 +238,25 @@ public class Node {
 		if (self.id == 0) {
 			for(int i = 0; i < NUM_REQUESTS; i++) {
 				Mutex.getInstance().enter();	// Blocking until request granted
-				//logStart();
+				logStart();
 
 				// Executing critical section
 				System.out.print(self.id + ": request " + i + " - cs_enter at " + System.currentTimeMillis()+ "\n");
 				self.incrementClock();	// Internal Event
-				idle(getRandomWaitTime(CS_EXECUTION_TIME));
-	
+				//idle(getRandomWaitTime(CS_EXECUTION_TIME));
+				idle(300);
 
 				Mutex.getInstance().exit();		// Exit critical section and release
-				//logEnd();
+				logEnd();
 
 				// Wait a random amount of time before requesting again
-				System.out.print(self.id + ": request " + i + " - cs_exit at " + System.currentTimeMillis()+ "\n");
-				idle(getRandomWaitTime(INTER_REQUEST_DELAY));
+				System.out.println(self.id + ": request " + i + " - cs_exit at  " + System.currentTimeMillis()+ "\n");
+				//idle(getRandomWaitTime(INTER_REQUEST_DELAY));
+				idle(300);
 			}
 
 			System.out.println("DONE");
-			//testMutex();
+			testMutex();
 		}
 	}
 
@@ -297,6 +298,9 @@ public class Node {
 	
 			while (scan.hasNextLine()) {
 				String line = scan.nextLine();
+
+				if(line.length() == 0) break;
+
 				long timestamp = Long.parseLong(line.split(" ")[3]);
 	
 				if(prevTS < timestamp) {
