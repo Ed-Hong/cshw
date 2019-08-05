@@ -234,28 +234,33 @@ public class Node {
 
 		long waitTime;
 
-		// keep it simple - for now assume only node 0 makes requests
-		if (self.id == 0) {
+//		if (self.id == 0) {
+
+
 			for(int i = 0; i < NUM_REQUESTS; i++) {
 				Mutex.getInstance().enter();	// Blocking until request granted
 				logStart();
 
 				// Executing critical section
-				System.out.print(self.id + ": request " + i + " - cs_enter at " + System.currentTimeMillis()+ "    ");
+//				System.out.print(self.id + ": request " + i + " - cs_enter at " + System.currentTimeMillis()+ "    ");
 				self.incrementClock();	// Internal Event
 				idle(getRandomWaitTime(CS_EXECUTION_TIME));
+//				idle(400);
 
 				Mutex.getInstance().exit();		// Exit critical section and release
 				logEnd();
 
 				// Wait a random amount of time before requesting again
-				System.out.print(" cs_exit at  " + System.currentTimeMillis()+ "\n");
+//				System.out.print(" cs_exit at  " + System.currentTimeMillis()+ "\n");
 				idle(getRandomWaitTime(INTER_REQUEST_DELAY));
+//				idle(400);
 			}
 
-			System.out.println("DONE");
+			System.out.println(self.id + ": DONE");
 			testMutex();
-		}
+
+			
+//		}
 	}
 
 	//todo make lambda be a float?
@@ -277,17 +282,19 @@ public class Node {
 	}
 
 	private static void logStart() {
-		String log = self.id + ": enters at " + System.currentTimeMillis();
+		String log = self.id + " : enters at " + System.currentTimeMillis();
 		log(log);
 	}
 
 	private static void logEnd() {
-		String log = self.id + ": exits at  " + System.currentTimeMillis();
+		String log = self.id + " : exits at  " + System.currentTimeMillis() + "\n";
 		log(log);
 	}
 
 	private static void testMutex() {
+		boolean checkNext = true;
 		boolean success = true;
+		int prevNode = -1;
 		long prevTS = 0;
 
 		try {
@@ -297,10 +304,24 @@ public class Node {
 			while (scan.hasNextLine()) {
 				String line = scan.nextLine();
 
-				if(line.length() == 0) break;
+				if(line.length() == 0) {
+					checkNext = true;
+					break;
+				}
 
+				int node = Integer.parseInt(line.split(" ")[0]);
 				long timestamp = Long.parseLong(line.split(" ")[3]);
-	
+
+				if (checkNext) {
+					prevNode = node;
+					checkNext = false;
+				} else {
+					if(prevNode != node) {
+						success = false;
+						break;
+					}
+				}
+
 				if(prevTS < timestamp) {
 					prevTS = timestamp;
 				} else {
@@ -310,11 +331,9 @@ public class Node {
 			}
 	
 			if(success) {
-				System.out.println("MUTEX SUCCESS");
-				log("SUCCESS\n");
+				System.out.println(self.id + ": MUTEX SUCCESS");
 			} else {
-				System.out.println("MUTEX FAIL");
-				log("FAIL\n");
+				System.out.println(self.id + ": MUTEX FAIL");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

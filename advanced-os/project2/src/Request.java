@@ -38,10 +38,16 @@ public class Request {
 
 class RequestComparator implements Comparator<Request>{ 
     public int compare(Request r1, Request r2) { 
-        if (r1.timestamp < r2.timestamp)
+        if (r1.timestamp < r2.timestamp) {
             return -1;
-        else if (r1.timestamp > r2.timestamp) 
+
+        }
+        else if (r1.timestamp > r2.timestamp) {
             return 1;
-        return 0; 
+        }
+        else {
+            // Implies timestamps are equal - order by nodeId
+            return r1.sourceId < r2.sourceId ? -1 : 1; 
+        }
     } 
 } 
