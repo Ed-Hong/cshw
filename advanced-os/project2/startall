@@ -8,7 +8,7 @@ echo "Building Project..."
 > bin/output.out
 
 # Spawn processes
-for i in dc02 dc03 dc06
+for i in dc02 dc03 dc06 dc05 dc10 dc09 dc15 dc18 dc23
 do
     ( ./scripts/run "$i" & )
 done
