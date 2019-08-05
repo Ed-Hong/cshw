@@ -18,6 +18,7 @@ public class Mutex {
     private Client client = null;
     private Server server = null;
     private PriorityQueue<Request> requests = null;
+    private int replyCount = 0;
 
     private Mutex(Node self) {
         this.self = self;
@@ -54,18 +55,24 @@ public class Mutex {
         requests.remove(request);
     }
 
-    public void enter() {
-        Request req = new Request(self.id, self.clock);
-
-        // Insert the request into priority queue
-        addRequest(req);
-
-        // Broadcast request message to all processes
-        client.broadcast(req);
+    public synchronized Request getNextRequest() {
+        return requests.poll();
     }
 
-    public void exit() {
-        System.out.println("* Exiting critical section.");
+    public synchronized Request peekNextRequest() {
+        return requests.peek();
+    }
+
+    public synchronized void addReply() {
+        replyCount++;
+    }
+
+    public synchronized int getReplies() {
+        return replyCount;
+    }
+
+    public synchronized void resetReplies() {
+        replyCount = 0;
     }
 
     public void onReceiveRequest(Request req) {
@@ -78,6 +85,25 @@ public class Mutex {
 
     public void onReceiveReply(int sourceId) {
         //System.out.println(self.id + "got REPLY from " + sourceId);
+        addReply();
+
+        if(peekNextRequest().sourceId == self.id && getReplies() == Node.NUM_NODES - 1) {
+            System.out.println("READY TO CRITICALLY EXECUTE!");
+        }
+    }
+
+    public void enter() {
+        Request req = new Request(self.id, self.clock);
+
+        // Insert the request into priority queue
+        addRequest(req);
+
+        // Broadcast request message to all processes
+        client.broadcast(req);
+    }
+
+    public void exit() {
+        System.out.println("* Exiting critical section.");
     }
 
     private void idle(long millis) {
