@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.IOException;
+import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 
@@ -237,28 +238,85 @@ public class Node {
 		if (self.id == 0) {
 			for(int i = 0; i < NUM_REQUESTS; i++) {
 				Mutex.getInstance().enter();	// Blocking until request granted
-		
+				//logStart();
 
 				// Executing critical section
-				waitTime = getRandomWaitTime(CS_EXECUTION_TIME);
-				System.out.print(self.id + ": cs_enter " + waitTime + " ms\n");
+				System.out.print(self.id + ": request " + i + " - cs_enter at " + System.currentTimeMillis()+ "\n");
 				self.incrementClock();	// Internal Event
-				idle(waitTime);
+				idle(getRandomWaitTime(CS_EXECUTION_TIME));
 	
 
 				Mutex.getInstance().exit();		// Exit critical section and release
+				//logEnd();
 
 				// Wait a random amount of time before requesting again
-				waitTime = getRandomWaitTime(INTER_REQUEST_DELAY);
-				System.out.print(self.id + ": cs_exit  " + waitTime + " ms\n");
-				idle(waitTime);
+				System.out.print(self.id + ": request " + i + " - cs_exit at " + System.currentTimeMillis()+ "\n");
+				idle(getRandomWaitTime(INTER_REQUEST_DELAY));
 			}
+
+			System.out.println("DONE");
+			//testMutex();
 		}
 	}
 
 	//todo make lambda be a float?
 	private static long getRandomWaitTime(int lambda) {
 		Random rng = new Random();
-		return (long) ((Math.log(1 - rng.nextDouble()) / (-lambda)) * 100);
+		return (long) ((Math.log(1 - rng.nextDouble()) / (-lambda)) * 1000);
+	}
+
+	private static void log(String log) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter("output.out", true)); 
+			writer.newLine();
+			writer.write(log);
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void logStart() {
+		String log = self.id + ": enters at " + System.currentTimeMillis();
+		log(log);
+	}
+
+	private static void logEnd() {
+		String log = self.id + ": exits at  " + System.currentTimeMillis();
+		log(log);
+	}
+
+	private static void testMutex() {
+		boolean success = true;
+		long prevTS = 0;
+
+		try {
+			File outputFile = new File("output.out");
+			Scanner scan = new Scanner(outputFile);
+	
+			while (scan.hasNextLine()) {
+				String line = scan.nextLine();
+				long timestamp = Long.parseLong(line.split(" ")[3]);
+	
+				if(prevTS < timestamp) {
+					prevTS = timestamp;
+				} else {
+					success = false;
+					break;
+				}
+			}
+	
+			if(success) {
+				System.out.println("MUTEX SUCCESS");
+				log("SUCCESS\n");
+			} else {
+				System.out.println("MUTEX FAIL");
+				log("FAIL\n");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 }
