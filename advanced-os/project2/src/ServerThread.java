@@ -32,16 +32,21 @@ public class ServerThread extends Thread {
 
 					// OnReceive
 					String message = in.readUTF();
-					//System.out.println(self.id + " < " + message + "	");
+					System.out.println(self.id + " < " + message + "	");
 					
-					// Received Request from another Node
-					if (message.split(" ")[0].equals("REQUEST")) {
-						Mutex.getInstance().onReceiveRequest(message);
-					}
+					Message msg = new Message(message);
 
-					// Received Reply from another Node
-					if (message.split(" ")[0].equals("REPLY")) {
-						Mutex.getInstance().onReceiveReply(message);
+					switch (msg.type) {
+						case REQUEST:
+							Mutex.getInstance().onReceiveRequest(new Request(msg.sourceId, msg.timestamp));
+							break;
+
+						case REPLY:
+							Mutex.getInstance().onReceiveReply(msg.sourceId);
+							break;
+						
+						case RELEASE:
+							break;
 					}
 
 				} else {

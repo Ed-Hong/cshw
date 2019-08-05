@@ -43,13 +43,13 @@ public class Client extends Thread {
 		//threads.clear();
     }
 	
-	public void send(int destId, String message) {
-		threads.get(destId).addMessage(message);
+	public void send(Message msg) {
+		threads.get(msg.destinationId).addMessage(msg.encode());
 	}
 
-	public void broadcast(String message) {
-		for(Integer id : threads.keySet()) {
-			send(id, message);
+	public void broadcast(Request req) {
+		for(Integer destId : threads.keySet()) {
+			send(new Message(Type.REQUEST, req.sourceId, destId, req.timestamp));
 		}
 	}
 

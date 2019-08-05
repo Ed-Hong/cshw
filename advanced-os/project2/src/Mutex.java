@@ -17,7 +17,7 @@ public class Mutex {
     private Node self = null;
     private Client client = null;
     private Server server = null;
-    private PriorityQueue<String> requests = null;
+    private PriorityQueue<Request> requests = null;
 
     private Mutex(Node self) {
         this.self = self;
@@ -45,37 +45,38 @@ public class Mutex {
         return _instance;
     }
 
-    public synchronized void addRequest(String request) {
+    public synchronized void addRequest(Request request) {
         requests.add(request);
-        System.out.println(self.id + ": added " + request);
+        //System.out.println(self.id + ": added " + request);
     }
 
-    public synchronized void removeRequest(String request) {
+    public synchronized void removeRequest(Request request) {
         requests.remove(request);
     }
 
     public void enter() {
+        Request req = new Request(self.id, self.clock);
         // Insert the request into priority queue
-        addRequest("REQUEST from Node " + self.id);
+        addRequest(req);
 
-        // Broadcast request to all processes
-        client.broadcast("REQUEST from Node " + self.id);
+        // Broadcast request message to all processes
+        client.broadcast(req);
     }
 
     public void exit() {
         System.out.println("* Exiting critical section.");
     }
 
-    public void onReceiveRequest(String message) {
+    public void onReceiveRequest(Request req) {
         // Insert request into queue
-        addRequest(message);
+        addRequest(req);
 
         // Send a reply
-        client.send(0, "REPLY from Node " + self.id);
+        client.send(new Message(Type.REPLY, self.id, 0, req.timestamp));
     }
 
-    public void onReceiveReply(String message) {
-        System.out.println(self.id + "got " + message);
+    public void onReceiveReply(int sourceId) {
+        //System.out.println(self.id + "got REPLY from " + sourceId);
     }
 
     private void idle(long millis) {
