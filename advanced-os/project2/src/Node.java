@@ -241,18 +241,16 @@ public class Node {
 				logStart();
 
 				// Executing critical section
-				System.out.print(self.id + ": request " + i + " - cs_enter at " + System.currentTimeMillis()+ "\n");
+				System.out.print(self.id + ": request " + i + " - cs_enter at " + System.currentTimeMillis()+ "    ");
 				self.incrementClock();	// Internal Event
-				//idle(getRandomWaitTime(CS_EXECUTION_TIME));
-				idle(300);
+				idle(getRandomWaitTime(CS_EXECUTION_TIME));
 
 				Mutex.getInstance().exit();		// Exit critical section and release
 				logEnd();
 
 				// Wait a random amount of time before requesting again
-				System.out.println(self.id + ": request " + i + " - cs_exit at  " + System.currentTimeMillis()+ "\n");
-				//idle(getRandomWaitTime(INTER_REQUEST_DELAY));
-				idle(300);
+				System.out.print(" cs_exit at  " + System.currentTimeMillis()+ "\n");
+				idle(getRandomWaitTime(INTER_REQUEST_DELAY));
 			}
 
 			System.out.println("DONE");
