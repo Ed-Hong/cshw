@@ -29,8 +29,21 @@ public class ServerThread extends Thread {
 		while(true) {
 			try {
 				if (in.available() > 0) {
+
+					// OnReceive
 					String message = in.readUTF();
-					System.out.println(self.id + " < " + message + "	");
+					//System.out.println(self.id + " < " + message + "	");
+					
+					// Received Request from another Node
+					if (message.split(" ")[0].equals("REQUEST")) {
+						Mutex.getInstance().onReceiveRequest(message);
+					}
+
+					// Received Reply from another Node
+					if (message.split(" ")[0].equals("REPLY")) {
+						Mutex.getInstance().onReceiveReply(message);
+					}
+
 				} else {
 					idle(10);
 				}
