@@ -39,12 +39,7 @@ public class Mutex {
         // Begin
         while(true) {
             client.send((self.id + 1) % 3, "Hello from Node " + self.id);
-
-            try {
-                Thread.sleep(2000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            idle(2000);
         }
     }
 
@@ -62,4 +57,12 @@ public class Mutex {
     public static void exit() {
         System.out.println("* Exiting critical section.");
     }
+
+    private void idle(long millis) {
+		try {
+			Thread.sleep(millis);	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
