@@ -61,30 +61,13 @@ public class Client extends Thread {
 	}
 
     private void setupChannels() {
-        while(true) {
-			// Stop once all channels have been established to all neighbors
-			if (threads.keySet().size() == Node.NUM_NODES - 1) break;
+		// Spawn a new thread for each channel to each neighbor
+		for (Integer nodeId : Node.nodes.keySet()) {
+			if (nodeId == self.id) continue;
+			Node neighbor = Node.nodes.get(nodeId);
 
-			// Spawn a new thread for each channel to each neighbor
-			for (Integer nodeId : Node.nodes.keySet()) {
-				if (nodeId == self.id) continue;
-				Node neighbor = Node.nodes.get(nodeId);
-				try {
-					// Connect to neighbors
-					Socket sock = new Socket("localhost", neighbor.listenPort);		//todo set hostname
-
-					DataInputStream in = new DataInputStream(sock.getInputStream());	
-					DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-					
-					// Build index of channels to neighbors
-					threads.put(nodeId, new ClientThread(sock, in, out, self));
-
-				} catch (ConnectException c) {
-					idle(500);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+			// Blocking call, retries until connection successfull
+			connectTo(neighbor);
 		}
 
 		// Start all threads
@@ -94,6 +77,25 @@ public class Client extends Thread {
 
 		// Set Done flag
 		Done();
+	}
+
+	private void connectTo(Node neighbor) {
+		while(true) {
+			try {
+				// Connect to neighbors
+				Socket sock = new Socket("localhost", neighbor.listenPort);		//todo set hostname
+				DataInputStream in = new DataInputStream(sock.getInputStream());	
+				DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+				
+				// Build index of channels to neighbors
+				threads.put(neighbor.id, new ClientThread(sock, in, out, self));
+				break;
+			} catch (ConnectException c) {
+				idle(500);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private void idle(long millis) {
