@@ -242,7 +242,7 @@ public class Node {
 				// Executing critical section
 				waitTime = getRandomWaitTime(CS_EXECUTION_TIME);
 				System.out.print(self.id + ": cs_enter " + waitTime + " ms\n");
-				incrementClock();	// Internal Event
+				self.incrementClock();	// Internal Event
 				idle(waitTime);
 	
 
