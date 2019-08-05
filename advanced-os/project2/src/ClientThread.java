@@ -43,8 +43,6 @@ public class ClientThread extends Thread {
 			if (hasMessage()) {
                 String msg = getNextMessage();
 				try {
-                    //debug
-                    System.out.println("  Sending: " + msg);
                     out.writeUTF(msg);
 				} catch (IOException i) {
 					i.printStackTrace();

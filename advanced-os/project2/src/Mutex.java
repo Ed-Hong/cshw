@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.Queue;
 import java.util.LinkedList;
+import java.util.Random;
 
 /*
  * Author: Edward Hong
@@ -36,10 +37,20 @@ public class Mutex {
             if(client.isDone() && server.isDone()) break;
         }
 
+        int messageCount = 0;
+
         // Begin
         while(true) {
-            client.send((self.id + 1) % 3, "Hello from Node " + self.id);
-            idle(2000);
+            if (messageCount >= 10) break;
+
+            //client.send((self.id + 1) % 3, "Hello from Node " + self.id);
+            client.broadcast("Hello from Node " + self.id);
+            messageCount++;
+
+            Random rand = new Random();
+
+            // Wait between 1 to 5 seconds
+            idle(1000 + rand.nextInt(4000));
         }
     }
 

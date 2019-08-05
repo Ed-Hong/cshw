@@ -30,7 +30,7 @@ public class ServerThread extends Thread {
 			try {
 				if (in.available() > 0) {
 					String message = in.readUTF();
-					System.out.println("  Received: " + message);
+					System.out.println(self.id + " < " + message + "	");
 				} else {
 					idle(10);
 				}

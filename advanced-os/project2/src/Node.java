@@ -58,8 +58,6 @@ public class Node {
 	// }
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("\n* Configuring node...");
-
 		// Create scanner for config file - filename of config is passed as args[0]
 		Scanner cfgScanner = null;
 		try {
@@ -69,7 +67,7 @@ public class Node {
 			cfgScanner = new Scanner(configFile);
 		} catch (Exception e) {
 			System.out.println("! Error reading config file.");
-			System.out.println("> Pass name of config file as an argument, and ensure that it is correct.\n");
+			System.out.println("> Pass name of config file as an argument, and ensure that it is correct.");
 			return;
 		}
 
@@ -81,7 +79,6 @@ public class Node {
 		try {
 			InetAddress ip = InetAddress.getLocalHost();
 			hostname = ip.getHostName();
-			System.out.println("* Current Hostname: " + hostname);
 		} catch (UnknownHostException e) {
 			System.out.println("! Error attempting to get hostname.");
 			e.printStackTrace();
@@ -93,15 +90,12 @@ public class Node {
 		try {
 			hostname = args[1];
 		} catch (Exception e) {
-			System.out.println("DEBUG: Please input a mock hostname for development purposes.\n");
+			System.out.println("DEBUG: Please input a mock hostname for development purposes.");
 			return;
 		}
 
 		// Initialize this node with this machine's hostname
 		init(hostname);
-		System.out.println("> Configuration Finished.\n");
-
-
 		
 		// Initialize Mutex singleton instance
 		Mutex.init(self);

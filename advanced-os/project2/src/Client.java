@@ -44,7 +44,7 @@ public class Client extends Thread {
     }
 	
 	public void send(int destId, String message) {
-		threads.get(destId).addMessage(message + " to Node " + destId);
+		threads.get(destId).addMessage(message);
 	}
 
 	public void broadcast(String message) {

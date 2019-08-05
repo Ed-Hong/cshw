@@ -29,7 +29,6 @@ public class Server extends Thread {
 
     @Override
     public void run() { 
-		System.out.println("* Listening on port " + self.listenPort + "...");
 		try {
 			// Open a ServerSocket on self node's port number
 			ServerSocket serverSock = new ServerSocket(self.listenPort);
@@ -39,7 +38,6 @@ public class Server extends Thread {
 				// Wait for a connection
 				Socket sock = serverSock.accept();
 
-				System.out.println("> Client connected.");
 				DataInputStream in = new DataInputStream(sock.getInputStream());	
 				DataOutputStream out = new DataOutputStream(sock.getOutputStream());	
 				
