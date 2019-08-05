@@ -18,7 +18,7 @@ public class Mutex {
     private Node self = null;
     private Client client = null;
     private Server server = null;
-    private Queue<Integer> requests = null;
+    private Queue<String> requests = null;
 
     private Mutex(Node self) {
         this.self = self;
@@ -36,22 +36,6 @@ public class Mutex {
         while(true) {
             if(client.isDone() && server.isDone()) break;
         }
-
-        int messageCount = 0;
-
-        // Begin
-        while(true) {
-            if (messageCount >= 10) break;
-
-            //client.send((self.id + 1) % 3, "Hello from Node " + self.id);
-            client.broadcast("Hello from Node " + self.id);
-            messageCount++;
-
-            Random rand = new Random();
-
-            // Wait between 1 to 5 seconds
-            idle(1000 + rand.nextInt(4000));
-        }
     }
 
     public static void init(Node self) {
@@ -62,10 +46,15 @@ public class Mutex {
         return _instance;
     }
 
-    public static void enter() {
-        System.out.println("* Entering critical section...");
+    public void enter() {
+        // Insert the request into priority queue
+        requests.add("Request from Node " + self.id);
+
+        // Broadcast request to all processes
+        client.broadcast("Request from Node " + self.id);
     }
-    public static void exit() {
+
+    public void exit() {
         System.out.println("* Exiting critical section.");
     }
 

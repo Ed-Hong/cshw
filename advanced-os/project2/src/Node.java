@@ -104,13 +104,6 @@ public class Node {
 		runApplication();
 	}
 
-	private static void runApplication() {
-		// wait a random amount of time, d, then call Mutex.enter()
-		// upon receiving permission from Mutex, wait for cs execution time, c
-		// once finished, call Mutex.exit()
-		// do this for NUM_REQUESTS
-	}
-
 	private static void init(String currentHostname) {
 		for (Integer id : nodes.keySet()) {
 			Node n = nodes.get(id);
@@ -229,6 +222,18 @@ public class Node {
 		for (Integer id : nodes.keySet()) {
 			Node n = nodes.get(id);
 			System.out.println("NodeId: " + n.id + " HostName: " + n.hostName + " PortNum: " + n.listenPort);
+		}
+	}
+
+	private static void runApplication() {
+		// wait a random amount of time, d, then call Mutex.enter()
+		// upon receiving permission from Mutex, wait for cs execution time, c
+		// once finished, call Mutex.exit()
+		// do this for NUM_REQUESTS
+
+		// keep it simple - for now assume node 0 makes a single request
+		if(self.id == 0) {
+			Mutex.getInstance().enter();
 		}
 	}
 }
