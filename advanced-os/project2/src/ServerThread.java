@@ -46,6 +46,7 @@ public class ServerThread extends Thread {
 							break;
 						
 						case RELEASE:
+							Mutex.getInstance().onReceiveRelease(msg.sourceId);
 							break;
 					}
 

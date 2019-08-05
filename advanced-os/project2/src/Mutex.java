@@ -38,11 +38,11 @@ public class Mutex {
         }
     }
 
-    public static void init(Node self) {
-        _instance = new Mutex(self);
+    public static synchronized void init(Node self) {
+        if (_instance == null) _instance = new Mutex(self);
     }
 
-    public static Mutex getInstance() {
+    public static synchronized Mutex getInstance() {
         return _instance;
     }
 
@@ -88,6 +88,11 @@ public class Mutex {
         addReply();
     }
 
+    public void onReceiveRelease(int sourceId) {
+        removeRequest(new Request(sourceId));
+        System.out.println(self.id + ": Released - queue size = " + requests.size());
+    }
+
     public void enter() {
         Request req = new Request(self.id, self.clock);
 
@@ -100,15 +105,12 @@ public class Mutex {
         // Block until request is granted
         while(true) {
             if(peekNextRequest().sourceId == self.id && getReplies() == Node.NUM_NODES - 1) {
-                System.out.println("READY TO CRITICALLY EXECUTE!");
                 break;
             }
         }
     }
 
-    public void exit() {
-        System.out.println("* Exiting critical section");
-        
+    public void exit() {        
         // Remove request from the queue
         getNextRequest();
 

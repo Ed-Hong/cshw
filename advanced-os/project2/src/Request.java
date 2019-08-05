@@ -10,10 +10,30 @@ public class Request {
     public int sourceId;
     public int timestamp;
 
+    public Request(int sourceId) {
+        this.sourceId = sourceId;
+    }
+
     public Request(int sourceId, int timestamp) {
         this.sourceId = sourceId;
         this.timestamp = timestamp;
     }
+    
+    @Override
+    public boolean equals(Object o) { 
+  
+        if (o == this) { 
+            return true; 
+        } 
+  
+        if (!(o instanceof Request)) { 
+            return false; 
+        } 
+        
+        Request r = (Request) o; 
+          
+        return this.sourceId == r.sourceId;
+    } 
 }
 
 class RequestComparator implements Comparator<Request>{ 

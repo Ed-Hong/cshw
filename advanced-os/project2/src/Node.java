@@ -241,12 +241,14 @@ public class Node {
 
 		// keep it simple - for now assume node 0 makes a single request
 		if(self.id == 0) {
-			Mutex.getInstance().enter();
+			Mutex.getInstance().enter();	// Blocking until request granted
 
-			System.out.println("WOW I'M DOING STUFF!");
+			// Executing critical section
+			System.out.println(self.id + ": cs_enter");
 			idle(1000);
+			System.out.println(self.id + ": cs_exit");
 
-			Mutex.getInstance().exit();
+			Mutex.getInstance().exit();		// Exit critical section and release
 		}
 	}
 }
