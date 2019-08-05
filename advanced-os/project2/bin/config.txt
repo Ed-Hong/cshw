@@ -12,7 +12,7 @@
 # 8 dc23 2546
 
 ##################################### TEST CONFIG ########################################
-3 20 10 10      # num nodes, avg d, avg c, num requests
+3 20 10 3      # num nodes, avg d, avg c, num requests
 
 0 dc02.utdallas.edu 34197    # nodeID hostName listenPort
 1 dc03.utdallas.edu 34196

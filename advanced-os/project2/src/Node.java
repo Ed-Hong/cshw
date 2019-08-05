@@ -269,10 +269,11 @@ public class Node {
 			writer.newLine();
 			writer.write(log);
 			writer.close();
+		} catch (IOException io) {
+			idle(10);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private static void logStart() {
