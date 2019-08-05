@@ -3,7 +3,6 @@ import java.net.Socket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 /*
  * Author: Edward Hong
@@ -90,7 +89,7 @@ public class Mutex {
 
     public void onReceiveRelease(int sourceId) {
         removeRequest(new Request(sourceId));
-        System.out.println(self.id + ": Released - queue size = " + requests.size());
+        //System.out.println(self.id + ": Released - queue size = " + requests.size());
     }
 
     public void enter() {

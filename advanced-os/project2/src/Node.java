@@ -193,8 +193,6 @@ public class Node {
 
 		if(cfg != null) cfg.close();
 		if(line != null) line.close();
-
-		//printConfig();
 	}
 
 	private static boolean isUnsignedInt(String str) {
@@ -212,18 +210,6 @@ public class Node {
 		CS_EXECUTION_TIME 		= params[2];
 		NUM_REQUESTS 			= params[3];
 	}
-	
-	private static void printConfig() {
-		//debug config
-		System.out.println("NUM_NODES = " + NUM_NODES);
-		System.out.println("INTER_REQUEST_DELAY = " + INTER_REQUEST_DELAY);
-		System.out.println("CS_EXECUTION_TIME = " + CS_EXECUTION_TIME);
-		System.out.println("NUM_REQUESTS = " + NUM_REQUESTS);
-		for (Integer id : nodes.keySet()) {
-			Node n = nodes.get(id);
-			System.out.println("NodeId: " + n.id + " HostName: " + n.hostName + " PortNum: " + n.listenPort);
-		}
-	}
 
 	private static void idle(long millis) {
 		try {
@@ -239,16 +225,33 @@ public class Node {
 		// once finished, call Mutex.exit()
 		// do this for NUM_REQUESTS
 
-		// keep it simple - for now assume node 0 makes a single request
-		if(self.id == 0) {
-			Mutex.getInstance().enter();	// Blocking until request granted
+		long waitTime;
 
-			// Executing critical section
-			System.out.println(self.id + ": cs_enter");
-			idle(1000);
-			System.out.println(self.id + ": cs_exit");
+		// keep it simple - for now assume only node 0 makes requests
+		if (self.id == 0) {
+			for(int i = 0; i < NUM_REQUESTS; i++) {
+				Mutex.getInstance().enter();	// Blocking until request granted
+		
 
-			Mutex.getInstance().exit();		// Exit critical section and release
+				// Executing critical section
+				waitTime = getRandomWaitTime(CS_EXECUTION_TIME);
+				System.out.print(self.id + ": cs_enter " + waitTime + " ms\n");
+				idle(waitTime);
+	
+
+				Mutex.getInstance().exit();		// Exit critical section and release
+
+				// Wait a random amount of time before requesting again
+				waitTime = getRandomWaitTime(INTER_REQUEST_DELAY);
+				System.out.print(self.id + ": cs_exit  " + waitTime + " ms\n");
+				idle(waitTime);
+			}
 		}
+	}
+
+	//todo make lambda be a float?
+	private static long getRandomWaitTime(int lambda) {
+		Random rng = new Random();
+		return (long) ((Math.log(1 - rng.nextDouble()) / (-lambda)) * 100);
 	}
 }

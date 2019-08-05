@@ -32,7 +32,7 @@ public class ServerThread extends Thread {
 
 					// OnReceive
 					String message = in.readUTF();
-					System.out.println(self.id + " < " + message + "	");
+					//System.out.println(self.id + " < " + message + "	");
 					
 					Message msg = new Message(message);
 
