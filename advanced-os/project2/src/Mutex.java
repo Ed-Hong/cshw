@@ -18,6 +18,7 @@ public class Mutex {
     private Server server = null;
     private PriorityQueue<Request> requests = null;
     private int replyCount = 0;
+    private int doneCount = 0;
 
     private Mutex(Node self) {
         this.self = self;
@@ -39,6 +40,15 @@ public class Mutex {
 
     public static synchronized void init(Node self) {
         if (_instance == null) _instance = new Mutex(self);
+    }
+
+    public void kill() {
+        this.server.kill();
+        this.client.kill();
+
+        _instance = null;
+        this.server = null;
+        this.client = null;
     }
 
     public static synchronized Mutex getInstance() {
@@ -72,6 +82,14 @@ public class Mutex {
 
     public synchronized void resetReplies() {
         replyCount = 0;
+    }
+
+    public synchronized void addDone() {
+        doneCount++;
+        if (doneCount == Node.NUM_NODES) {
+            client.broadcast(new Message(Type.KILL, self.id, self.incrementClock()));
+            kill();
+        }
     }
 
     public synchronized void onReceiveRequest(Request req) {
@@ -116,6 +134,10 @@ public class Mutex {
         
         // Broadcast release
         client.broadcast(new Message(Type.RELEASE, self.id, self.incrementClock()));
+    }
+
+    public void done() {
+        client.send(new Message(Type.DONE, self.id, Node.startingNodeId, self.incrementClock()));
     }
 
     private void idle(long millis) {

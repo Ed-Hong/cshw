@@ -44,6 +44,14 @@ public class Message {
             case "RELEASE":
                 this.type = Type.RELEASE;
                 break;
+
+            case "DONE":
+                this.type = Type.DONE;
+                break;
+            
+            case "KILL":
+                this.type = Type.KILL;
+                break;
         }
 
         this.sourceId       = Integer.parseInt(params[2]);
@@ -69,6 +77,14 @@ public class Message {
             case RELEASE:
                 encoding += "RELEASE ";
                 break;
+
+            case DONE:
+                encoding += "DONE ";
+                break;
+            
+            case KILL:
+                encoding += "KILL ";
+                break;
         }
 
         // Encode Source and Destination IDs
@@ -82,5 +98,5 @@ public class Message {
 }
 
 enum Type {
-    REQUEST, REPLY, RELEASE
+    REQUEST, REPLY, RELEASE, DONE, KILL
 }

@@ -15,24 +15,35 @@ public class ServerThread extends Thread {
 	final Node self;
 	final Socket sock; 
 	final DataInputStream in; 
-    final DataOutputStream out; 
+	final DataOutputStream out; 
+	private volatile boolean done;
         
     public ServerThread (Socket s, DataInputStream is, DataOutputStream os, Node n) { 
         this.sock = s; 
         this.in = is; 
 		this.out = os; 
 		this.self = n;
-    } 
+	} 
+	
+	public synchronized boolean alive() {
+		return !done;
+	}
+
+	public synchronized void kill() {
+		done = true;
+	}
   
     @Override
     public void run() { 
-		while(true) {
+		done = false;
+		while(alive()) {
 			try {
 				if (in.available() > 0) {
 
 					// OnReceive
 					String message = in.readUTF();
-					System.out.println(self.id + " < " + message + "	");
+					//System.out.println(self.id + " < " + message + "	");
+					System.out.print(".");
 					Message msg = new Message(message);
 
 					// Update clock with message timestamp
@@ -50,6 +61,14 @@ public class ServerThread extends Thread {
 						case RELEASE:
 							Mutex.getInstance().onReceiveRelease(msg.sourceId);
 							break;
+
+						case DONE:
+							Mutex.getInstance().onReceiveRelease(msg.sourceId);
+							break;
+
+						case KILL:
+							Mutex.getInstance().kill();
+							break;
 					}
 
 				} else {
@@ -58,6 +77,15 @@ public class ServerThread extends Thread {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+
+		// Cleanup
+		try {
+			sock.close();
+			in.close();
+			out.close();	
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	

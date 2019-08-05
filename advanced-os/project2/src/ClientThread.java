@@ -17,6 +17,7 @@ public class ClientThread extends Thread {
 	final DataInputStream in; 
 	final DataOutputStream out; 
 	private final Queue<String> _messages = new LinkedList<>();
+	private volatile boolean done;
 
 	public ClientThread (Socket s, DataInputStream is, DataOutputStream os, Node n) { 
         this.sock = s; 
@@ -37,15 +38,25 @@ public class ClientThread extends Thread {
 		return _messages.poll();
 	}
 
+	public synchronized boolean alive() {
+		return !done;
+	}
+
+	public synchronized void kill() {
+		done = true;
+	}
+
     @Override
     public void run() {
-		while(true) {
+		done = false;
+		while(alive()) {
 			if (hasMessage()) {
                 String msg = getNextMessage();
 				try {
                     out.writeUTF(msg);
 				} catch (IOException i) {
 					i.printStackTrace();
+					break;
 				}
 			} else {
 				idle(50);
@@ -53,9 +64,13 @@ public class ClientThread extends Thread {
 		}
 
 		// Cleanup
-		// sock.close();
-		// in.close();
-		// out.close();
+		try {
+			sock.close();
+			in.close();
+			out.close();	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void idle(long millis) {
@@ -65,11 +80,4 @@ public class ClientThread extends Thread {
 			e.printStackTrace();
 		}
 	}
-
-	// protected void finalize() throws Throwable {
-	// 	//cleanup
-	// 	sock.close();
-	// 	in.close();
-	// 	out.close();
-	// }
 }

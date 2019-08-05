@@ -33,6 +33,7 @@ public class Node {
 
 	// Index of All Nodes
 	public static HashMap<Integer, Node> nodes = new HashMap<>();
+	public static int startingNodeId = Integer.MAX_VALUE;
 
 	// The Node on the current host
 	static Node self;
@@ -41,7 +42,7 @@ public class Node {
 	public int id;
 	public String hostName;
 	public int listenPort;
-	public int clock;
+	private int clock;
 
 	public Node(int id, String hostName, int listenPort) {
 		this.id = id;
@@ -109,6 +110,8 @@ public class Node {
 
 		// Begin application
 		runApplication();
+
+		return;
 	}
 
 	private static void init(String currentHostname) {
@@ -175,6 +178,11 @@ public class Node {
 						Node newNode = new Node(nodeId, hostName, listenPort);
 						nodes.put(nodeId, newNode);
 
+						// Starting node is the node with lowest id
+						if (nodeId < startingNodeId) {
+							startingNodeId = nodeId;
+						}
+
 						// Reset for next node definition
 						nodeId = null;
 						hostName = null;
@@ -227,43 +235,37 @@ public class Node {
 	}
 
 	private static void runApplication() {
-		// wait a random amount of time, d, then call Mutex.enter()
-		// upon receiving permission from Mutex, wait for cs execution time, c
-		// once finished, call Mutex.exit()
-		// do this for NUM_REQUESTS
-
 		long waitTime;
+		for(int i = 0; i < NUM_REQUESTS; i++) {
+			Mutex.getInstance().enter();	// Blocking until request granted
+			logStart();
 
-//		if (self.id == 0) {
+			// Executing critical section
+			self.incrementClock();	// Internal Event
+			idle(getRandomWaitTime(CS_EXECUTION_TIME));
 
+			Mutex.getInstance().exit();		// Exit critical section and release
+			logEnd();
 
-			for(int i = 0; i < NUM_REQUESTS; i++) {
-				Mutex.getInstance().enter();	// Blocking until request granted
-				logStart();
+			// Wait a random amount of time before requesting again
+			idle(getRandomWaitTime(INTER_REQUEST_DELAY));
+		}
 
-				// Executing critical section
-//				System.out.print(self.id + ": request " + i + " - cs_enter at " + System.currentTimeMillis()+ "    ");
-				self.incrementClock();	// Internal Event
-				idle(getRandomWaitTime(CS_EXECUTION_TIME));
-//				idle(400);
-
-				Mutex.getInstance().exit();		// Exit critical section and release
-				logEnd();
-
-				// Wait a random amount of time before requesting again
-//				System.out.print(" cs_exit at  " + System.currentTimeMillis()+ "\n");
-				idle(getRandomWaitTime(INTER_REQUEST_DELAY));
-//				idle(400);
-			}
-
-			System.out.println(self.id + ": DONE");
-			testMutex();
-
-			
-//		}
+		done();
 	}
 
-	//todo make lambda be a float?
+	private static void done() {
+		System.out.println("\n");
+		System.out.println(self.id + ": DONE");
+		testMutex();
+
+		if (self.id == startingNodeId) {
+			Mutex.getInstance().addDone();
+		} else {
+			Mutex.getInstance().done();
+		}
+	}
+
 	private static long getRandomWaitTime(int lambda) {
 		Random rng = new Random();
 		return (long) ((Math.log(1 - rng.nextDouble()) / (-lambda)) * 1000);

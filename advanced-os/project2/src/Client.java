@@ -14,6 +14,7 @@ public class Client extends Thread {
 	final Node self;
 	final HashMap<Integer, ClientThread> threads = new HashMap<>();
 	private boolean _done = false;
+	private volatile boolean alive;
 
 	public Client(Node n) {
 		this.self = n;
@@ -27,19 +28,23 @@ public class Client extends Thread {
 		_done = true;
 	}
 
+	public synchronized boolean alive() {
+		return alive;
+	}
+
+	public synchronized void kill() {
+		alive = false;
+	}
+
     @Override
     public void run() {
 
         setupChannels();
 
-		// Once all channels established, begin MAP 
-		// while(true) {
-		// 		
-		// 	break;
-		// }
+		alive = true;
+		while(alive()) { }
 
-		// Cleanup
-		//threads.clear();
+		cleanup();
     }
 	
 	public void send(Message msg) {
@@ -94,6 +99,12 @@ public class Client extends Thread {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private void cleanup() {
+		for(Integer destId : threads.keySet()) {
+			threads.get(destId).kill();
 		}
 	}
 	
