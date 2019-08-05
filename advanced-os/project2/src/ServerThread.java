@@ -63,7 +63,7 @@ public class ServerThread extends Thread {
 							break;
 
 						case DONE:
-							Mutex.getInstance().onReceiveRelease(msg.sourceId);
+							Mutex.getInstance().addDone();
 							break;
 
 						case KILL:
