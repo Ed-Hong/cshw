@@ -86,10 +86,6 @@ public class Mutex {
     public void onReceiveReply(int sourceId) {
         //System.out.println(self.id + "got REPLY from " + sourceId);
         addReply();
-
-        if(peekNextRequest().sourceId == self.id && getReplies() == Node.NUM_NODES - 1) {
-            System.out.println("READY TO CRITICALLY EXECUTE!");
-        }
     }
 
     public void enter() {
@@ -100,10 +96,20 @@ public class Mutex {
 
         // Broadcast request message to all processes
         client.broadcast(req);
+
+        // Block until request is granted
+        while(true) {
+            if(peekNextRequest().sourceId == self.id && getReplies() == Node.NUM_NODES - 1) {
+                System.out.println("READY TO CRITICALLY EXECUTE!");
+                break;
+            }
+        }
     }
 
     public void exit() {
-        System.out.println("* Exiting critical section.");
+        System.out.println("* Exiting critical section");
+        getNextRequest();
+        //todo broadcast release
     }
 
     private void idle(long millis) {

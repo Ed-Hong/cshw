@@ -225,6 +225,14 @@ public class Node {
 		}
 	}
 
+	private static void idle(long millis) {
+		try {
+			Thread.sleep(millis);	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private static void runApplication() {
 		// wait a random amount of time, d, then call Mutex.enter()
 		// upon receiving permission from Mutex, wait for cs execution time, c
@@ -234,6 +242,11 @@ public class Node {
 		// keep it simple - for now assume node 0 makes a single request
 		if(self.id == 0) {
 			Mutex.getInstance().enter();
+
+			System.out.println("WOW I'M DOING STUFF!");
+			idle(1000);
+
+			Mutex.getInstance().exit();
 		}
 	}
 }
