@@ -47,6 +47,13 @@ public class Client extends Thread {
 		threads.get(msg.destinationId).addMessage(msg.encode());
 	}
 
+	public void broadcast(Message msg) {
+		for(Integer destId : threads.keySet()) {
+			msg.destinationId = destId;
+			send(msg);
+		}
+	}
+
 	public void broadcast(Request req) {
 		for(Integer destId : threads.keySet()) {
 			send(new Message(Type.REQUEST, req.sourceId, destId, req.timestamp));

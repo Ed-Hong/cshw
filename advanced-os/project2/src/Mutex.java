@@ -108,8 +108,12 @@ public class Mutex {
 
     public void exit() {
         System.out.println("* Exiting critical section");
+        
+        // Remove request from the queue
         getNextRequest();
-        //todo broadcast release
+
+        // Broadcast release
+        client.broadcast(new Message(Type.RELEASE, self.id, self.clock));
     }
 
     private void idle(long millis) {

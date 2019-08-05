@@ -15,6 +15,13 @@ public class Message {
     public int destinationId;
     public int timestamp;
 
+
+    public Message(Type type, int sourceId, int timestamp) {
+        this.type = type;
+        this.sourceId = sourceId;
+        this.timestamp = timestamp;
+    }
+
     public Message(Type type, int sourceId, int destId, int timestamp) {
         this.type = type;
         this.sourceId = sourceId;
