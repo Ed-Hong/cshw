@@ -2,6 +2,8 @@
   
 clear
 
+cd ~/aos-pgms/project2/
+
 # Run
 cd bin
 java Node config.txt
