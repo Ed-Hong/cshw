@@ -1,5 +1,8 @@
 #!/bin/bash
 
-killall -9 java
+for i in dc02 dc03 dc06
+do
+    ( ssh $(whoami)@"$i".utdallas.edu killall -9 java )
+done
 
 echo "Done"
