@@ -94,14 +94,6 @@ public class Node {
 			return;
 		}
 
-		//DEBUG - todo remove this
-		try {
-			hostname = args[1];
-		} catch (Exception e) {
-			System.out.println("DEBUG: Please input a mock hostname for development purposes.");
-			return;
-		}
-
 		// Initialize this node with this machine's hostname
 		init(hostname);
 		

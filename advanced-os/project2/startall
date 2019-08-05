@@ -10,5 +10,5 @@ echo "Building Project..."
 # Spawn processes
 for i in dc02 dc03 dc06
 do
-    ( ./scripts/run "$i" & )
+    ( ssh $(whoami)@"$i".utdallas.edu ./run )
 done

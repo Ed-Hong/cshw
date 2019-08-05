@@ -4,4 +4,4 @@ clear
 
 # Run
 cd bin
-java Node config.txt $1
+java Node config.txt

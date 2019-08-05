@@ -87,7 +87,7 @@ public class Client extends Thread {
 		while(true) {
 			try {
 				// Connect to neighbors
-				Socket sock = new Socket("localhost", neighbor.listenPort);		//todo set hostname
+				Socket sock = new Socket(self.hostname, neighbor.listenPort);
 				DataInputStream in = new DataInputStream(sock.getInputStream());	
 				DataOutputStream out = new DataOutputStream(sock.getOutputStream());
 				
