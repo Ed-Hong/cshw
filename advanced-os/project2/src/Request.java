@@ -1,3 +1,5 @@
+import java.util.Comparator; 
+
 /*
  * Author: Edward Hong
  * Class:  CS 6378.0U1
@@ -13,3 +15,13 @@ public class Request {
         this.timestamp = timestamp;
     }
 }
+
+class RequestComparator implements Comparator<Request>{ 
+    public int compare(Request r1, Request r2) { 
+        if (r1.timestamp < r2.timestamp)
+            return -1;
+        else if (r1.timestamp > r2.timestamp) 
+            return 1;
+        return 0; 
+    } 
+} 

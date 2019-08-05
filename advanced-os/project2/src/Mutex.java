@@ -21,7 +21,7 @@ public class Mutex {
 
     private Mutex(Node self) {
         this.self = self;
-        this.requests = new PriorityQueue<>(); 
+        this.requests = new PriorityQueue<>(new RequestComparator()); 
         this.client = new Client(self);
         this.server = new Server(self);
         
@@ -47,7 +47,7 @@ public class Mutex {
 
     public synchronized void addRequest(Request request) {
         requests.add(request);
-        //System.out.println(self.id + ": added " + request);
+        //System.out.println(self.id + ": added request from " + request.sourceId);
     }
 
     public synchronized void removeRequest(Request request) {
@@ -56,6 +56,7 @@ public class Mutex {
 
     public void enter() {
         Request req = new Request(self.id, self.clock);
+
         // Insert the request into priority queue
         addRequest(req);
 
