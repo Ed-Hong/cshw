@@ -49,6 +49,7 @@ public class Client extends Thread {
 	
 	public void send(Message msg) {
 		threads.get(msg.destinationId).addMessage(msg.encode());
+		self.incrementSentMessageCount();
 	}
 
 	public void broadcast(Message msg) {

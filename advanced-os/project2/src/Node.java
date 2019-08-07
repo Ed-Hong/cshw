@@ -44,11 +44,15 @@ public class Node {
 	public int listenPort;
 	private int clock;
 
+	// Running statistics
+	private int sentMessageCount;
+
 	public Node(int id, String hostName, int listenPort) {
 		this.id = id;
 		this.hostName = hostName;
 		this.listenPort = listenPort;
 		this.clock = 0;
+		this.sentMessageCount = 0;
 	}
 
 	public synchronized int incrementClock() {
@@ -63,6 +67,15 @@ public class Node {
 	public synchronized int setClock(int clk) {
 		clock = clk;
 		return clock;
+	}
+
+	public synchronized int incrementSentMessageCount() {
+		sentMessageCount++;
+		return sentMessageCount;
+	}
+
+	public synchronized int getSentMessageCount() {
+		return sentMessageCount;
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -257,7 +270,9 @@ public class Node {
 	private static void done() {
 		System.out.println("\n");
 		System.out.println(self.id + ": DONE");
+		
 		testMutex();
+		logStatistics();
 
 		if (self.id == startingNodeId) {
 			Mutex.getInstance().addDone();
@@ -280,7 +295,17 @@ public class Node {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
 
+	private static void logTo(String fileName, String log) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true)); 
+			writer.newLine();
+			writer.write(log);
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void logStart() {
@@ -340,6 +365,10 @@ public class Node {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
 
+	private static void logStatistics() {
+		String fileName = "stats.out";
+		logTo(fileName, self.id + ": sent " + self.getSentMessageCount() + " messages");
 	}
 }
