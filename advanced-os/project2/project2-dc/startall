@@ -4,8 +4,9 @@
 echo "Building Project..."
 ./scripts/build
 
-# Truncate output file
+# Truncate output files
 > bin/output.out
+> bin/stats.out
 
 # Spawn processes
 for i in dc02 dc03 dc06
