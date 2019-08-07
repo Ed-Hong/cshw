@@ -1,0 +1,10 @@
+#!/bin/bash
+  
+# Build
+cd src
+javac -g Stats.java
+mv Stats.class ../bin/
+
+# Run
+cd ../bin/
+java Stats
