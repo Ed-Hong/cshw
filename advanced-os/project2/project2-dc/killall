@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for i in dc02 dc03 dc06
+do
+    ( ssh $(whoami)@"$i".utdallas.edu killall -u $(whoami) )
+done
+
+echo "Done"

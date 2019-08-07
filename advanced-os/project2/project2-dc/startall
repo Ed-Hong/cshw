@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Build
+echo "Building Project..."
+./scripts/build
+
+# Truncate output file
+> bin/output.out
+
+# Spawn processes
+for i in dc02 dc03 dc06
+do
+    ( ssh $(whoami)@"$i".utdallas.edu 'nohup ./aos-pgms/project2/scripts/run >/dev/null 2>/dev/null </dev/null &' )
+    #( ssh $(whoami)@"$i".utdallas.edu -t 'screen -D -RR -S this ./aos-pgms/project2/scripts/run' )
+done

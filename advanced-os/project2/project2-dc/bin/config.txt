@@ -1,0 +1,5 @@
+3 20 10 3      # num nodes, avg d, avg c, num requests
+
+0 dc02.utdallas.edu 34197    # nodeID hostName listenPort
+1 dc03.utdallas.edu 34196
+2 dc06.utdallas.edu 34195
