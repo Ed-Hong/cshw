@@ -250,9 +250,11 @@ public class Node {
 	private static void runApplication() {
 		long waitTime;
 		for(int i = 0; i < NUM_REQUESTS; i++) {
+			long startTime = System.currentTimeMillis();
 			Mutex.getInstance().enter();	// Blocking until request granted
-			logStart();
-
+			long endTime = System.currentTimeMillis();
+			long responseTime = endTime - startTime;
+			logStat(self.id + ": response time = " + responseTime);			
 			// Executing critical section
 			self.incrementClock();	// Internal Event
 			idle(getRandomWaitTime(CS_EXECUTION_TIME));
@@ -272,7 +274,7 @@ public class Node {
 		System.out.println(self.id + ": DONE");
 		
 		testMutex();
-		logStat(self.id + ": sent " + self.getSentMessageCount() + " messages");
+		logStat(self.id + ": messages sent = " + self.getSentMessageCount());
 
 		if (self.id == startingNodeId) {
 			Mutex.getInstance().addDone();
@@ -333,11 +335,11 @@ public class Node {
 
 				if(line.length() == 0) {
 					checkNext = true;
-					break;
+					continue;
 				}
-
+				
 				int node = Integer.parseInt(line.split(" ")[0]);
-				long timestamp = Long.parseLong(line.split(" ")[3]);
+				long timestamp = Long.parseLong(line.split(" ")[4]);
 
 				if (checkNext) {
 					prevNode = node;
@@ -358,9 +360,9 @@ public class Node {
 			}
 	
 			if(success) {
-				System.out.println(self.id + ": MUTEX SUCCESS");
+				System.out.println("MUTEX SUCCESS");
 			} else {
-				System.out.println(self.id + ": MUTEX FAIL");
+				System.out.println("MUTEX FAIL");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

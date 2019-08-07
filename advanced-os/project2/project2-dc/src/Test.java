@@ -58,8 +58,4 @@ public class Test {
 		}
     }
 
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/master
