@@ -11,3 +11,8 @@ the program. The dc version's killall script also ssh's into each of the dcXX ho
 
 The program writes two output files: output.out and stats.out.
 output.out is used to test for Mutual Exclusion, while stats.out is used to report statistics such as message complexity, response time, etc.
+The current version of the program however only tracks two stats: message complexity (counted in number of messages sent) and response time (milliseconds).
+
+
+The statavg script can be used to compute the average response time and message complexity.
+The test script can be used to test for Mutual Exclusion.
