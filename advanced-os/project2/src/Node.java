@@ -289,7 +289,7 @@ public class Node {
 	}
 
 	private static void logEnd() {
-		String log = self.id + " : exits at  " + System.currentTimeMillis() + "\n";
+		String log = self.id + " : exits at " + System.currentTimeMillis() + "\n";
 		log(log);
 	}
 

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Build
+cd src
+javac -g Test.java
+mv Test.class ../bin/
+
+# Run
+cd ../bin/
+java Test
