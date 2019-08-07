@@ -272,7 +272,7 @@ public class Node {
 		System.out.println(self.id + ": DONE");
 		
 		testMutex();
-		logStatistics();
+		logStat(self.id + ": sent " + self.getSentMessageCount() + " messages");
 
 		if (self.id == startingNodeId) {
 			Mutex.getInstance().addDone();
@@ -297,9 +297,9 @@ public class Node {
 		}
 	}
 
-	private static void logTo(String fileName, String log) {
+	private static void logStat(String log) {
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true)); 
+			BufferedWriter writer = new BufferedWriter(new FileWriter("stats.out", true)); 
 			writer.newLine();
 			writer.write(log);
 			writer.close();
@@ -365,10 +365,5 @@ public class Node {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private static void logStatistics() {
-		String fileName = "stats.out";
-		logTo(fileName, self.id + ": sent " + self.getSentMessageCount() + " messages");
 	}
 }
