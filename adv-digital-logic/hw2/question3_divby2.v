@@ -5,19 +5,21 @@ module question3_divby2 (
     );
 
     reg qnot; 
+    wire _q;
 
     question3_dff dff(
         .clk(clk),
         .rst(rst),
         .d(qnot),
-        .q(f)
+        .q(_q)
     );
 
     always @(negedge clk or posedge rst) begin
         if (rst) 
             qnot <= 0;
         else
-            qnot <= !q;
+            qnot <= !_q;
+        f <= _q;
     end
  
 endmodule

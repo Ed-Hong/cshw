@@ -21,20 +21,23 @@ architecture divby2_behav of question3_divby2 is
         );
     end component;
     signal qnot: std_logic;
+    signal _q: std_logic;
 begin
     dff: question3_dff port map (
         clk => clk,
         rst => rst,
         d => qnot,
-        q => f
+        q => _q
     );
 
     process(clk,rst) begin
         if(rst = '1') then
             qnot <= '0';
         elsif(falling_edge(clk)) then
-            qnot <= not q;
+            qnot <= not _q;
         end if; 
+
+        f <= _q;
     end process;
     
 end divby2_behav;
