@@ -7,7 +7,7 @@ entity question2_counter8b is
     port (
         c       :out std_logic_vector (7 downto 0); -- 8bit vector which acts as counter output
         clk     :in  std_logic;
-        rst     :in  std_logic;
+        rst     :in  std_logic
     );
 end entity;
 

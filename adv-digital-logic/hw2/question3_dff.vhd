@@ -8,7 +8,7 @@ entity question3_dff is
         q   :out std_logic;
         d   :in  std_logic;
         clk :in  std_logic;
-        rst :in  std_logic;
+        rst :in  std_logic
    );
 end question3_dff;
 

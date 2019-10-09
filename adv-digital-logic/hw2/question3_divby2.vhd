@@ -7,7 +7,7 @@ entity question3_divby2 is
     port (
         f   :out std_logic;
         clk :in  std_logic;
-        rst :in  std_logic;
+        rst :in  std_logic
    );
 end question3_divby2;
 
@@ -17,7 +17,7 @@ architecture divby2_behav of question3_divby2 is
             q   :out std_logic;
             d   :in  std_logic;
             clk :in  std_logic;
-            rst :in  std_logic;
+            rst :in  std_logic
         );
     end question3_dff;
     signal qnot: std_logic;
