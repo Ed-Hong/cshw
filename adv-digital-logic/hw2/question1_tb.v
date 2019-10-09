@@ -1,20 +1,14 @@
-////////////////////////////////////////////////
-// Note that this generic testbench function 
-// omits the code segments which would 
-// instantiate the Unit Under Test (UUT)
-////////////////////////////////////////////////
-
 module question1_tb;
 
-    // --- This section omitted -----------
-
     // Inputs
+    reg clk;
 
     // Outputs
 
-    // Instantiate Unit Under Test (UUT)
-    
-    // --- End section -------------------
+    // dummy test module
+    test uut (
+      .clk(clk)
+    );
 
 
     // --- Begin Test Function ------------
@@ -24,14 +18,22 @@ module question1_tb;
 
     // n-bit register representing current input state
     reg [n:0] state;
-
+    
     initial begin
         // init input state
         state = 0;
+        clk = 0;
     end
 
-   // incrementally check all states
-   always
-      #1 state = state + 1;
+    // clock generation
+    always begin
+        #10 clk = !clk;
+    end
+
+    // incrementally check all states
+    always (@posedge clk) begin
+        state = state + 1;
+        #10;
+    end 
 
 endmodule
