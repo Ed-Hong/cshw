@@ -19,6 +19,6 @@ begin
             q <= '0';
         elsif(falling_edge(clk)) then
             q <= d;
-        end if;     
-    end process; 
+        end if;
+    end process;
 end dff_behav;
