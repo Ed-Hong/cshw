@@ -19,7 +19,7 @@ architecture divby2_behav of question3_divby2 is
             clk :in  std_logic;
             rst :in  std_logic
         );
-    end question3_dff;
+    end component;
     signal qnot: std_logic;
 begin
     dff: question3_dff port map (
