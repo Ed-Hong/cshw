@@ -1,4 +1,4 @@
-module question2_counter8b(
+module question2_counter8b (
     input clk,
     input rst,
     output reg [7:0] count
