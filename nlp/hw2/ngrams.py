@@ -18,14 +18,22 @@ unigram = {}
 bigramCounts = {}
 bigram = {}
 
+histogram = {} # <k,v>: the number of ngrams, v, which occur k times
+
 def count(word):
     if word not in counts.keys():
         counts[word] = 1
     else:
         counts[word] += 1
 
+    if smoothing == "gt":
+        if counts[word] not in histogram.keys():
+            histogram[counts[word]] = 1
+        else:
+            histogram[counts[word]] += 1
+
 def buildCounts():
-    lines = open("test.txt", "r")
+    lines = open("corpus.txt", "r")
     for line in lines:
         word_tags = line.lower().split()
         for word_tag in word_tags:
@@ -41,7 +49,7 @@ def buildUnigram():
         unigram[word] = count/tokenCount
 
 def buildBigramCounts():
-    # init bigramCounts with all zeroes
+    # init bigramCounts with all zeroes (or ones if +1 smoothing)
     for word in counts.keys():
         bigramCounts[word] = {}
         for w in counts.keys():
@@ -50,8 +58,9 @@ def buildBigramCounts():
             else:
                 bigramCounts[word][w] = 0
 
+    # count bigrams
     prev = None
-    lines = open("test.txt", "r")
+    lines = open("corpus.txt", "r")
     for line in lines:
         word_tags = line.lower().split()
         for word_tag in word_tags:
@@ -63,6 +72,15 @@ def buildBigramCounts():
                 bigramCounts[prev][word] += 1
                 prev = word
 
+    # Good-Touring discounting smoothed counts
+    if smoothing == "gt":
+        for prev in bigramCounts:
+            for word in bigramCounts[prev]:
+                c = bigramCounts[prev][word]
+                if c > 0:
+                    cstar = (c+1) * (histogram[c+1] / histogram[c])
+                    bigramCounts[prev][word] = cstar
+
 def buildBigram():
     buildBigramCounts()
     bigram.update(bigramCounts)
@@ -70,6 +88,12 @@ def buildBigram():
         for word in bigramCounts[prev]:
             if smoothing == "+1":
                 bigram[prev][word] = bigramCounts[prev][word] / (counts[prev] + len(counts))
+            elif smoothing == "gt":
+                c = bigramCounts[prev][word]
+                if c == 0:
+                    bigram[prev][word] = histogram[1] / tokenCount
+                else:
+                    bigram[prev][word] = bigramCounts[prev][word] / tokenCount
             else:
                 bigram[prev][word] = bigramCounts[prev][word] / counts[prev]
 
