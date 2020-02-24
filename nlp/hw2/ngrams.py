@@ -59,10 +59,10 @@ def buildBigramCounts():
                 bigramCounts[word][w] = 0
 
     # count bigrams
-    prev = None
     lines = open("corpus.txt", "r")
     for line in lines:
         word_tags = line.lower().split()
+        prev = None
         for word_tag in word_tags:
             pair = word_tag.split('_')
             word = pair[0]
