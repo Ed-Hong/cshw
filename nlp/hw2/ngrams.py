@@ -15,19 +15,19 @@ unigram = {}
 def buildCounts():
     lines = open("test.txt", "r")
     for line in lines:
-        word_tags = line.split()
+        word_tags = line.lower().split()
         for word_tag in word_tags:
             pair = word_tag.split('_')
             word = pair[0]
-            count(word)
+            count(word, counts)
             global tokenCount
             tokenCount += 1
 
-def count(word):
-    if word not in counts.keys():
-        counts[word] = 1
+def count(word, d):
+    if word not in d.keys():
+        d[word] = 1
     else:
-        counts[word] += 1
+        d[word] += 1
 
 def buildUnigram():
     uniqueWords = len(counts)
@@ -63,12 +63,17 @@ def main(argv):
 
     buildUnigram()
     print(unigram)
+    writeToFile("unigram.txt", unigram)
 
 def helpmsg():
     print('usage:   -n {1|2} -s {no|+1|gt}')
     print('-n   1 for unigram, 2 for bigram')
     print('-s  +1 for +1 smoothing, gt for Good-Touring, or no for no smoothing')
 
+def writeToFile(filename, d):
+    f = open(filename, "a")
+    f.write(str(d))
+    f.close()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
