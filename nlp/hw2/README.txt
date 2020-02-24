@@ -56,5 +56,8 @@ To use the output file to calculate probabilities of input sentences:
 Given the input sentence:
     The standard Turbo engine is hard to work
 
-The following grep command may be useful:
-grep -E '(\bthe standard\b) | (\bstandard turbo\b) | (\bturbo engine\b) | (\bengine is\b) | (\bis hard\b) | (\bhard to\b) | (\bto work\b)' bigram_no_smoothing.txt
+The following grep commands may be useful:
+
+grep -E '(^the )|(^standard )|(^turbo )|(^engine )|(^is )|(^hard )|(^to )|(^work )' unigram.txt
+
+grep -E '(^the standard )|(^standard turbo )|(^turbo engine )|(^engine is )|(^is hard )|(^hard to )|(^to work )' bigram_no_smoothing.txt
