@@ -1,0 +1,13 @@
+Brainpower_NNP ,_, not_RB physical_JJ plant_NN ,_, is_VBZ now_RB a_DT firm_NN 's_POS chief_JJ asset_NN ._. 
+Brainpower_NNP ,_, not_RB physical_JJ plant_NN ,_, is_VBZ now_RB a_DT firm_NN 's_POS chief_JJ asset_NN ._. 
+Brainpower_NNP ,_, not_RB physical_JJ plant_NN ,_, is_VBZ now_RB a_DT firm_NN 's_POS chief_JJ asset_NN ._. 
+Hundreds_NNS of_IN sewers_NNS at_IN Arrow_NNP Shirt_NNP Co._NNP ,_, who_WP were_VBD making_VBG $_$ 5_CD to_TO $_$ 7.50_CD an_DT hour_NN ,_, were_VBD dismissed_VBN when_WRB the_DT plant_NN closed_VBD in_IN October_NNP and_CC the_DT jobs_NNS moved_VBD to_TO Latin_NNP America_NNP ._. 
+That_DT may_MD be_VB cold_JJ comfort_NN for_IN Belle_NNP McFall_NNP and_CC 350_CD other_JJ workers_NNS who_WP in_IN October_NNP lost_VBD their_PRP$ jobs_NNS at_IN the_DT Cedartown_NNP plant_NN owned_VBN by_IN Arrow_NNP Shirt_NNP ,_, a_DT unit_NN of_IN Bidermann_NNP International_NNP ._. 
+In_IN Tijuana_NNP ,_, across_IN the_DT border_NN from_IN San_NNP Diego_NNP ,_, the_DT wastewater_NN treatment_NN plant_NN is_VBZ large_JJ enough_RB to_TO treat_VB less_JJR than_IN half_PDT the_DT Mexican_JJ city_NN 's_POS waste_NN ,_, the_DT report_NN said_VBD ._. 
+Fire_NNP insures_VBZ biological_JJ diversity_NN ,_, for_IN instance_NN ,_, by_IN keeping_VBG a_DT handful_NN of_IN aggressive_JJ plant_NN species_NNS from_IN crowding_VBG out_RP scores_NNS of_IN less_RBR aggressive_JJ ones_NNS ._. 
+Pruett_NNP has_VBZ worked_VBN as_IN a_DT church_NN custodian_NN and_CC in_IN a_DT cinder-block_JJ plant_NN in_IN jobs_NNS that_WDT were_VBD better_JJR than_IN the_DT alternative_NN ._. 
+``_`` I_PRP 'm_VBP already_RB telling_VBG my_PRP$ kids_NNS to_TO go_VB out_RP to_TO a_DT city_NN and_CC start_VB a_DT new_JJ business_NN ,_, ''_'' said_VBD Mitsuhiro_NNP Onishi_NNP ,_, who_WP runs_VBZ a_DT flower_NN and_CC plant_NN distribution_NN business_NN ._. 
+In_IN Tijuana_NNP ,_, across_IN the_DT border_NN from_IN San_NNP Diego_NNP ,_, the_DT wastewater_NN treatment_NN plant_NN is_VBZ large_JJ enough_RB to_TO treat_VB less_JJR than_IN half_PDT the_DT Mexican_JJ city_NN 's_POS waste_NN ,_, the_DT report_NN said_VBD ._. 
+Brainpower_NNP ,_, not_RB physical_JJ plant_NN ,_, is_VBZ now_RB a_DT firm_NN 's_POS chief_JJ asset_NN ._. 
+Brainpower_NNP ,_, not_RB physical_JJ plant_NN ,_, is_VBZ now_RB a_DT firm_NN 's_POS chief_JJ asset_NN ._. 
+Brainpower_NNP ,_, not_RB physical_JJ plant_NN ,_, is_VBZ now_RB a_DT firm_NN 's_POS chief_JJ asset_NN ._. 
